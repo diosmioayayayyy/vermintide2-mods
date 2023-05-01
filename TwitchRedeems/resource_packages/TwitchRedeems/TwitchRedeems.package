@@ -1,0 +1,11 @@
+mod = [
+	"TwitchRedeems"
+]
+
+package = [
+	"resource_packages/TwitchRedeems/TwitchRedeems"
+]
+
+lua = [
+	"scripts/mods/TwitchRedeems/*"
+]
