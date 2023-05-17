@@ -315,6 +315,13 @@ TwitchRedeemTemplates.twitch_redeem_monster = {
                 elseif string.find(str, "wn") then
                     breed = Breeds.chaos_spawn
 
+                elseif string.find(str, "storm") then
+                    breed = Breeds.skaven_stormfiend
+                elseif string.find(str, "fiend") then
+                    breed = Breeds.skaven_stormfiend
+                elseif string.find(str, "friend") then
+                    breed = Breeds.skaven_stormfiend
+
                 elseif string.find(str, "min") then
                     breed = Breeds.beastmen_minotaur
                 elseif string.find(str, "cow") then
@@ -327,7 +334,7 @@ TwitchRedeemTemplates.twitch_redeem_monster = {
             end
 
             optional_data.max_health_modifier = 0.85
- 
+
             Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
             play_sound("enemy_grudge_cursed_enter")
         end
@@ -424,5 +431,5 @@ table.append(TwitchRedeemTemplates, TwitchRedeemTemplatesFromConfig)
 
 TwitchRedeemTemplatesLookup = create_template_lookup(TwitchRedeemTemplates)
 
-mod:dump(TwitchRedeemTemplates, "TwitchRedeemTemplates", 5)
-mod:dump(TwitchRedeemTemplatesLookup, "TwitchRedeemTemplatesLookup", 5)
+--mod:dump(TwitchRedeemTemplates, "TwitchRedeemTemplates", 5)
+--mod:dump(TwitchRedeemTemplatesLookup, "TwitchRedeemTemplatesLookup", 5)
