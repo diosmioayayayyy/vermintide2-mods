@@ -1,6 +1,23 @@
 local mod = get_mod("TwitchRedeems")
 
-TwitchRedeemTemplates = TwitchRedeemTemplates or {}
+TwitchRedeemTemplates = {}
+
+local monster_breads = {
+    Breeds.skaven_rat_ogre,
+    Breeds.skaven_stormfiend,
+    Breeds.chaos_spawn,
+    Breeds.chaos_troll,
+    Breeds.beastmen_minotaur,
+}
+
+local special_breads = {
+    Breeds.skaven_pack_master,
+    Breeds.skaven_gutter_runner,
+    Breeds.skaven_ratling_gunner,
+    Breeds.skaven_warpfire_thrower,
+    Breeds.skaven_poison_wind_globadier,
+    -- TODO missing chaos specials
+}
 
 local function get_random_monster_breed()
     local monster_breeds = {
@@ -50,207 +67,222 @@ local play_sound = function (stinger_name, pos)
 end
 
 local function default_spawn_function(spawn_list, optional_data)
-	local side = Managers.state.side:get_side_from_name("dark_pact")
-	local side_id = side.side_id
-	local spawn_list = {}
+    for k, spawn in pairs(spawn_list) do
+        local breed = Breeds[spawn.breed]
+
+        optional_data.max_health_modifier = spawn.max_health_modifier
+
+        if spawn.spawn == "hidden" then
+            spawn_hidden(breed, spawn.amount, optional_data)
+        elseif spawn.spawn == "horde" then
+            local spawns = {
+                { breed = spawn.breed, amount = spawn.amount },
+            }
+            spawn_custom_horde(spawns, optional_data)
+        elseif spawn.spawn == "one" then
+            for i = 1, spawn.amount, 1 do
+                Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
+            end
+        end
+    end
 end
 
 -- Specials
 
-TwitchRedeemTemplates.twitch_redeem_hook_rat = {
-    key = "hook rat",
-    text = "hook rat",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            spawn_hidden(Breeds.skaven_pack_master, 1, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_hook_rat = {
+--     key = "hook rat",
+--     text = "hook rat",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             spawn_hidden(Breeds.skaven_pack_master, 1, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_gutter_runner = {
-    key = "gutter runner",
-    text = "gutter runner",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            spawn_hidden(Breeds.skaven_gutter_runner, 1, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_gutter_runner = {
+--     key = "gutter runner",
+--     text = "gutter runner",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             spawn_hidden(Breeds.skaven_gutter_runner, 1, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_ratling_gunner = {
-    key = "ratling gunner",
-    text = "ratling gunner",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            spawn_hidden(Breeds.skaven_ratling_gunner, 1, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_ratling_gunner = {
+--     key = "ratling gunner",
+--     text = "ratling gunner",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             spawn_hidden(Breeds.skaven_ratling_gunner, 1, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_warpfire_thrower = {
-    key = "warpfire thrower",
-    text = "warpfire thrower",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            spawn_hidden(Breeds.skaven_warpfire_thrower, 1, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_warpfire_thrower = {
+--     key = "warpfire thrower",
+--     text = "warpfire thrower",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             spawn_hidden(Breeds.skaven_warpfire_thrower, 1, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
--- Elites
+-- -- Elites
 
-TwitchRedeemTemplates.twitch_redeem_green_rats = {
-    key = "green rats",
-    text = "a pack of green rats",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            local spawns = {
-                { breed = "skaven_plague_monk", amount = 5 },
-            }
-            spawn_custom_horde(spawns, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_green_rats = {
+--     key = "green rats",
+--     text = "a pack of green rats",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             local spawns = {
+--                 { breed = "skaven_plague_monk", amount = 5 },
+--             }
+--             spawn_custom_horde(spawns, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_chaos_warrior = {
-    key = "chaos warriors",
-    text = "a pack of chaos warriors",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            local spawns = {
-                { breed = "chaos_warrior", amount = 3 },
-            }
-            spawn_custom_horde(spawns, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_chaos_warrior = {
+--     key = "chaos warriors",
+--     text = "a pack of chaos warriors",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             local spawns = {
+--                 { breed = "chaos_warrior", amount = 3 },
+--             }
+--             spawn_custom_horde(spawns, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_stormvermins = {
-    key = "stormvermins",
-    text = "a pack of stormvermins",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            local spawns = {
-                { breed = "skaven_storm_vermin", amount = 5 },
-            }
-            spawn_custom_horde(spawns, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_stormvermins = {
+--     key = "stormvermins",
+--     text = "a pack of stormvermins",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             local spawns = {
+--                 { breed = "skaven_storm_vermin", amount = 5 },
+--             }
+--             spawn_custom_horde(spawns, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_shielded_stormvermins = {
-    key = "shielded stormvermins",
-    text = "a pack of shielded stormvermins",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            local spawns = {
-                { breed = "skaven_storm_vermin_with_shield", amount = 7 },
-            }
-            spawn_custom_horde(spawns, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_shielded_stormvermins = {
+--     key = "shielded stormvermins",
+--     text = "a pack of shielded stormvermins",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             local spawns = {
+--                 { breed = "skaven_storm_vermin_with_shield", amount = 7 },
+--             }
+--             spawn_custom_horde(spawns, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_beasty_boys = {
-    key = "beasty boys",
-    text = "some beasty boys",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            local spawns = {
-                { breed = "beastmen_bestigor", amount = 5 },
-                { breed = "beastmen_standard_bearer", amount = 3 },
-                --{ breed = "ethereal_skeleton_with_hammer", amount = 20 },
-            }
-            spawn_custom_horde(spawns, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_beasty_boys = {
+--     key = "beasty boys",
+--     text = "some beasty boys",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             local spawns = {
+--                 { breed = "beastmen_bestigor", amount = 5 },
+--                 { breed = "beastmen_standard_bearer", amount = 3 },
+--                 --{ breed = "ethereal_skeleton_with_hammer", amount = 20 },
+--             }
+--             spawn_custom_horde(spawns, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_maulers = {
-    key = "maulers",
-    text = "get mauled",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            local spawns = {
-                { breed = "chaos_raider", amount = 10 },
-            }
-            spawn_custom_horde(spawns, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_maulers = {
+--     key = "maulers",
+--     text = "get mauled",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             local spawns = {
+--                 { breed = "chaos_raider", amount = 10 },
+--             }
+--             spawn_custom_horde(spawns, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
--- Other
+-- -- Other
 
-TwitchRedeemTemplates.twitch_redeem_loot_rat = {
-    key = "loot rat",
-    text = "loot rat",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            local breed = Breeds.skaven_loot_rat
-            Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
-            Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
-            Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_loot_rat = {
+--     key = "loot rat",
+--     text = "loot rat",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             local breed = Breeds.skaven_loot_rat
+--             Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
+--             Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
+--             Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_shadow_lieutenant = {
-    key = "shadow lieutenant",
-    text = "shadow lieutenant",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            local spawns = {
-                { breed = "shadow_lieutenant", amount = 3 },
-            }
-            optional_data = {
-                max_health_modifier = 3.0
-            }
-            spawn_custom_horde(spawns, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_shadow_lieutenant = {
+--     key = "shadow lieutenant",
+--     text = "shadow lieutenant",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             local spawns = {
+--                 { breed = "shadow_lieutenant", amount = 3 },
+--             }
+--             optional_data = {
+--                 max_health_modifier = 3.0
+--             }
+--             spawn_custom_horde(spawns, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_beastmen_archers = {
-    key = "beastmen archers",
-    text = "an army of archers",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            local spawns = {
-                { breed = "beastmen_ungor_archer", amount = 25 },
-            }
-            spawn_custom_horde(spawns)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_beastmen_archers = {
+--     key = "beastmen archers",
+--     text = "an army of archers",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             local spawns = {
+--                 { breed = "beastmen_ungor_archer", amount = 25 },
+--             }
+--             spawn_custom_horde(spawns)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_bomb_rats = {
-    key = "bomb rats",
-    text = "some running ammo crates",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            local spawns = {
-                { breed = "skaven_explosive_loot_rat", amount = 5 },
-            }
-            spawn_custom_horde(spawns)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_bomb_rats = {
+--     key = "bomb rats",
+--     text = "some running ammo crates",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             local spawns = {
+--                 { breed = "skaven_explosive_loot_rat", amount = 5 },
+--             }
+--             spawn_custom_horde(spawns)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
--- Monsters
+-- -- Monsters
 
 TwitchRedeemTemplates.twitch_redeem_monster = {
     key = "monster",
@@ -302,154 +334,81 @@ TwitchRedeemTemplates.twitch_redeem_monster = {
     end 
 }
 
-TwitchRedeemTemplates.twitch_redeem_rat_ogre = {
-    key = "rat ogre",
-    text = "rat ogre",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            optional_data.max_health_modifier = 0.85
-            local breed = Breeds.skaven_rat_ogre
-            Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_rat_ogre = {
+--     key = "rat ogre",
+--     text = "rat ogre",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             optional_data.max_health_modifier = 0.85
+--             local breed = Breeds.skaven_rat_ogre
+--             Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_skaven_stormfiend = {
-    key = "stormfiend",
-    text = "stormfiend",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            optional_data.max_health_modifier = 0.85
-            local breed = Breeds.skaven_stormfiend
-            Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_skaven_stormfiend = {
+--     key = "stormfiend",
+--     text = "stormfiend",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             optional_data.max_health_modifier = 0.85
+--             local breed = Breeds.skaven_stormfiend
+--             Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_chaos_troll = {
-    key = "chaos troll",
-    text = "chaos troll",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            optional_data.max_health_modifier = 0.85
-            local breed = Breeds.chaos_troll
-            Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_chaos_troll = {
+--     key = "chaos troll",
+--     text = "chaos troll",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             optional_data.max_health_modifier = 0.85
+--             local breed = Breeds.chaos_troll
+--             Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_chaos_spawn = {
-    key = "chaos spawn",
-    text = "chaos spawn",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            optional_data.max_health_modifier = 0.85
-            local breed = Breeds.chaos_spawn
-            Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
+-- TwitchRedeemTemplates.twitch_redeem_chaos_spawn = {
+--     key = "chaos spawn",
+--     text = "chaos spawn",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             optional_data.max_health_modifier = 0.85
+--             local breed = Breeds.chaos_spawn
+--             Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
-TwitchRedeemTemplates.twitch_redeem_beastmen_minotaur = {
-    key = "minotaur",
-    text = "big cow",
-    on_success = function(is_server, optional_data)
-        if is_server then
-            optional_data.max_health_modifier = 0.85
-            local breed = Breeds.beastmen_minotaur
-            Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
-            play_sound("enemy_grudge_cursed_enter")
-        end
-    end 
-}
-
--- [beastmen_ungor_dummy]
--- [skaven_storm_vermin_commander]
--- [beastmen_ungor_archer]
--- [chaos_warrior]
--- [skaven_grey_seer]
--- [beastmen_ungor]
--- [beastmen_gor_dummy]
--- [chaos_marauder_with_shield]
--- [chaos_exalted_champion_warcamp]
--- [beastmen_bestigor_dummy]
--- [skaven_storm_vermin_with_shield]
--- [beastmen_gor]
--- [skaven_stormfiend_boss]
--- [chaos_corruptor_sorcerer]
--- [chaos_zombie]
--- [chaos_dummy_exalted_sorcerer_drachenfels]
--- [skaven_rat_ogre]
--- [chaos_tentacle_sorcerer]
--- [chaos_exalted_sorcerer]
--- [skaven_stormfiend]
--- [skaven_clan_rat]
--- [skaven_slave]
--- [chaos_fanatic]
--- [beastmen_minotaur]
--- [chaos_dummy_sorcerer]
--- [skaven_gutter_runner]
--- [chaos_plague_wave_spawner]
--- [skaven_storm_vermin_warlord]
--- [beastmen_bestigor]
--- [chaos_raider]
--- [skaven_dummy_clan_rat]
--- [skaven_explosive_loot_rat]
--- [chaos_dummy_troll]
--- [chaos_spawn_exalted_champion_norsca]
--- [skaven_pack_master]
--- [chaos_mutator_sorcerer]
--- [chaos_marauder_tutorial]
--- [chaos_exalted_champion_norsca]
--- [skaven_dummy_slave]
--- [skaven_clan_rat_with_shield]
--- [shadow_totem]
--- [critter_nurgling]
--- [shadow_lieutenant]
--- [beastmen_standard_bearer]
--- [skaven_storm_vermin]
--- [chaos_vortex_sorcerer]
--- [chaos_exalted_sorcerer_drachenfels]
--- [chaos_greed_pinata]
--- [chaos_spawn]
--- [chaos_troll]
--- [critter_rat]
--- [chaos_vortex]
--- [skaven_loot_rat]
--- [skaven_stormfiend_demo]
--- [skaven_clan_rat_tutorial]
--- [chaos_tentacle]
--- [chaos_berzerker]
--- [critter_pig]
--- [skaven_plague_monk]
--- [chaos_marauder]
--- [shadow_skull]
--- [chaos_plague_sorcerer]
--- [curse_mutator_sorcerer]
--- [beastmen_standard_bearer_crater]
--- [skaven_poison_wind_globadier]
--- [skaven_warpfire_thrower]
--- [skaven_storm_vermin_champion]
--- [skaven_ratling_gunner]
--- [chaos_raider_tutorial]
+-- TwitchRedeemTemplates.twitch_redeem_beastmen_minotaur = {
+--     key = "minotaur",
+--     text = "big cow",
+--     on_success = function(is_server, optional_data)
+--         if is_server then
+--             optional_data.max_health_modifier = 0.85
+--             local breed = Breeds.beastmen_minotaur
+--             Managers.state.conflict:spawn_one(breed, nil, nil, optional_data)
+--             play_sound("enemy_grudge_cursed_enter")
+--         end
+--     end 
+-- }
 
 local mod = get_mod("TwitchRedeems")
 
 local function create_template_lookup(templates)
     local lookup_table = {}
     for key,template in pairs(templates) do
-        lookup_table[template.key] = key
+        lookup_table[string.lower(template.key)] = (type(key) == "string") and string.lower(key) or key
     end
     return lookup_table
 end
 
-
-
---TwitchRedeemTemplates2 = TwitchRedeemTemplates2 or {}
 local TwitchRedeemTemplatesFromConfig = mod:get("redeems")
 
 for _, redeem in pairs(TwitchRedeemTemplatesFromConfig) do
@@ -466,3 +425,4 @@ table.append(TwitchRedeemTemplates, TwitchRedeemTemplatesFromConfig)
 TwitchRedeemTemplatesLookup = create_template_lookup(TwitchRedeemTemplates)
 
 mod:dump(TwitchRedeemTemplates, "TwitchRedeemTemplates", 5)
+mod:dump(TwitchRedeemTemplatesLookup, "TwitchRedeemTemplatesLookup", 5)

@@ -87,16 +87,23 @@ local function cmd_trigger_twitch_redeem(redeem_key)
     print(table.random_elem(TwitchRedeemTemplates))
     local user = "TestUser"
     local msg = "this is a test xdd"
-    local key = table.random_elem(TwitchRedeemTemplates).key
+    local key = nil
 
     if redeem_key ~= nil then
-        key = redeem_key
+        local lookup_key = TwitchRedeemTemplatesLookup[redeem_key]
+        if lookup_key then
+            key = TwitchRedeemTemplates[lookup_key].key
+        else
+            mod:error("invalid redeem key '" .. redeem_key .. "'")
+        end
+    else
+        key = table.random_elem(TwitchRedeemTemplates).key
     end
 
-    --key = TwitchRedeemTemplates.twitch_redeem_shadow_lieutenant.key
-
-    local redeem_str = string.format("-%s- redeemed :%s: | %s |", user, key, msg)
-    cb_twitch_chat_message(nil, nil, mod.redeem_twitch_user_name, redeem_str)
+    if key ~= nil then
+        local redeem_str = string.format("-%s- redeemed :%s: | %s |", user, key, msg)
+        cb_twitch_chat_message(nil, nil, mod.redeem_twitch_user_name, redeem_str)
+    end
 end
 
 if in_modded_realm then
@@ -183,22 +190,27 @@ local function process_redeem_queue(redeem_queue, optional_data)
     if redeem_queue ~= nil and redeem_queue:size() > 0 and not redeem_queue:is_on_cooldown() then
         local redeem = redeem_queue:pop()
 
-        local redeem_template = TwitchRedeemTemplates[TwitchRedeemTemplatesLookup[redeem.key]]
+        local lookup_key = TwitchRedeemTemplatesLookup[redeem.key]
+        local redeem_template = TwitchRedeemTemplates[lookup_key]
         local is_server = Managers.state.network and Managers.state.network.is_server
 
-        if redeem_template ~= nil then
-            redeem_template.on_success(is_server, optional_data, redeem.param)
-            -- TODO return boolean for success and add back to queue to try again later
+        if lookup_key ~= nil then
+            if redeem_template ~= nil then
+                redeem_template.on_success(is_server, optional_data, redeem.param)
+                -- TODO return boolean for success and add back to queue to try again later
 
-            local msg = redeem.user .. " redeemed " .. redeem_template.text
-            if redeem.param then
-                msg = msg .. '\n "'.. redeem.param .. '"'
+                local msg = redeem.user .. " redeemed " .. redeem_template.text
+                if redeem.param then
+                    msg = msg .. '\n "'.. redeem.param .. '"'
+                end
+                mod:chat_broadcast(msg)
+
+                --mod:echo("Queue size: " .. tostring(redeem_queue:size()))
+            else
+                mod:error("unknown redeem key '" .. redeem.key .."' with lookup key '" .. lookup_key .. "'")
             end
-            mod:chat_broadcast(msg)
-
-            --mod:echo("Queue size: " .. tostring(redeem_queue:size()))
         else
-            mod:error("unknown redeem key '" .. redeem.key .."'")
+            mod:error("redeem key not found")
         end
     end
 end
