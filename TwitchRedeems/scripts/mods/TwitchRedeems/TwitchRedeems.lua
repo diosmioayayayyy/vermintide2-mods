@@ -254,3 +254,19 @@ mod:hook_safe(TwitchManager, "update", function(self, dt, t)
         process_redeem_queue(mod.global_redeem_queue, optional_data)
     end
 end)
+
+-- Do not freeze modified breeds. Else the game will reuse those breeds for normal enemies and everything gets messy.
+mod:hook(BreedFreezer, "try_mark_unit_for_freeze", function(func, self, breed, unit)
+    if breed.is_twitch_redeem == true then
+        return false
+    end
+    return func(self, breed, unit)
+end)
+
+-- Do not unfreeze modified breeds. Else the game might just reuse a normal breed instead.
+mod:hook(BreedFreezer, "try_unfreeze_breed", function(func, self, breed, data)
+    if breed.is_twitch_redeem == true then
+        return nil
+    end
+    return func(self, breed, data)
+end)
