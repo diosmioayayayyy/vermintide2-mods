@@ -66,6 +66,21 @@ local play_sound = function (stinger_name, pos)
 	Managers.state.network.network_transmit:send_rpc_clients("rpc_server_audio_event", NetworkLookup.sound_events[stinger_name])
 end
 
+local function add_spawn_func(optional_data, spawn_func)
+    optional_data = optional_data or {}
+
+	if optional_data.spawned_func then
+		local previous_spawned_func = optional_data.spawned_func
+
+		optional_data.spawned_func = function (unit, breed, optional_data)
+			previous_spawned_func(unit, breed, optional_data)
+			spawn_func(unit, breed, optional_data)
+		end
+	else
+		optional_data.spawned_func = spawn_func
+	end
+end
+
 -- Apply custom breed configuration and returns cloned modified breed.
 local function prepare_breed(breed, breed_data)
     local new_breed = table.clone(breed)
@@ -121,7 +136,7 @@ local function default_spawn_function(spawn_list, optional_data)
         end
 
         if spawn.taggable == true then
-            optional_data.spawned_func = on_spawn_func
+            add_spawn_func(optional_data, on_spawn_func)
         end
 
         optional_data.max_health_modifier = spawn.max_health_modifier
