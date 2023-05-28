@@ -145,6 +145,31 @@ local function default_spawn_function(spawn_list, optional_data)
     end
 end
 
+TwitchRedeemTemplates.twitch_redeem_test = {
+    key = "test",
+    text = "test",
+    on_success = function(is_server, optional_data)
+        if is_server then
+
+            local spawn_list = {}
+            spawn_list[0] = {
+                amount = 3,
+                breed = "skaven_slave",
+                max_health_modifier = 1,
+                spawn = "horde",
+                taggable = true,
+                breed_data = {
+                    stagger_immune = true,
+                    size_variation_range = { 1.0, 1.3 },
+                    walk_speed = 0.1,
+                    run_speed = 10.0,
+                }
+            }
+
+            default_spawn_function(spawn_list, optional_data)
+        end
+    end
+}
 
 -- Monsters
 
