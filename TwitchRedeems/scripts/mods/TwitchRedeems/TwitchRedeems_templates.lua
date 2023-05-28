@@ -66,17 +66,75 @@ local play_sound = function (stinger_name, pos)
 	Managers.state.network.network_transmit:send_rpc_clients("rpc_server_audio_event", NetworkLookup.sound_events[stinger_name])
 end
 
+-- Apply custom breed configuration and returns cloned modified breed.
+local function prepare_breed(breed, breed_data)
+    local new_breed = table.clone(breed)
+
+    for key, value in pairs(breed_data) do
+        print(breed.name, key, value)
+        new_breed[key] = value
+    end
+
+    new_breed.is_twitch_redeem = true
+
+    return new_breed
+end
+
+-- EntityManager2.add_extenion_to_lookup = function(self, unit, system_name, extension_name)
+--     local unit_extensions_list = self._unit_extensions_list
+--     local extensions_list = unit_extensions_list[unit]
+--     local system_to_extension_map = self.system_to_extension_per_unit_type_map[extensions_list]
+--     system_to_extension_map[system_name] = extension_name
+-- end
+
+-- local function apply_make_pingable(world, unit)
+--     if not ScriptUnit.has_extension(unit, "ping_system") then
+--         local ping_system = Managers.state.entity:system("ping_system")
+--         local extension = ping_system:on_add_extension(world, unit, "PingTargetExtension", {})
+--         extension:extensions_ready(world, unit)
+--     end
+-- end
+
+-- local function remove_make_pingable(unit)
+--     local ping_system = Managers.state.entity:system("ping_system")
+--     ping_system:remove_ping_from_unit(unit)
+--     ScriptUnit.destroy_extension(unit, "ping_system")
+--     ping_system:on_remove_extension(unit, "PingTargetExtension")
+--end
+
 local function default_spawn_function(spawn_list, optional_data)
     for k, spawn in pairs(spawn_list) do
         local breed = Breeds[spawn.breed]
 
+        local on_spawn_func = function(unit)
+            -- TODO WT: might pull those locals out?
+            local world = Managers.world:world("level_world")
+            local entity_manager = Managers.state.entity
+
+            --apply_make_pingable(world, unit)
+            --local extension = Managers.state.entity:system("ping_system"):on_add_extension(world, unit, "PingTargetExtension", {})
+            --extension:extensions_ready(world, unit)
+
+            --entity_manager:add_extenion_to_lookup(unit, "ping_system", "PingTargetExtension")
+
+            --self.entity_manager:register_units_extensions(pending_extension_adds_list, num_pending_units)
+        end
+
+        if spawn.taggable == true then
+            optional_data.spawned_func = on_spawn_func
+        end
+
         optional_data.max_health_modifier = spawn.max_health_modifier
+
+        if spawn.breed_data ~= nil then
+            breed = prepare_breed(breed, spawn.breed_data)
+        end
 
         if spawn.spawn == "hidden" then
             spawn_hidden(breed, spawn.amount, optional_data)
         elseif spawn.spawn == "horde" then
             local spawns = {
-                { breed = spawn.breed, amount = spawn.amount },
+                { breed = breed, amount = spawn.amount },
             }
             spawn_custom_horde(spawns, optional_data)
         elseif spawn.spawn == "one" then

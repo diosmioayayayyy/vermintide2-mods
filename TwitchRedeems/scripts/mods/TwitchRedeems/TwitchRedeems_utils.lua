@@ -87,7 +87,7 @@ HordeSpawner.execute_twitch_redeem_horde = function (self, spawn_list, only_ahea
 			spawn_pos = LocomotionUtils.pos_on_mesh(nav_world, blob_pos + offset * 2)
 
 			if spawn_pos then
-				local breed = Breeds[spawn_list[i]]
+				local breed = spawn_list[i]
 
                 local optional_data = optional_data or {}
                 optional_data.side_id = side_id
