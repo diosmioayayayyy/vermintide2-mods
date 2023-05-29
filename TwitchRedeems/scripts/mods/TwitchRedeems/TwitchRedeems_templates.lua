@@ -16,7 +16,8 @@ local special_breads = {
     Breeds.skaven_ratling_gunner,
     Breeds.skaven_warpfire_thrower,
     Breeds.skaven_poison_wind_globadier,
-    -- TODO missing chaos specials
+    Breeds.chaos_corruptor_sorcerer,
+    Breeds.chaos_vortex_sorcerer,
 }
 
 local function get_random_monster_breed()
