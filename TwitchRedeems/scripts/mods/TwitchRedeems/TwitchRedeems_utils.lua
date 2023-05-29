@@ -13,6 +13,10 @@ function table.random_elem(tb)
     return tb[keys[math.random(#keys)]]
 end
 
+function breed_name_valid(breed_name)
+	local breed = Breeds[breed_name]
+	return breed ~= nil
+end
 
 function mod.add_buff_template(buff_name, buff_data, extra_data, override_index)
     if BuffTemplates[buff_name] == nil then

@@ -222,7 +222,9 @@ local mod = get_mod("TwitchRedeems")
 local function create_template_lookup(templates)
     local lookup_table = {}
     for key,template in pairs(templates) do
-        lookup_table[string.lower(template.key)] = (type(key) == "string") and string.lower(key) or key
+        if template ~= nil then
+            lookup_table[string.lower(template.key)] = (type(key) == "string") and string.lower(key) or key
+        end
     end
     return lookup_table
 end
@@ -240,6 +242,29 @@ end
 
 table.append(TwitchRedeemTemplates, TwitchRedeemTemplatesFromConfig)
 
+-- Loop through redeems and check for any configuration errors.
+local invalid_redeems = {}
+for k, redeem in pairs(TwitchRedeemTemplates) do
+    if type(redeem.spawn_list) == "table" then
+        for _, element in pairs(redeem.spawn_list) do
+            if not breed_name_valid(element.breed) then
+                mod:error("unknown breed name '" .. element.breed .. "' for redeem key '" .. redeem.key .. "'")
+                table.insert(invalid_redeems, k)
+                break
+            end
+        end
+    end
+end
+
+if #invalid_redeems > 0 then
+    mod:info("Removing invalid redeems...")
+    mod:dump(invalid_redeems, "invalid_redeems", 1)
+    for _, k in pairs(invalid_redeems) do
+        TwitchRedeemTemplates[k] = nil
+    end
+end
+
+-- Create inverse lookup table for redeems.
 TwitchRedeemTemplatesLookup = create_template_lookup(TwitchRedeemTemplates)
 
 --mod:dump(TwitchRedeemTemplates, "TwitchRedeemTemplates", 5)
