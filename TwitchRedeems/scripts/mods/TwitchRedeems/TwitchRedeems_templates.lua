@@ -95,44 +95,15 @@ local function prepare_breed(breed, breed_data)
     return new_breed
 end
 
--- EntityManager2.add_extenion_to_lookup = function(self, unit, system_name, extension_name)
---     local unit_extensions_list = self._unit_extensions_list
---     local extensions_list = unit_extensions_list[unit]
---     local system_to_extension_map = self.system_to_extension_per_unit_type_map[extensions_list]
---     system_to_extension_map[system_name] = extension_name
--- end
-
--- local function apply_make_pingable(world, unit)
---     if not ScriptUnit.has_extension(unit, "ping_system") then
---         local ping_system = Managers.state.entity:system("ping_system")
---         local extension = ping_system:on_add_extension(world, unit, "PingTargetExtension", {})
---         extension:extensions_ready(world, unit)
---     end
--- end
-
--- local function remove_make_pingable(unit)
---     local ping_system = Managers.state.entity:system("ping_system")
---     ping_system:remove_ping_from_unit(unit)
---     ScriptUnit.destroy_extension(unit, "ping_system")
---     ping_system:on_remove_extension(unit, "PingTargetExtension")
---end
-
 local function default_spawn_function(spawn_list, optional_data)
+    local buff_system = Managers.state.entity:system("buff_system")
+
     for k, spawn in pairs(spawn_list) do
         local breed = Breeds[spawn.breed]
 
+        -- TODO MOVE THIS
         local on_spawn_func = function(unit)
-            -- TODO WT: might pull those locals out?
-            local world = Managers.world:world("level_world")
-            local entity_manager = Managers.state.entity
-
-            --apply_make_pingable(world, unit)
-            --local extension = Managers.state.entity:system("ping_system"):on_add_extension(world, unit, "PingTargetExtension", {})
-            --extension:extensions_ready(world, unit)
-
-            --entity_manager:add_extenion_to_lookup(unit, "ping_system", "PingTargetExtension")
-
-            --self.entity_manager:register_units_extensions(pending_extension_adds_list, num_pending_units)
+            buff_system:add_buff(unit, "twitch_redeem_buff_pingable", unit)
         end
 
         if spawn.taggable == true then
@@ -165,16 +136,17 @@ TwitchRedeemTemplates.twitch_redeem_test = {
     text = "test",
     on_success = function(is_server, optional_data)
         if is_server then
-
+-- https://github.dev/Aussiemon/Vermintide-2-JHF-Mods/blob/master/CreatureSpawner/scripts/mods/CreatureSpawner/CreatureSpawner.lua
+-- c 275
             local spawn_list = {}
             spawn_list[0] = {
-                amount = 3,
-                breed = "skaven_slave",
+                amount = 1,
+                breed = "skaven_slave", -- TODO make breed check function
                 max_health_modifier = 1,
-                spawn = "horde",
+                spawn = "horde", -- "one"
                 taggable = true,
                 breed_data = {
-                    stagger_immune = true,
+                    stagger_immune = false,
                     size_variation_range = { 1.0, 1.3 },
                     walk_speed = 0.1,
                     run_speed = 10.0,

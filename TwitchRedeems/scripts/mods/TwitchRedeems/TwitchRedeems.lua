@@ -3,18 +3,11 @@ local mod = get_mod("TwitchRedeems")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_utils")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_templates")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_redeem_queue")
+require("scripts/mods/TwitchRedeems/TwitchRedeems_buffs")
 
 local in_modded_realm = script_data["eac-untrusted"]
 local Managers = Managers
 local TwitchRedeemTemplates = TwitchRedeemTemplates
-
--- Enemies spawned with Twitch redeems will have purple glowing eyes.
-mod.add_buff_template("twitch_redeem_buff_eye_glow",
-{
-    remove_buff_func = "belakor_cultists_remove_eye_glow",
-    name = "belakor_cultists_buff_eye_glow",
-    apply_buff_func = "belakor_cultists_apply_eye_glow"
-}, nil, 1900)
 
 -- Load purple eye material.
 Managers.package:load("resource_packages/levels/dlcs/morris/belakor_common", "global")
@@ -149,6 +142,20 @@ mod.on_setting_changed = function()
     mod.apply_settings()
 end
 
+mod.on_game_state_changed = function(status, state_name)
+    local is_server = Managers.state.network and Managers.state.network.is_server
+
+    if is_server then
+        local is_in_inn_level = Managers.level_transition_handler:in_hub_level()
+
+        if status == "exit" then
+            mod.enable_redeems(false)
+        elseif status == "enter" and not is_in_inn_level then
+            mod.enable_redeems(true)
+        end 
+    end
+end
+
 mod.enable_redeems = function(enable)
     local is_server = Managers.state.network and Managers.state.network.is_server
     if is_server and mod.redeems_enabled ~= enable then
@@ -172,21 +179,7 @@ mod.reset_redeem_queues = function()
     mod.global_redeem_queue:set_cooldown(mod.global_cooldown_duration)
 end
 
-mod.on_game_state_changed = function(status, state_name)
-    local is_server = Managers.state.network and Managers.state.network.is_server
-
-    if is_server then
-        local is_in_inn_level = Managers.level_transition_handler:in_hub_level()
-
-        if status == "exit" then
-            mod.enable_redeems(false)
-        elseif status == "enter" and not is_in_inn_level then
-            mod.enable_redeems(true)
-        end 
-    end
-end
-
-local function process_redeem_queue(redeem_queue, optional_data)
+mod.process_redeem_queue = function(redeem_queue, optional_data)
     if redeem_queue ~= nil and redeem_queue:size() > 0 and not redeem_queue:is_on_cooldown() then
         local redeem = redeem_queue:pop()
 
@@ -204,8 +197,6 @@ local function process_redeem_queue(redeem_queue, optional_data)
                     msg = msg .. '\n "'.. redeem.param .. '"'
                 end
                 mod:chat_broadcast(msg)
-
-                --mod:echo("Queue size: " .. tostring(redeem_queue:size()))
             else
                 mod:error("unknown redeem key '" .. redeem.key .."' with lookup key '" .. lookup_key .. "'")
             end
@@ -215,58 +206,5 @@ local function process_redeem_queue(redeem_queue, optional_data)
     end
 end
 
-mod:hook_safe(TwitchManager, "update", function(self, dt, t)
-    local is_server = Managers.state.network and Managers.state.network.is_server
-    if is_server and Managers.state.entity ~= nil then
-
-        -- Setup buff which lets the enemy eyes glow purple.
-        local buff_system = Managers.state.entity:system("buff_system")
-        local optional_data = {}
-        optional_data.spawned_func = function (unit, breed, optional_data)
-            buff_system:add_buff(unit, "twitch_redeem_buff_eye_glow", unit)
-        end
-
-        -- User to remove. Used to clean up user redeem queues.
-        local users_to_remove = GrowQueue:new()
-
-        -- We process both user and global queue. 
-        -- This makes sure all redeems are handled even when mode was switched.
-
-        -- Process queues.
-        for user_name, redeem_queue in pairs(mod.user_redeem_queues) do
-            if redeem_queue ~= nil then
-                redeem_queue:update(dt)
-                process_redeem_queue(redeem_queue, optional_data)
-
-                if redeem_queue:empty() and not redeem_queue:is_on_cooldown() then
-                    users_to_remove:push_back(user_name)
-                end
-            end
-        end
-
-        while users_to_remove:size() > 0 do
-            local user_name = users_to_remove:pop_first()
-            mod.user_redeem_queues[user_name] = nil
-        end
-
-        -- Process global queue.
-        mod.global_redeem_queue:update(dt)
-        process_redeem_queue(mod.global_redeem_queue, optional_data)
-    end
-end)
-
--- Do not freeze modified breeds. Else the game will reuse those breeds for normal enemies and everything gets messy.
-mod:hook(BreedFreezer, "try_mark_unit_for_freeze", function(func, self, breed, unit)
-    if breed.is_twitch_redeem == true then
-        return false
-    end
-    return func(self, breed, unit)
-end)
-
--- Do not unfreeze modified breeds. Else the game might just reuse a normal breed instead.
-mod:hook(BreedFreezer, "try_unfreeze_breed", function(func, self, breed, data)
-    if breed.is_twitch_redeem == true then
-        return nil
-    end
-    return func(self, breed, data)
-end)
+-- Load hooks.
+mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_hooks")
