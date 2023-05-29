@@ -61,8 +61,8 @@ local function spawn_hidden(breed, amount_of_enemies, optional_data)
 end
 
 local play_sound = function (stinger_name, pos)
-    local conflict_director = Managers.state.conflict -- TODO is this right way to get world?
-    local wwise_world = Managers.world:wwise_world(conflict_director._world)
+    local world = Managers.world:world("level_world")
+    local wwise_world = Managers.world:wwise_world(world)
     local wwise_playing_id, wwise_source_id = WwiseWorld.trigger_event(wwise_world, stinger_name)
 	Managers.state.network.network_transmit:send_rpc_clients("rpc_server_audio_event", NetworkLookup.sound_events[stinger_name])
 end
@@ -154,6 +154,7 @@ TwitchRedeemTemplates.twitch_redeem_test = {
                 }
             }
 
+            play_sound("enemy_grudge_cursed_enter")
             default_spawn_function(spawn_list, optional_data)
         end
     end
