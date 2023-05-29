@@ -102,21 +102,19 @@ local function default_spawn_function(spawn_list, optional_data)
     for k, spawn in pairs(spawn_list) do
         local breed = Breeds[spawn.breed]
 
-        -- TODO MOVE THIS
-        local on_spawn_func = function(unit)
-            buff_system:add_buff(unit, "twitch_redeem_buff_pingable", unit)
-        end
-
-        if spawn.taggable == true then
-            add_spawn_func(optional_data, on_spawn_func)
-        end
-
+        -- Apply optional data.
         optional_data.max_health_modifier = spawn.max_health_modifier
 
+        if spawn.taggable == true then
+            add_spawn_func(optional_data, function (unit) buff_system:add_buff(unit, "twitch_redeem_buff_pingable", unit) end)
+        end
+
+        -- Prepare custom breed.
         if spawn.breed_data ~= nil then
             breed = prepare_breed(breed, spawn.breed_data)
         end
 
+        -- Decide on spawn function.
         if spawn.spawn == "hidden" then
             spawn_hidden(breed, spawn.amount, optional_data)
         elseif spawn.spawn == "horde" then
@@ -142,7 +140,7 @@ TwitchRedeemTemplates.twitch_redeem_test = {
             local spawn_list = {}
             spawn_list[0] = {
                 amount = 1,
-                breed = "skaven_slave", -- TODO make breed check function
+                breed = "skaven_slave",
                 max_health_modifier = 1,
                 spawn = "horde", -- "one"
                 taggable = true,
