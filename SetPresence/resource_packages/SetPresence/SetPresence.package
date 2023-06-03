@@ -1,0 +1,11 @@
+mod = [
+	"SetPresence"
+]
+
+package = [
+	"resource_packages/SetPresence/SetPresence"
+]
+
+lua = [
+	"scripts/mods/SetPresence/*"
+]
