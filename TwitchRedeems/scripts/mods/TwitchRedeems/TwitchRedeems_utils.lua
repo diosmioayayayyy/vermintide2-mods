@@ -13,9 +13,46 @@ function table.random_elem(tb)
     return tb[keys[math.random(#keys)]]
 end
 
+Rectangle.contains_rect = function(self, other)
+    return (other.x + other.width) <= (self.x + self.width)
+        and (other.x) >= (self.x)
+        and (other.y) >= (self.y)
+        and (other.y + other.height) <= (self.y + self.height)
+end
+
+Rectangle.contains_point = function(self, point)
+    return (point.x) <= (self.x + self.width)
+        and (point.x) >= (self.x)
+        and (point.y) >= (self.y)
+        and (point.y) <= (self.y + self.height)
+end
+
+Rectangle.restrain = function(self, largerRect)
+    self.x = math.max(self.x, largerRect.x)
+    self.y = math.max(self.y, largerRect.y)
+
+    local maxX = largerRect.x + largerRect.width - self.width
+    local maxY = largerRect.y + largerRect.height - self.height
+
+    self.x = math.min(self.x, maxX)
+    self.y = math.min(self.y, maxY)
+end
+
+Vector3.any = function(v)
+    return v.x ~= 0 or v.y ~= 0 or v.z ~= 0
+end
+
+Vector3.all = function(v)
+    return v.x ~= 0 and v.y ~= 0 and v.z ~= 0
+end
+
+function sign(number)
+    return number > 0 and 1 or (number == 0 and 0 or -1)
+end
+
 function breed_name_valid(breed_name)
-	local breed = Breeds[breed_name]
-	return breed ~= nil
+    local breed = Breeds[breed_name]
+    return breed ~= nil
 end
 
 function mod.add_buff_template(buff_name, buff_data, extra_data, override_index)
@@ -31,7 +68,7 @@ function mod.add_buff_template(buff_name, buff_data, extra_data, override_index)
 
         BuffTemplates[buff_name] = new_buff
         local index = override_index or #NetworkLookup.buff_templates + 1
-        
+
         if not table.contains(NetworkLookup.buff_templates, index) then
             NetworkLookup.buff_templates[index] = buff_name
             NetworkLookup.buff_templates[buff_name] = index

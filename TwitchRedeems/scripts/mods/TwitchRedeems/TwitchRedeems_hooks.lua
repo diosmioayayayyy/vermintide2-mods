@@ -56,3 +56,49 @@ mod:hook(BreedFreezer, "try_unfreeze_breed", function(func, self, breed, data)
     end
     return func(self, breed, data)
 end)
+
+
+-- TODO del
+--mod.test = nil
+
+-- mod:hook_safe(OptionsView, "init", function(self, ingame_ui_context)
+--     mod:echo("HOOKED")
+--     mod.test = self
+-- end)
+
+-- mod:hook_safe(OptionsView, "update", function(self, dt)
+--     mod:echo("HOOKED OptionsView update")
+-- end)
+
+-- mod:hook_safe(StateTitleScreenMainMenu, "update", function(self, dt, t)
+--     mod:echo("HOOKED StateTitleScreenMainMenu")
+-- end)
+
+local function assigned(a, b)
+	if a == nil then
+		return b
+	else
+		return a
+	end
+end
+
+-- mod:hook(OptionsView, "cb_twitch_vote_time_saved_value", function(func, self, widget)
+--     mod:echo("PLS HELP")
+-- 	if not assigned(self.changed_user_settings.twitch_vote_time, Application.user_setting("twitch_vote_time")) then
+-- 		local value = DefaultUserSettings.get("user_settings", "twitch_vote_time")
+-- 	end
+
+-- 	local options_values = widget.content.options_values
+-- 	local selected_option = 1
+
+-- 	for i = 1, #options_values, 1 do
+-- 		if value == options_values[i] then
+-- 			selected_option = i
+
+-- 			break
+-- 		end
+-- 	end
+
+-- 	widget.content.current_selection = selected_option
+--     mod:echo(tostring(widget.content.current_selection))
+-- end)

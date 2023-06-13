@@ -2,6 +2,12 @@ return {
 	mod_description = {
 		en = "Twitch Redeems description",
 	},
+	KEYBIND_TOGGLE_TWITCH_REDEEM_CONFIG_GUI = {
+		en = "Toggle Twitch Redeem Configuration Interface",
+	},
+	KEYBIND_TOGGLE_TWITCH_GUI = {
+		en = "Toggle Twitch Interface",
+	},
 	unit_seconds_id = {
 		en = "s",
 	},

@@ -1,34 +1,29 @@
 local mod = get_mod("TwitchRedeems")
 
-print("UJAF")
-
 return {
-	name = "TwitchRedeems",
-	description = mod:localize("mod_description"),
-	is_togglable = true,
-	options = {
-		widgets = {
-			{
-				setting_id      = "global_redeem_cooldown_duration",
-				type            = "numeric",
-				default_value   = 5,
-				range           = {0, 600},
-				unit_text       = "unit_seconds_id", -- optional
-				decimals_number = 0                  -- optional
-			},
-			{
-				setting_id      = "user_redeem_cooldown_duration",
-				type            = "numeric",
-				default_value   = 5,
-				range           = {0, 600},
-				unit_text       = "unit_seconds_id", -- optional
-				decimals_number = 0                  -- optional
-			},
-			{
-				setting_id      = "user_redeem_cooldown",
-				type            = "checkbox",
-				default_value   = true,
-			},
-		}
-	  }
+    name = "TwitchRedeems",
+    description = mod:localize("mod_description"),
+    is_togglable = true,
+    options = {
+        widgets = {
+            {
+                setting_id      = "KEYBIND_TOGGLE_TWITCH_REDEEM_CONFIG_GUI",
+                type            = "keybind",
+                default_value   = {},
+                keybind_global  = true,
+                keybind_trigger = "pressed",
+                keybind_type    = "function_call",
+                function_name   = "toggle_twitch_redeems_configuration_gui",
+            },
+            {
+                setting_id      = "KEYBIND_TOGGLE_TWITCH_GUI",
+                type            = "keybind",
+                default_value   = {},
+                keybind_global  = true,
+                keybind_trigger = "pressed",
+                keybind_type    = "function_call",
+                function_name   = "toggle_twitch_gui",
+            },
+        }
+      }
 }

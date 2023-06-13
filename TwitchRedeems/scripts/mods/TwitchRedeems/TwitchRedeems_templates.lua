@@ -138,7 +138,8 @@ TwitchRedeemTemplates.twitch_redeem_test = {
 -- https://github.dev/Aussiemon/Vermintide-2-JHF-Mods/blob/master/CreatureSpawner/scripts/mods/CreatureSpawner/CreatureSpawner.lua
 -- c 275
             local spawn_list = {}
-            spawn_list[0] = {
+            spawn_list[0] = 
+            {
                 amount = 1,
                 breed = "skaven_slave",
                 max_health_modifier = 1,
