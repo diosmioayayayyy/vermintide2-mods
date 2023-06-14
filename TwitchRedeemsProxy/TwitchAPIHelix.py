@@ -83,8 +83,8 @@ def update_custom_reward(auth_token, broadcaster_id, client_id, custom_reward_id
 
     body = {}
 
-    if is_enabled is not None:  body['is_enabled'] = is_enabled
-    if is_paused  is not None:   body['is_paused']  = is_paused
+    if is_enabled is not None: body['is_enabled'] = is_enabled
+    if is_paused  is not None: body['is_paused']  = is_paused
 
     if len(body) == 0:
         return False

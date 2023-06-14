@@ -147,13 +147,56 @@ RedeemConfiguration.render_ui = function (self)
             local api_url = "http://localhost:8000/pop-redeem"
             local url = api_url
             Managers.curl:get(url, {}, function(success, response_code, headers, data, userdata)
-                if data = "Unkown request" then
+                if data == "Unkown request" then
                     mod:error("Pop Redeem: Unkown request")
                 else
                     local dataJson = cjson.decode(data)
                     mod:echo(dataJson.name)
                     mod:dump(dataJson, "dataJson", 1)
                 end
+            end)
+        end
+
+        if Imgui.button("Map Start") then
+            local api_url = "http://localhost:8000/map_start"
+            local url = api_url
+            Managers.curl:get(url, {}, function(success, response_code, headers, data, userdata)
+            print(data)
+            end)
+        end
+
+        if Imgui.button("Map End") then
+            local api_url = "http://localhost:8000/map_end"
+            local url = api_url
+            Managers.curl:get(url, {}, function(success, response_code, headers, data, userdata)
+            print(data)
+            end)
+        end
+
+        if Imgui.button("Create Redeems") then
+            local api_url = "http://localhost:8000/redeems?action=create"
+            local url = api_url
+
+            local l = {}
+            local r = {}
+            r = { title="TEST1", cost="1" }
+            table.insert(l, r)
+            r = { title="TEST2", cost="1" }
+            table.insert(l, r)
+            r = { title="TEST3", cost="1" }
+            table.insert(l, r)
+            local json_payload = cjson.encode(l)
+
+            Managers.curl:post(url, json_payload, {}, function(success, response_code, headers, data, userdata)
+                print(data)
+            end)
+        end
+
+        if Imgui.button("Delete Redeems") then
+            local api_url = "http://localhost:8000/redeems?action=delete"
+            local url = api_url
+            Managers.curl:delete(url, nil, nil, function(success, response_code, headers, data, userdata)
+                print(data)
             end)
         end
 
