@@ -43,6 +43,6 @@ luac.out
 *.tmp
 *.temp
 *.vscode
-
+*node_modules
 
 __pycache__
