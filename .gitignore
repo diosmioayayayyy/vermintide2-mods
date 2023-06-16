@@ -40,5 +40,9 @@ luac.out
 *.hex
 
 *.processed
+*.tmp
+*.temp
+*.vscode
+
 
 __pycache__
