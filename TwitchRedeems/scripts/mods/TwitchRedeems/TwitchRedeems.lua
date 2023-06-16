@@ -8,6 +8,7 @@ mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_redeem_queue")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_templates")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_ui")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_utils")
+mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeemsHTTPProxyClient")
 require("scripts/mods/TwitchRedeems/TwitchRedeems_buffs")
 
 --local pl = require'pl.import_into'()
@@ -36,6 +37,8 @@ mod.breed_editor = BreedEditor:new()
 mod.settings_twitch = SettingsTwitch:new()
 mod.settings_redeems = SettingsRedeems:new()
 mod.gui_control = false
+
+mod.http_proxy_client = TwitchRedeemsHTTPProxyClient:new()
 
 -- Mod settings ids.
 mod.SETTING_ID_TWITCH_REDEEM_USER = "TWITCH_REDEEM_USER"

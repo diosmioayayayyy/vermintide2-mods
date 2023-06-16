@@ -1,5 +1,6 @@
 local mod = get_mod("TwitchRedeems")
 mod:dofile("scripts/mods/TwitchRedeems/Gui/ImguiWindow")
+mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeemsHTTPProxyClient")
 
 RedeemConfiguration = class(RedeemConfiguration)
 
@@ -144,60 +145,43 @@ RedeemConfiguration.render_ui = function (self)
         end
 
         if Imgui.button("Pool Redeem") then
-            local api_url = "http://localhost:8000/pop-redeem"
-            local url = api_url
-            Managers.curl:get(url, {}, function(success, response_code, headers, data, userdata)
-                if data == "Unkown request" then
-                    mod:error("Pop Redeem: Unkown request")
-                else
-                    local dataJson = cjson.decode(data)
-                    mod:echo(dataJson.name)
-                    mod:dump(dataJson, "dataJson", 1)
-                end
-            end)
+            mod.http_proxy_client:request_next_reedem()
         end
 
         if Imgui.button("Map Start") then
-            local api_url = "http://localhost:8000/map_start"
-            local url = api_url
-            Managers.curl:get(url, {}, function(success, response_code, headers, data, userdata)
-            print(data)
-            end)
+            mod.http_proxy_client:request_map_start()
         end
 
         if Imgui.button("Map End") then
-            local api_url = "http://localhost:8000/map_end"
-            local url = api_url
-            Managers.curl:get(url, {}, function(success, response_code, headers, data, userdata)
-            print(data)
-            end)
+            mod.http_proxy_client:request_map_end()
         end
 
         if Imgui.button("Create Redeems") then
-            local api_url = "http://localhost:8000/redeems?action=create"
-            local url = api_url
+            local redeems = {}
+            table.insert(redeems, { title="TEST1", cost="1" })
+            table.insert(redeems, { title="TEST2", cost="2" })
+            table.insert(redeems, { title="TEST3", cost="3" })
 
-            local l = {}
-            local r = {}
-            r = { title="TEST1", cost="1" }
-            table.insert(l, r)
-            r = { title="TEST2", cost="1" }
-            table.insert(l, r)
-            r = { title="TEST3", cost="1" }
-            table.insert(l, r)
-            local json_payload = cjson.encode(l)
-
-            Managers.curl:post(url, json_payload, {}, function(success, response_code, headers, data, userdata)
-                print(data)
-            end)
+            mod.http_proxy_client:request_create_redeems(redeems)
+        end
+        Imgui.same_line()
+        if Imgui.button("Delete Redeems") then
+            mod.http_proxy_client:request_delete_redeems()
         end
 
-        if Imgui.button("Delete Redeems") then
-            local api_url = "http://localhost:8000/redeems?action=delete"
-            local url = api_url
-            Managers.curl:delete(url, nil, nil, function(success, response_code, headers, data, userdata)
-                print(data)
-            end)
+        if Imgui.button("Enable Redeems") then
+            mod.http_proxy_client:request_update_redeems({ is_enabled=true })
+        end
+        Imgui.same_line()
+        if Imgui.button("Disable Redeems") then
+            mod.http_proxy_client:request_update_redeems({ is_enabled=false })
+        end
+        if Imgui.button("Pause Redeems") then
+            mod.http_proxy_client:request_update_redeems({ is_paused=true })
+        end
+        Imgui.same_line()
+        if Imgui.button("Unpause Redeems") then
+            mod.http_proxy_client:request_update_redeems({ is_paused=false })
         end
 
         Imgui.separator()
