@@ -9,7 +9,7 @@ function open(client_id, client_secret, redirect_uri, scopes) {
   twitch_api = new TwitchHelixAPI(client_id, client_secret)
 }
 
-function close() {
+async function close() {
   // TODO
 }
 
@@ -77,43 +77,126 @@ function get_authentication_url(force_verify) {
   return twitch_auth.get_authentication_url(force_verify)
 }
 
-function authenticate(auth_code) {
-  twitch_auth.get_access_token(auth_code)
-    .then((response) => {
-      const data = JSON.parse(response.data);
-      if (response.statusCode == 200) {
-        console.log('Twitch authentication token acquired');
+async function authenticate(auth_code) {
+  try {
+    const response = await twitch_auth.get_access_token(auth_code);
 
-        // Set twitch authorization tokens.
-        twitch_auth.access_token = data['access_token']
-        twitch_auth.refresh_token = data['refresh_token']
+    const data = JSON.parse(response.data);
+    if (response.statusCode == 200) {
+      console.log('Twitch authentication token acquired');
 
-        // Authenticate user.
-        twitch_auth.set_user_authentication()
-          .then((response) => {
-            // Check response.
-            const data = JSON.parse(response.data);
-            if (response.statusCode == 200) {
-              console.log('Twitch authentication complete');
-              // Store user id for twitch api requests later.
-              twitch_auth.user_id = data['user_id']
-            }
-            else {
-              console.error(`Twitch authentication failed with status code ${response.statusCode}`);
-            }
-          })
-          .catch((error) => {
-            console.error(`Twitch Authentication error: '${error}'`);
-          });
+      // Set twitch authorization tokens.
+      twitch_auth.access_token = data['access_token']
+      twitch_auth.refresh_token = data['refresh_token']
 
+      // Authenticate user.
+      try {
+        const response = await twitch_auth.set_user_authentication();
+
+        // Check response.
+        const data = JSON.parse(response.data);
+        if (response.statusCode == 200) {
+          console.log('Twitch authentication complete');
+          // Store user id for twitch api requests later.
+          twitch_auth.user_id = data['user_id']
+        }
+        else {
+          console.error(`Twitch authentication failed with status code ${response.statusCode}`);
+        }
       }
-      else {
-        console.error(`Acquiring twitch authentication token failed with status code ${response.statusCode}`);
+      catch (error) {
+        console.error(`Twitch Authentication error: '${error}'`);
       }
-    })
-    .catch((error) => {
-      console.error(`Error on acquiring twitch authentication token: '${error}'`);
-    });
+    }
+    else {
+      console.error(`Acquiring twitch authentication token failed with status code ${response.statusCode}`);
+    }
+  }
+  catch (error) {
+    console.error(`Error on acquiring twitch authentication token: '${error}'`);
+  }
+
+  // // twitch_auth.get_access_token(auth_code)
+  // //   .then((response) => {
+  //     const data = JSON.parse(response.data);
+  //     if (response.statusCode == 200) {
+  //       console.log('Twitch authentication token acquired');
+
+  //       // Set twitch authorization tokens.
+  //       twitch_auth.access_token = data['access_token']
+  //       twitch_auth.refresh_token = data['refresh_token']
+
+  //       // Authenticate user.
+  //       twitch_auth.set_user_authentication()
+  //         .then((response) => {
+  //           // Check response.
+  //           const data = JSON.parse(response.data);
+  //           if (response.statusCode == 200) {
+  //             console.log('Twitch authentication complete');
+  //             // Store user id for twitch api requests later.
+  //             twitch_auth.user_id = data['user_id']
+  //           }
+  //           else {
+  //             console.error(`Twitch authentication failed with status code ${response.statusCode}`);
+  //           }
+  //         })
+  //         .catch((error) => {
+  //           console.error(`Twitch Authentication error: '${error}'`);
+  //         });
+  //     }
+  //     else {
+  //       console.error(`Acquiring twitch authentication token failed with status code ${response.statusCode}`);
+  //     }
+  //   })
+    // .catch((error) => {
+    //   console.error(`Error on acquiring twitch authentication token: '${error}'`);
+    // });
+}
+
+// async function authenticate(auth_code) {
+//   twitch_auth.get_access_token(auth_code)
+//     .then((response) => {
+//       const data = JSON.parse(response.data);
+//       if (response.statusCode == 200) {
+//         console.log('Twitch authentication token acquired');
+
+//         // Set twitch authorization tokens.
+//         twitch_auth.access_token = data['access_token']
+//         twitch_auth.refresh_token = data['refresh_token']
+
+//         // Authenticate user.
+//         twitch_auth.set_user_authentication()
+//           .then((response) => {
+//             // Check response.
+//             const data = JSON.parse(response.data);
+//             if (response.statusCode == 200) {
+//               console.log('Twitch authentication complete');
+//               // Store user id for twitch api requests later.
+//               twitch_auth.user_id = data['user_id']
+//             }
+//             else {
+//               console.error(`Twitch authentication failed with status code ${response.statusCode}`);
+//             }
+//           })
+//           .catch((error) => {
+//             console.error(`Twitch Authentication error: '${error}'`);
+//           });
+//       }
+//       else {
+//         console.error(`Acquiring twitch authentication token failed with status code ${response.statusCode}`);
+//       }
+//     })
+//     .catch((error) => {
+//       console.error(`Error on acquiring twitch authentication token: '${error}'`);
+//     });
+// }
+
+async function revoke_authentication() {
+  // TODO 
+}
+
+function getAuthData() {
+  return [twitch_auth.user_id, twitch_auth.client_id, twitch_auth.access_token];
 }
 
 class TwitchHelixAPI {
@@ -187,28 +270,12 @@ class TwitchHelixAPI {
   }
 }
 
-
-// TODO probably not wait for promise here
 async function create_custom_reward(reward) {
   return twitch_api.create_custom_reward(reward);
-  // return twitch_api.create_custom_reward(reward)
-  //   .then((response) => {
-  //     console.log("GOOD")
-  //   })
-  //   .catch((error) => {
-  //     console.error(`Twitch Authentication error: '${error}'`);
-  //   });
 }
 
 async function delete_custom_reward(custom_reward_id) {
   return twitch_api.delete_custom_reward(custom_reward_id);
-  // return twitch_api.delete_custom_reward(custom_reward_id)
-  //   .then((response) => {
-  //     console.log("GOOD")
-  //   })
-  //   .catch((error) => {
-  //     console.error(`Twitch Authentication error: '${error}'`);
-  //   });
 }
 
 async function get_custom_rewards() {
@@ -224,6 +291,8 @@ module.exports = {
   close,
   get_authentication_url,
   authenticate,
+  getAuthData ,
+  revoke_authentication,
   create_custom_reward,
   update_custom_reward,
   delete_custom_reward,

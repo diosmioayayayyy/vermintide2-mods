@@ -1,5 +1,5 @@
 const http = require('http');
-const TwitchHelixAPI = require('./twtich_helix_api.js');
+const TwitchHelixAPI = require('./twitch_helix_api.js');
 
 let server;
 
