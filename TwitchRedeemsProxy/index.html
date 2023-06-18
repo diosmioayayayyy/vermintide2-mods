@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+<!-- <!DOCTYPE html>
 <html>
 <head>
   <meta charset="UTF-8">
@@ -6,7 +6,81 @@
 </head>
 <body>
   <h1>Welcome to my Electron App!</h1>
-
+  <button id="buttonOptions">Options</button>
   <script src="renderer.js"></script>
 </body>
+</html> -->
+
+
+<!-- <!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Options Page</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Options Page</h1>
+    <button id="goBackButton">Go Back</button>
+  </div>
+  <script src="renderer.js"></script>
+</body>
+</html> -->
+
+<!DOCTYPE html>
+<html>
+
+<head>
+  <style>
+    .window-control {
+      font-size: 20px;
+      padding: 0;
+      margin-right: 0px;
+      line-height: 1;
+    }
+  </style>
+  <title>Hello World!</title>
+  <link rel="stylesheet" href="style.css" />
+</head>
+
+<body>
+  <!-- <webview src="https://www.example.com" style="display: flex; width: 100%; height: 100%;"></webview> -->
+  <div id="title-bar">
+    <div id="title">Twitch Redeems</div>
+    <div id="title-bar-btns">
+      <button id="min-btn">─</button>
+      <button id="max-btn">◻</button>
+      <button id="close-btn">✕</button>
+    </div>
+  </div>
+
+  <div id="content">
+    I learned about Electron in Visual Studio Code<br />
+    from <a href="http://www.mylifeforthecode.com">My Life For The Code</a>.
+  </div>
+
+  <div id="bottom-bar">
+    <div id="connections-container">
+      <div id="connection-image-container">
+        <img id="twitch-authentication-image" class="connection-image" src="images/unlocked.png" alt="Inactive Image">
+      </div>
+      <span id="text-content" class="connection-text">Authentication</span>
+
+      <div id="connection-image-container">
+        <img id="twitch-eventsub-connection-image" class="connection-image" src="images/disconnected.png"
+          alt="Inactive Image">
+      </div>
+      <span id="text-content" class="connection-text">Twitch EventSub</span>
+
+      <div id="connection-image-container">
+        <img id="game-http-server-connection-image" class="connection-image" src="images/disconnected.png"
+          alt="Inactive Image">
+      </div>
+      <span id="text-content" class="connection-text">GameHttpProxy</span>
+    </div>
+  </div>
+</body>
+<script src="renderer.js"></script>
+
 </html>
