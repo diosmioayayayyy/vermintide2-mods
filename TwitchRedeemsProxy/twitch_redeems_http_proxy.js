@@ -1,4 +1,5 @@
 const http = require('http');
+const myModule  = require('./test.js'); // TODO RENAME this file
 const TwitchHelixAPI = require('./twitch_helix_api.js');
 
 let server;
@@ -275,15 +276,21 @@ function startHTTPProxyServer() {
     });
   });
 
-  const port = 8000  // TODO : setting?
+  const port = 8000;  // TODO : setting?
   server.listen(port, '127.0.0.1', function () {
     console.log(`Server started on http://127.0.0.1:${port}`);
   });
+
+  server.on('close', () => {
+    console.log('Twitch Redeems HTTP ProxyServer is gracefully closed.');
+    myModule.setGameHttpProxyServerConnectionState(false);
+  });
+
+  myModule.setGameHttpProxyServerConnectionState(true);
 }
 
 async function closeHTTPProxyServer() {
-  server.close(() => {
-    console.log('Twitch Redeems HTTP ProxyServer is gracefully closed.');
+  server.close(() => {s
   });
 }
 
