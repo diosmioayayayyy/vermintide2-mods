@@ -11,6 +11,24 @@ let main_window;
 let web_view;
 
 function createWindow() {
+  // TODO clean up this mess later
+  function parseFilePath(urlString) {
+    const parsedUrl = new URL(urlString);
+    let fileName = parsedUrl.pathname;
+    if (process.platform === 'win32') fileName = fileName.substr(1);
+    return fileName.replace(/(?:\s|%20)/g, ' ');
+  }
+
+    // TODO clean up this mess later
+  protocol.registerFileProtocol('asset', (request, callback) => {
+    const currentAssetFolderPath = "./";
+    const parsedUrl = new URL(request.url);
+    const hostName = parsedUrl.host;
+    const fileName = parseFilePath(request.url);
+    const filePath = path.join(process.cwd(), currentAssetFolderPath, hostName, fileName);
+    callback({ path: filePath });
+  });
+
   var main_window = new BrowserWindow({
     width: 800,
     height: 600,
