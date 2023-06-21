@@ -138,7 +138,7 @@ function push_console_message(severity, message) {
   }
 }
 
-ipcRenderer.on('logToConsole', (event, severity, text) => {
+function add_console_message(severity, text) {
   console_messages.push([severity, text]);
 
   // Push new console messages into container.
@@ -149,4 +149,8 @@ ipcRenderer.on('logToConsole', (event, severity, text) => {
       console_messages_index = index;
     }
   }
+}
+
+ipcRenderer.on('logToConsole', (event, severity, text) => {
+  add_console_message(severity, text);
 });

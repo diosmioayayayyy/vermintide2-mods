@@ -1,0 +1,35 @@
+#console {
+  overflow: auto;
+  min-height: calc(100% - 13px); /*xddhack*/
+  border: 1px solid #4c4c4c;
+  padding: 1px;
+  padding-bottom: 10px;
+  background-color: #181818;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+/* Styles for individual console messages */
+.console-message {
+  padding: 0px 10px;
+  border-radius: 4px;
+  margin-top: 5px;
+  margin-bottom: 3px;
+  background-color: transparent;
+}
+
+.console-message.info {
+  color: #3f9dff;
+}
+
+.console-message.warning {
+  color: #ffd504;
+}
+
+.console-message.error {
+  color: #ff000c;
+}
+
+.console-message.log {
+  color: #3f9dff;
+}

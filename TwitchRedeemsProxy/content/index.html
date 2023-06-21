@@ -2,42 +2,52 @@
 <html>
 
 <head>
-  <link rel="stylesheet" href="css/style.css" />
+  <!-- Global CSS settings -->
+  <link rel="stylesheet" href="css/style.css"/>
+  <link rel="stylesheet" href="css/title.css"/>
+  <link rel="stylesheet" href="css/content.css"/>
+  <link rel="stylesheet" href="css/bottom.css"/>
+  <!-- Concent specific CSS settings -->
+  <link rel="stylesheet" href="css/content/console.css"/>
+  <link rel="stylesheet" href="css/content/twitch_login.css"/>
 </head>
 
 <body>
-  <!-- Title bar -->
-  <div id="title-bar">
-    <div id="title">Twitch Redeems</div>
-    <div id="title-bar-btns">
-      <button id="min-btn">─</button>
-      <button id="max-btn">◻</button>
-      <button id="close-btn">✕</button>
+  <div id="window">
+
+    <!-- Title bar -->
+    <div id="title-bar">
+      <div id="title">Twitch Redeems</div>
+      <div id="title-bar-btns">
+        <button id="min-btn">─</button>
+        <button id="max-btn">◻</button>
+        <button id="close-btn">✕</button>
+      </div>
     </div>
-  </div>
 
-  <!-- Dynamic content -->
-  <main id="content"></main>
+    <!-- Dynamic content -->
+    <div id="content"></div>
 
-  <!-- Bottom bar -->
-  <div id="bottom-bar">
-    <div id="connections-container">
-      <div id="connection-image-container">
-        <img id="twitch-authentication-image" class="connection-image" src="images/unlocked.png" alt="Inactive Image">
+     <!-- Bottom bar -->
+    <div id="bottom-bar">
+      <div id="connections-container">
+        <div id="connection-image-container">
+          <img id="twitch-authentication-image" class="connection-image" src="images/unlocked.png" alt="Inactive Image">
+        </div>
+        <span id="text-content" class="connection-text">Authentication</span>
+
+        <div id="connection-image-container">
+          <img id="twitch-eventsub-connection-image" class="connection-image" src="images/disconnected.png"
+            alt="Inactive Image">
+        </div>
+        <span id="text-content" class="connection-text">Twitch EventSub</span>
+
+        <div id="connection-image-container">
+          <img id="game-http-server-connection-image" class="connection-image" src="images/disconnected.png"
+            alt="Inactive Image">
+        </div>
+        <span id="text-content" class="connection-text">GameHttpProxy</span>
       </div>
-      <span id="text-content" class="connection-text">Authentication</span>
-
-      <div id="connection-image-container">
-        <img id="twitch-eventsub-connection-image" class="connection-image" src="images/disconnected.png"
-          alt="Inactive Image">
-      </div>
-      <span id="text-content" class="connection-text">Twitch EventSub</span>
-
-      <div id="connection-image-container">
-        <img id="game-http-server-connection-image" class="connection-image" src="images/disconnected.png"
-          alt="Inactive Image">
-      </div>
-      <span id="text-content" class="connection-text">GameHttpProxy</span>
     </div>
   </div>
 </body>
