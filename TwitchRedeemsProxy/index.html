@@ -2,19 +2,11 @@
 <html>
 
 <head>
-  <style>
-    .window-control {
-      font-size: 20px;
-      padding: 0;
-      margin-right: 0px;
-      line-height: 1;
-    }
-  </style>
-  <title>Hello World!</title>
   <link rel="stylesheet" href="style.css" />
 </head>
 
 <body>
+  <!-- Title bar -->
   <div id="title-bar">
     <div id="title">Twitch Redeems</div>
     <div id="title-bar-btns">
@@ -24,11 +16,10 @@
     </div>
   </div>
 
-  <div id="content">
-    I learned about Electron in Visual Studio Code<br />
-    from <a href="http://www.mylifeforthecode.com">My Life For The Code</a>.
-  </div>
+  <!-- Dynamic content -->
+  <main id="content"></main>
 
+  <!-- Bottom bar -->
   <div id="bottom-bar">
     <div id="connections-container">
       <div id="connection-image-container">
@@ -50,6 +41,7 @@
     </div>
   </div>
 </body>
+
 <script src="renderer.js"></script>
 
 </html>

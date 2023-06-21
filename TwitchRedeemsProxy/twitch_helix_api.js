@@ -1,17 +1,8 @@
-const https = require('https');
 const Requests = require('./https_requests.js');
+const ipc = require('./ipc.js');
 
 let twitch_api = null;
 let twitch_auth = null;
-
-function open(client_id, client_secret, redirect_uri, scopes) {
-  twitch_auth = new TwitchAuth(client_id, client_secret, redirect_uri, scopes)
-  twitch_api = new TwitchHelixAPI(client_id, client_secret)
-}
-
-async function close() {
-  // TODO
-}
 
 class TwitchAuth {
   constructor(client_id, client_secret, redirect_uri, scopes) {
@@ -31,10 +22,10 @@ class TwitchAuth {
     let url = "https://id.twitch.tv/oauth2/authorize";
     url += `?client_id=${this.client_id}`;
     url += `&redirect_uri=http://${this.redirect_uri}`;
-    url += `&response_type=code`; //token`
+    url += `&response_type=code`;
     url += `&scope=${this.scopes.map(scope => encodeURIComponent(scope)).join('+')}`;
     url += `&force_verify=${force_verify}`;
-    url += `&state=${"THIS-IS-A-TOTALLY-RANDOM-STRING"}`; // TODO xdd
+    url += `&state=${"THIS-IS-A-TOTALLY-RANDOM-STRING"}`; // xdd
     return url;
   }
 
@@ -86,8 +77,8 @@ async function authenticate(auth_code) {
       console.log('Twitch authentication token acquired');
 
       // Set twitch authorization tokens.
-      twitch_auth.access_token = data['access_token']
-      twitch_auth.refresh_token = data['refresh_token']
+      twitch_auth.access_token = data['access_token'];
+      twitch_auth.refresh_token = data['refresh_token'];
 
       // Authenticate user.
       try {
@@ -98,7 +89,8 @@ async function authenticate(auth_code) {
         if (response.statusCode == 200) {
           console.log('Twitch authentication complete');
           // Store user id for twitch api requests later.
-          twitch_auth.user_id = data['user_id']
+          twitch_auth.user_id = data['user_id'];
+          ipc.setTwitchAuthenticationState(true);
         }
         else {
           console.error(`Twitch authentication failed with status code ${response.statusCode}`);
@@ -115,84 +107,42 @@ async function authenticate(auth_code) {
   catch (error) {
     console.error(`Error on acquiring twitch authentication token: '${error}'`);
   }
-
-  // // twitch_auth.get_access_token(auth_code)
-  // //   .then((response) => {
-  //     const data = JSON.parse(response.data);
-  //     if (response.statusCode == 200) {
-  //       console.log('Twitch authentication token acquired');
-
-  //       // Set twitch authorization tokens.
-  //       twitch_auth.access_token = data['access_token']
-  //       twitch_auth.refresh_token = data['refresh_token']
-
-  //       // Authenticate user.
-  //       twitch_auth.set_user_authentication()
-  //         .then((response) => {
-  //           // Check response.
-  //           const data = JSON.parse(response.data);
-  //           if (response.statusCode == 200) {
-  //             console.log('Twitch authentication complete');
-  //             // Store user id for twitch api requests later.
-  //             twitch_auth.user_id = data['user_id']
-  //           }
-  //           else {
-  //             console.error(`Twitch authentication failed with status code ${response.statusCode}`);
-  //           }
-  //         })
-  //         .catch((error) => {
-  //           console.error(`Twitch Authentication error: '${error}'`);
-  //         });
-  //     }
-  //     else {
-  //       console.error(`Acquiring twitch authentication token failed with status code ${response.statusCode}`);
-  //     }
-  //   })
-    // .catch((error) => {
-    //   console.error(`Error on acquiring twitch authentication token: '${error}'`);
-    // });
 }
 
-// async function authenticate(auth_code) {
-//   twitch_auth.get_access_token(auth_code)
-//     .then((response) => {
-//       const data = JSON.parse(response.data);
-//       if (response.statusCode == 200) {
-//         console.log('Twitch authentication token acquired');
+function open(client_id, client_secret, redirect_uri, scopes) {
+  twitch_auth = new TwitchAuth(client_id, client_secret, redirect_uri, scopes)
+  twitch_api = new TwitchHelixAPI(client_id, client_secret)
+}
 
-//         // Set twitch authorization tokens.
-//         twitch_auth.access_token = data['access_token']
-//         twitch_auth.refresh_token = data['refresh_token']
-
-//         // Authenticate user.
-//         twitch_auth.set_user_authentication()
-//           .then((response) => {
-//             // Check response.
-//             const data = JSON.parse(response.data);
-//             if (response.statusCode == 200) {
-//               console.log('Twitch authentication complete');
-//               // Store user id for twitch api requests later.
-//               twitch_auth.user_id = data['user_id']
-//             }
-//             else {
-//               console.error(`Twitch authentication failed with status code ${response.statusCode}`);
-//             }
-//           })
-//           .catch((error) => {
-//             console.error(`Twitch Authentication error: '${error}'`);
-//           });
-//       }
-//       else {
-//         console.error(`Acquiring twitch authentication token failed with status code ${response.statusCode}`);
-//       }
-//     })
-//     .catch((error) => {
-//       console.error(`Error on acquiring twitch authentication token: '${error}'`);
-//     });
-// }
+async function close() {
+  revoke_authentication();
+}
 
 async function revoke_authentication() {
-  // TODO 
+  // https://dev.twitch.tv/docs/authentication/revoke-tokens/
+  ipc.setTwitchAuthenticationState(false);
+
+  // TODO untested
+
+  if (twitch_auth.access_token) {
+    let body = `client_id=${this.client_id}`;
+    body += `&token=${twitch_auth.access_token}`;
+
+    const options = {
+      method: 'POST',
+      hostname: 'id.twitch.tv',
+      path: '/oauth2/validate',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded',
+        'Content-Length': Buffer.byteLength(body),
+      }
+    };
+
+    return Requests.requests(options, body);
+  }
+  else {
+    return null;
+  }
 }
 
 function getAuthData() {
@@ -291,7 +241,7 @@ module.exports = {
   close,
   get_authentication_url,
   authenticate,
-  getAuthData ,
+  getAuthData,
   revoke_authentication,
   create_custom_reward,
   update_custom_reward,

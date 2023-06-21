@@ -3,6 +3,13 @@
   src: url('fonts/consola.ttf');
 }
 
+.window-control {
+  font-size: 20px;
+  padding: 0;
+  margin-right: 0px;
+  line-height: 1;
+}
+
 html {
   margin: 0px;
   padding: 0px;
@@ -13,12 +20,12 @@ body {
   margin: 0px;
   background-color: #313338;
   border: 0px solid #313338;
-  /* border-bottom: 24px solid #0078d4; */
   position: absolute;
   top: 0px;
   left: 0px;
   right: 0px;
   bottom: 0px;
+  overflow: hidden !important;
 }
 
 #title-bar {
@@ -103,9 +110,66 @@ body {
   font-family: sans-serif;
   color: #ffffff;
   font-size: 12px;
-  /*position: fixed;
-  top: 0px;
-  left: 12px;
-  line-height: 32px;
-  user-select: none; */
+}
+
+#webview-container {
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+}
+
+webview {
+  white-space: nowrap;
+  width: 100%;
+  height: 100%;
+  overflow-y: auto;
+}
+
+
+
+
+
+
+
+
+#console {
+  width: 100%;
+  height: 200px;
+  overflow: auto;
+  border: 1px solid #4c4c4c;
+  padding: 1px;
+  background-color: #181818;
+  font-family: monospace;
+  font-size: 12px;
+}
+
+/* Styles for individual console messages */
+.console-message {
+  padding: 0px 10px;
+  border-radius: 4px;
+  margin-top: 5px;
+  margin-bottom: 3px;
+  background-color: transparent;
+}
+
+.console-message.info {
+  color: #3f9dff;
+}
+
+.console-message.warning {
+  color: #ffd504;
+}
+
+.console-message.error {
+  color: #ff000c;
+}
+
+.console-message.log {
+  color: #3f9dff;
+}
+
+.parent-container {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }

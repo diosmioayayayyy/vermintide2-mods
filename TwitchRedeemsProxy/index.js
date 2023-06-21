@@ -1,41 +1,19 @@
-const { app, BrowserWindow, ipcMain } = require('electron');
-const handlebars = require('handlebars');
-const fs = require('fs');
+const { app, BrowserWindow, ipcMain, protocol } = require('electron');
 const path = require('path');
 
+require('./logging.js');
 const TwitchRedeemsHTTPProxy = require('./twitch_redeems_http_proxy.js');
 const TwitchHelixAPI = require('./twitch_helix_api.js');
 const TwitchEventSub = require('./twitch_even_sub.js');
 
-let main_window;
-let web_view;
-
 function createWindow() {
-  // TODO clean up this mess later
-  function parseFilePath(urlString) {
-    const parsedUrl = new URL(urlString);
-    let fileName = parsedUrl.pathname;
-    if (process.platform === 'win32') fileName = fileName.substr(1);
-    return fileName.replace(/(?:\s|%20)/g, ' ');
-  }
-
-    // TODO clean up this mess later
-  protocol.registerFileProtocol('asset', (request, callback) => {
-    const currentAssetFolderPath = "./";
-    const parsedUrl = new URL(request.url);
-    const hostName = parsedUrl.host;
-    const fileName = parseFilePath(request.url);
-    const filePath = path.join(process.cwd(), currentAssetFolderPath, hostName, fileName);
-    callback({ path: filePath });
-  });
-
-  var main_window = new BrowserWindow({
+  global.main_window = new BrowserWindow({
     width: 800,
     height: 600,
     minWidth: 300,
     minHeight: 300,
     icon: 'twitch_redeems.png',
-    frame: false, // Remove title bar
+    frame: false,
     titleBarStyle: 'customButtonsOnHover',
     backgroundColor: '#000000',
     center: true,
@@ -45,12 +23,12 @@ function createWindow() {
     maximizable: true,
     webPreferences: {
       nodeIntegration : true,
+      webSecurity: true,
       webviewTag: true,
       enableRemoteModule: true,
       contextIsolation: false,
     },
   });
-  global.main_window = main_window;
 
   // Setup Twitch Authentication.
   const client_id     = "zuknbow10f0m5b0rqosg0gpba6tg41"
@@ -60,52 +38,25 @@ function createWindow() {
 
   // Open twitch helix api and get auhtorization url.
   TwitchHelixAPI.open(client_id, client_secret, redirectUri, scopes)
-  const auth_url = TwitchHelixAPI.get_authentication_url(true)
+  const auth_url = TwitchHelixAPI.get_authentication_url(true);
 
-  {
-    // Handlebars
-    const index_path = path.join(__dirname, 'index.hbs');
-    const css_file_path = path.join(__dirname, 'partials', 'default.css.hbs');
-    const title_path = path.join(__dirname, 'partials', 'title.hbs');
-    const bottom_path = path.join(__dirname, 'partials', 'bottom.hbs');
-  
-    const index_template = fs.readFileSync(index_path, 'utf8');
-    const css_partial = fs.readFileSync(css_file_path, 'utf8');
-    const title_partial = fs.readFileSync(title_path, 'utf8');
-    const bottom_partial = fs.readFileSync(bottom_path, 'utf8');
+  // Open index page.
+  global.main_window.loadFile('index.html');
 
-    // Register the partial with Handlebars
-    handlebars.registerPartial('css', css_partial);
-    handlebars.registerPartial('title', title_partial);
-    handlebars.registerPartial('bottom', bottom_partial);
-
-    // Render the template with data
-    var compiledTemplate = handlebars.compile(index_template);
-  }
-
-  const html = compiledTemplate({});
-
-  // Authenticate.Options Page
-  //main_window.loadURL(auth_url); // TODO
-  main_window.loadFile('index.html'); // TODO
-  //main_window.loadURL(`data:text/html;charset=utf-8,${encodeURIComponent(html)}`);
-
-  // Catch redirect uri from twitch 
-  main_window.webContents.on('will-navigate', function (event, newUrl) {
-    const parsedUrl = new URL(newUrl);
-    host = parsedUrl.host
-
-    if (parsedUrl.host == redirectUri) {
+  ipcMain.on('twitch-auth-redirect-url', (event, redirect_url) => {
+    // Parse redirect uri from twitch authentication procedure.
+    const parsedUrl = new URL(redirect_url);
+    if (!global.twitch_auth_redirected && parsedUrl.host == redirectUri) {
+      global.twitch_auth_redirected = true; // This happens two times for whatever reason, just execute it once.
       const queryParams = parsedUrl.searchParams;
       const auth_code = queryParams.get('code');
 
       if (auth_code) {
         // Start twitch authorization.
         connectToTwitch(auth_code);
-        event.preventDefault();
 
-        // Load app gui.
-        //main_window.loadFile('index.html'); // TODO
+        // Load main content after successful authentication.
+        global.main_window.webContents.send('openMain');
       }
       else {
         // Shut down app.
@@ -119,14 +70,14 @@ function createWindow() {
   });
 
   // Wait for the window to be ready
-  main_window.webContents.on('did-finish-load', () => {
+  global.main_window.webContents.on('did-finish-load', () => {
     main_window.show();
     main_window.focus();
-    TwitchRedeemsHTTPProxy.startHTTPProxyServer();
+    global.main_window.webContents.send('openTwitchAuth', auth_url);
   });
 
-  main_window.on('closed', function () {
-    main_window = null;
+  global.main_window.on('closed', function () {
+    global.main_window = null;
   });
 }
 
@@ -138,6 +89,9 @@ async function connectToTwitch(auth_code) {
       // Open EventSub websocket connection.
       const events = ['channel.channel_points_custom_reward_redemption.add']
       await TwitchEventSub.openEventSubWebsocket(events, cb);
+
+      const port = 8000;
+      TwitchRedeemsHTTPProxy.startHTTPProxyServer(port);
     }
     catch (error) { console.error(`Twitch EventSub: '${error}'`); }
   }
@@ -159,5 +113,3 @@ function cb(data) {
   // TODO this is the event callback
   console.log(data.payload.event.reward.title)
 }
-
-// TODO font: Caslon Antique

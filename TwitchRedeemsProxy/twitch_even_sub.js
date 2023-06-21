@@ -1,18 +1,11 @@
 const WebSocket = require('ws');
 const Requests = require('./https_requests.js');
 const TwitchHelixAPI = require('./twitch_helix_api.js');
+const ipc = require('./ipc.js');
+require('./utils.js');
 
 const url = "wss://eventsub.wss.twitch.tv/ws"
 let twitch_event_sub_api = null;
-
-function check_response_status_codes(responses, success_code) { // TODO same function in http proxy
-  for (const response of responses) {
-    if (response.statusCode != success_code) {
-      return response.statusCode;
-    }
-  }
-  return success_code;
-}
 
 class TwitchEventSubAPI {
   constructor(events, event_callback) {
@@ -25,9 +18,9 @@ class TwitchEventSubAPI {
 
   start_timeout() {
     this.timeout_id = setTimeout(() => {
-      // TODO 10s have passed
+      // After 10s twitch eventsub will close connection if no message has been sent.
       console.error("Twitch EventSub connection has timed out. Trying to reconnect...")
-      
+
       // Try to reconnect.
       this.close()
       this.connect()
@@ -58,6 +51,7 @@ class TwitchEventSubAPI {
       throw criticalError;
     }
     else {
+      ipc.setTwitchEventSubConnectionState(true);
       console.log("Subscribed to events")
     }
   }
@@ -102,12 +96,12 @@ class TwitchEventSubAPI {
     
     this.ws.on('close', () => {
       console.log('Twitch EventSub websocket closed');
+      ipc.setTwitchEventSubConnectionState(false);
       // TODO handle when closed, but game is still running.
     });
   }
 
   async subscribe(event) {
-    // TODO WAIT FOR AUTH
     const [broadcaster_id, client_id, access_token] = TwitchHelixAPI.getAuthData();
 
     const body = JSON.stringify({

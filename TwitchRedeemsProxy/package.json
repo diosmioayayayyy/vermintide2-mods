@@ -13,9 +13,11 @@
   "devDependencies": {
     "@twurple/auth": "^6.2.1",
     "axios": "^1.4.0",
+    "ejs": "^3.1.9",
     "electron": "^25.1.1",
     "electron-oauth2": "^3.0.0",
     "electron-pug": "^2.0.0",
+    "electron-webpack": "^2.8.2",
     "handlebars": "^4.7.7",
     "https": "^1.0.0",
     "node-twitch": "^0.5.0",

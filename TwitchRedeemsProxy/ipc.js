@@ -1,6 +1,3 @@
-const myModule  = require('./index.js');
-const { remote } = require('electron');
-const { session } = require('electron');
 
 function setTwitchAuthenticationState(is_connected) {
   global.main_window.webContents.send('setTwitchAuthenticationState', is_connected);
@@ -19,5 +16,3 @@ module.exports = {
   setTwitchEventSubConnectionState,
   setGameHttpProxyServerConnectionState,
 };
-
-// TODO FILENAME
