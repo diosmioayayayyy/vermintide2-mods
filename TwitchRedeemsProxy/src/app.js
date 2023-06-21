@@ -1,10 +1,10 @@
 const { app, BrowserWindow, ipcMain, protocol } = require('electron');
 const path = require('path');
 
-require('./logging.js');
-const TwitchRedeemsHTTPProxy = require('./twitch_redeems_http_proxy.js');
-const TwitchHelixAPI = require('./twitch_helix_api.js');
-const TwitchEventSub = require('./twitch_even_sub.js');
+require('./utils/logging.js');
+const TwitchRedeemsHTTPProxy = require('./api/twitch_redeems_http_proxy.js');
+const TwitchHelixAPI = require('./api/twitch_helix_api.js');
+const TwitchEventSub = require('./api/twitch_even_sub.js');
 
 function createWindow() {
   global.main_window = new BrowserWindow({
@@ -41,7 +41,7 @@ function createWindow() {
   const auth_url = TwitchHelixAPI.get_authentication_url(true);
 
   // Open index page.
-  global.main_window.loadFile('index.html');
+  global.main_window.loadFile('content/index.html');
 
   ipcMain.on('twitch-auth-redirect-url', (event, redirect_url) => {
     // Parse redirect uri from twitch authentication procedure.

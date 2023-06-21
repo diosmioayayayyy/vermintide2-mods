@@ -26,8 +26,10 @@ console.warn = function(...args) {
 
 console.error = function(...args) {
   // Send to rendere.js
-  const log_string = args.map((arg) => String(arg)).join(' ');
-  global.main_window.webContents.send('logToConsole', "error", log_string);
+  if (global.main_window) {
+    const log_string = args.map((arg) => String(arg)).join(' ');
+    global.main_window.webContents.send('logToConsole', "error", log_string);
+  }
 
   // Call the original console.log method with the same arguments
   originalConsoleError.apply(console, args);

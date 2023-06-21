@@ -1,6 +1,6 @@
 const http = require('http');
-const ipc  = require('./ipc.js');
-require('./utils.js')
+const ipc  = require('../utils/ipc.js');
+require('../utils/utils.js')
 const TwitchHelixAPI = require('./twitch_helix_api.js');
 
 let server;

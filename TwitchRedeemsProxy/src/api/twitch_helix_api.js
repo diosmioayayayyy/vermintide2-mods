@@ -1,5 +1,6 @@
-const Requests = require('./https_requests.js');
-const ipc = require('./ipc.js');
+const Requests = require('../utils/https_requests.js');
+const ipc  = require('../utils/ipc.js');
+require('../utils/utils.js')
 
 let twitch_api = null;
 let twitch_auth = null;

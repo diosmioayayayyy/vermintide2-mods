@@ -1,6 +1,6 @@
 @font-face {
   font-family: 'Consolas';
-  src: url('fonts/consola.ttf');
+  src: url('../fonts/consola.ttf');
 }
 
 .window-control {

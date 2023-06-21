@@ -16,6 +16,7 @@ function loadContent(page) {
   fetch(url)
     .then(response => response.text())
     .then(html => {
+      console.log("ASDASD ", html) // TODO
       content.innerHTML = html;
     })
     .catch(error => {
@@ -25,11 +26,11 @@ function loadContent(page) {
 
 ipcRenderer.on('openTwitchAuth', (event, auth_url) => {
   twitch_auth_url = auth_url;
-  loadContent('content/twitch_login');
+  loadContent('twitch_login');
 });
 
 ipcRenderer.on('openMain', (event) => {
-  loadContent('content/main');
+  loadContent('main');
   delete_twitch_auth_webview();
 });
 
@@ -57,7 +58,7 @@ ipcRenderer.on('setGameHttpProxyServerConnectionState', (event, is_connected) =>
 // Observe if dynamic content changes.
 const observer = new MutationObserver(function (mutationsList, observer) {
   switch (current_content) {
-    case "content/twitch_login":
+    case "twitch_login":
       {
         const element = document.getElementById("webview_twitch_auth");
         if (element == null) {
@@ -65,7 +66,7 @@ const observer = new MutationObserver(function (mutationsList, observer) {
         }
         break;
       }
-    case "content/main":
+    case "main":
       {
         break;
       }

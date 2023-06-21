@@ -1,8 +1,8 @@
 const WebSocket = require('ws');
-const Requests = require('./https_requests.js');
+const Requests = require('../utils/https_requests.js');
 const TwitchHelixAPI = require('./twitch_helix_api.js');
-const ipc = require('./ipc.js');
-require('./utils.js');
+const ipc = require('../utils/ipc.js');
+require('../utils/utils.js');
 
 const url = "wss://eventsub.wss.twitch.tv/ws"
 let twitch_event_sub_api = null;
