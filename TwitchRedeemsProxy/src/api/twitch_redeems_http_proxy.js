@@ -1,5 +1,5 @@
 const http = require('http');
-const ipc  = require('../utils/ipc.js');
+const ipc = require('../utils/ipc.js');
 require('../utils/utils.js')
 const TwitchHelixAPI = require('./twitch_helix_api.js');
 
@@ -289,8 +289,10 @@ function startHTTPProxyServer(port) {
 }
 
 async function closeHTTPProxyServer() {
-  server.close(() => {s
-  });
+  if (server) {
+    server.close(() => {s
+    });
+  }
 }
 
 module.exports = {

@@ -79,6 +79,20 @@ const observer = new MutationObserver(function (mutationsList, observer) {
   }
 });
 
+
+// Title bar buttons.
+document.getElementById("min-btn").addEventListener("click", function() {
+  ipcRenderer.send('buttonWindowMinimizePressed');
+});
+
+document.getElementById("max-btn").addEventListener("click", function() {
+  ipcRenderer.send('buttonWindowMaximizePressed');
+});
+
+document.getElementById("close-btn").addEventListener("click", function() {
+  ipcRenderer.send('buttonWindowClosePressed');
+});
+
 // Start observing changes to the body
 observer.observe(document.body, { childList: true, subtree: true });
 

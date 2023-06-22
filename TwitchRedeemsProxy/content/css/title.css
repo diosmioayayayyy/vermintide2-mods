@@ -22,8 +22,10 @@
 #title-bar-btns {
   -webkit-app-region: no-drag;
   position: fixed;
-  top: 1px;
   right: 5px;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 }
 
 #title-bar-btns button {
@@ -39,4 +41,10 @@
 #title-bar-btns button:hover {
   background-color: #3F3F41;
   user-select: none;
+}
+
+.title-button-text {
+  display: inline-block;
+  vertical-align: middle;
+  line-height: 32px;
 }

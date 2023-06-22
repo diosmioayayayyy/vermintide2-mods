@@ -2,6 +2,7 @@ const { app, BrowserWindow, ipcMain, protocol } = require('electron');
 const path = require('path');
 
 require('./utils/logging.js');
+const ipc = require('./utils/ipc.js');
 const TwitchRedeemsHTTPProxy = require('./api/twitch_redeems_http_proxy.js');
 const TwitchHelixAPI = require('./api/twitch_helix_api.js');
 const TwitchEventSub = require('./api/twitch_even_sub.js');
@@ -100,6 +101,7 @@ async function connectToTwitch(auth_code) {
 
 app.on('ready', function () {
   createWindow();
+  ipc.registerTitleButtonActions(app);
 });
 
 app.on('before-quit', async () => {
