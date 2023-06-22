@@ -22,7 +22,7 @@
 #title-bar-btns {
   -webkit-app-region: no-drag;
   position: fixed;
-  right: 5px;
+  right: 0px;
   display: flex;
   justify-content: flex-end;
   align-items: center;
@@ -30,7 +30,7 @@
 
 #title-bar-btns button {
   height: 32px;
-  width: 24px;
+  width: 32px;
   background-color: transparent;
   border: none;
   color: #F1F1F1;
@@ -41,6 +41,10 @@
 #title-bar-btns button:hover {
   background-color: #3F3F41;
   user-select: none;
+}
+
+button#close-btn.close:hover {
+  background-color: #ff0000;
 }
 
 .title-button-text {
