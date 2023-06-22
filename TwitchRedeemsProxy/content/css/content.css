@@ -5,7 +5,8 @@
   overflow-x: auto;
   overflow-y: auto;
   white-space: nowrap;
-  /* TODO Border messes some stuff up right now => maybe another child div? */
-  /* border: 1px solid #4c4c4c;
-  padding: 1px; */
+  background-image: url('../images/twitch_redeems_logo.png');
+  background-repeat: no-repeat;
+  background-size: 300px auto;
+  background-position: center center;
 }

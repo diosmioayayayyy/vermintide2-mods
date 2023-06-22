@@ -5,7 +5,16 @@
   padding: 0px;
   margin: 0px;
   font-family: sans-serif;
-  flex: none;
+  display: flex;
+  align-items: center;
+}
+
+#title-icon {
+  width: 24px;
+  height: 24px;
+  margin-left: 5px;
+  background-image: url('../images/twitch_redeems_symbol.png');
+  background-size: cover;
 }
 
 #title {
@@ -13,7 +22,7 @@
   color: #aeafaf;
   position: fixed;
   top: 0px;
-  left: 12px;
+  left: 40px;
   line-height: 32px;
   font-size: 14px;
   user-select: none;

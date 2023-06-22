@@ -11,9 +11,9 @@ function createWindow() {
   global.main_window = new BrowserWindow({
     width: 800,
     height: 600,
-    minWidth: 300,
-    minHeight: 300,
-    icon: 'twitch_redeems.png',
+    minWidth: 512,
+    minHeight: 512,
+    icon: './content/images/twitch_redeems_symbol.png',
     frame: false,
     titleBarStyle: 'customButtonsOnHover',
     backgroundColor: '#000000',

@@ -16,7 +16,6 @@ function loadContent(page) {
   fetch(url)
     .then(response => response.text())
     .then(html => {
-      console.log("ASDASD ", html) // TODO
       content.innerHTML = html;
     })
     .catch(error => {
