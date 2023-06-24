@@ -239,6 +239,7 @@ function startHTTPProxyServer(port) {
   server = http.createServer(function (request, response) {
     // Set response header.
     response.setHeader('Content-Type', 'application/json');
+    response.appendHeader('Access-Control-Allow-Origin', '*');
 
     let requestBody = '';
     request.on('data', (chunk) => {
