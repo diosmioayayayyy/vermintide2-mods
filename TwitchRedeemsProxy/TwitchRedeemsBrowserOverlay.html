@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+  <script src="https://code.jquery.com/jquery-3.6.0.min.js"
+    integrity="sha256-/xUj+3OJU5yExlq6GSYGSHk7tPXikynS7ogEvDej/m4=" crossorigin="anonymous"></script>
+
+  <style>
+    @font-face {
+      font-family: 'CaslonAntique';
+      src: url('content/fonts/CaslonAntique.ttf');
+    }
+
+    body {
+      background-color: rgba(0, 0, 0, 0);
+      margin: auto;
+      overflow: hidden;
+      font-family: "Source Sans Pro", sans-serif;
+    }
+
+    #content {
+      height: 100vh;
+      width: 300px;
+      background-color: transparent;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-end;
+      perspective: 50cm;
+      perspective-origin: right top;
+    }
+
+    #title-bar {
+      background-color: transparent;
+      padding: 0px;
+      margin: 0px;
+      white-space: nowrap;
+      display: flex;
+      flex-direction: row;
+      align-items: baseline;
+      flex-wrap: nowrap;
+      justify-content: center;
+    }
+
+    #title {
+      font-family: CaslonAntique, sans-serif;
+      color: #9347ff;
+      text-shadow: 0px 0px 10.5px #000;
+      text-decoration: underline;
+      padding-left: 0px;
+      padding-right: 0px;
+      font-size: 40px;
+      transform: skewY(-5deg) rotateY(-25deg);
+    }
+
+    #timer {
+      font-family: CaslonAntique, sans-serif;
+      color: #aeafaf;
+      width: 90px;
+      text-align: end;
+      font-size: 50px;
+      text-shadow: 0px 0px 10.5px #000;
+    }
+
+    .flash {
+      animation: flash 1s infinite;
+    }
+
+    @keyframes flash {
+      0% {
+        opacity: 1;
+        transform: scale(1);
+      }
+
+      25% {
+        opacity: 0.5;
+        transform: scale(1.2);
+      }
+
+      50% {
+        opacity: 1;
+        transform: scale(0.8);
+      }
+
+      75% {
+        opacity: 0.5;
+        transform: scale(1.2);
+      }
+
+      100% {
+        opacity: 1;
+        transform: scale(1);
+      }
+    }
+
+    .list-container {
+      text-align: right;
+      padding-top: 0px;
+      position: relative;
+      width: 100%;
+      overflow-y: visible;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      justify-content: flex-end;
+    }
+
+    .list-item {
+      font-family: CaslonAntique, sans-serif;
+      font-size: 30px;
+      text-shadow: 0px 0px 10.5px #000;
+      color: #ffffff;
+      background-color: transparent;
+      opacity: 0;
+      width: 100%;
+      margin-bottom: 10px;
+      padding-right: 10px;
+      white-space: nowrap;
+      display: flex;
+      justify-content: flex-end;
+      align-items: baseline;
+      transition: opacity 0.5s, transform 0.5s;
+      transform: skewY(-15deg) rotateY(-35deg) translateY(-30px) translateX(-300px);
+    }
+
+    .list-item-redeem {
+      font-family: CaslonAntique, sans-serif;
+      font-size: 30px;
+    }
+
+    .list-item-fill {
+      font-family: Helvetica;
+      font-size: 15px;
+      padding-left: 10px;
+      padding-right: 10px;
+    }
+
+    .list-item-user {
+      font-family: Helvetica;
+      font-size: 20px;
+    }
+
+    .list-item.slide-up {
+      transform: translateY(-100%), skewY(-5deg) rotateY(-55deg);
+    }
+
+    .list-item.fade-in {
+      opacity: 1.0;
+      transition: all 1s;
+      transform: skewY(-5deg) rotateY(-35deg);
+    }
+
+    .list-item.fade-out {
+      opacity: 0;
+      margin: -30px;
+      transition: all 1s;
+    }
+
+    .buttons-container {
+      display: flex;
+      justify-content: flex-start;
+      margin-bottom: 10px;
+    }
+
+    .button {
+      padding: 5px 10px;
+      background-color: #007bff;
+      color: #fff;
+      border: none;
+      cursor: pointer;
+      margin-right: 10px;
+    }
+  </style>
+</head>
+
+<body>
+  <div class="buttons-container">
+    <button id="addButton" class="button">Add Item</button>
+    <button id="deleteButton" class="button">Delete Item</button>
+  </div>
+
+  <div id="content">
+    <div id="title-bar">
+      <div id="title">Twitch Redeems</div>
+      <div id="timer">69s</div>
+    </div>
+    <div id="redeem_container" class="list-container"></div>
+  </div>
+
+  <script>
+    // Browser overlay.
+    const addButton = document.getElementById("addButton");
+    const deleteButton = document.getElementById("deleteButton");
+    const redeem_container = document.getElementById("redeem_container")
+    const timer = document.getElementById("timer")
+
+    // Dynamically add css styles for coloring text.
+    function add_css_style_color(id, color) {
+      const styleElement = document.createElement('style');
+      styleElement.textContent = `#${id} { color: #${color} }`;
+      document.head.appendChild(styleElement);
+    }
+
+    // Delete css style.
+    function remove_css_style(id) {
+      const styleElement = document.getElementById(id);
+      if (styleElement)
+        document.head.removeChild(styleElement);;
+    }
+
+    // Add item to display queue with nice css animations.
+    function spawnListItem(id, redeem_name, redeem_color, user_name, user_color) {
+      const listItem = document.createElement("div");
+      listItem.classList.add("list-item");
+
+      const redeem_title = document.createElement('div');
+      redeem_title.id = `Title${id}`;
+      redeem_title.classList.add("list-item-redeem");
+      redeem_title.innerHTML = redeem_name;
+      add_css_style_color(redeem_title.id, redeem_color);
+
+      const redeem_fill = document.createElement('div');
+      redeem_fill.classList.add("list-item-fill");
+      redeem_fill.innerHTML = "by";
+
+      const redeem_user = document.createElement('div');
+      redeem_user.id = `User${id}`;
+      redeem_user.classList.add("list-item-user");
+      redeem_user.innerHTML = user_name;
+      add_css_style_color(redeem_user.id, user_color);
+
+      listItem.appendChild(redeem_title);
+      listItem.appendChild(redeem_fill);
+      listItem.appendChild(redeem_user);
+
+      // Handle spawn animation.
+      setTimeout(() => {
+        listItem.classList.add("fade-in");
+      }, 100);
+
+      listItem.classList.add("slide-up");
+
+      return listItem;
+    }
+
+    // Pop item from display queue with nice css animation.
+    function popListItem() {
+      const listItems = document.getElementsByClassName("list-item");
+      if (listItems.length > 0) {
+        const topItem = listItems[0];
+
+        topItem.classList.remove("fade-in");
+
+        setTimeout(() => {
+          topItem.classList.add("fade-out");
+        }, 100);
+
+        topItem.addEventListener("transitionend", () => {
+          topItem.remove();
+        });
+      }
+    }
+
+    const MAX_LIST_ITEMS = 10;
+
+    class RedeemQueue {
+      constructor() {
+        this.clear();
+      }
+
+      clear() {
+        // Clear redeem buffer.
+        this.queue = [];
+
+        // Clear display redeem queue.
+        redeem_container.innerHTML = "";
+
+        // Some state variables.
+        this.highest_id = -1;        // Stores the highest redeem-id seen.
+        this.last_redeemed_id = -1;  // Stores the highest redeemed id.
+        this.ui_head_id = -1;        // Stores the redeem-id at the head of the display queue.
+        this.timer_value = 0;
+        this.timer_is_flashing = false;
+      }
+
+      pop() {
+        return this.queue.shift();
+      }
+
+      push(redeem, redeem_id) {
+        // Only add new redeems to buffer.
+        if (this.last_redeemed_id < redeem_id && (this.head_id() < redeem_id)) {
+          redeem.title_color = redeem.title_color.slice(2); // TODO check what app sends
+          redeem.user_color = redeem.user_color.slice(2); // TODO check what app sends
+          this.queue.push({ data: redeem, id: redeem_id });
+        }
+        // Keep track of highest seen redeem-id.
+        this.highest_id = Math.max(this.highest_id, redeem_id);
+      }
+
+      head_id() {
+        return (this.queue.length > 0) ? this.queue[this.queue.length - 1].id : -1;
+      }
+
+      tail_id() {
+        return (this.queue.length > 0) ? this.queue[0].id : -1;
+      }
+
+      size() {
+        return this.queue.length;
+      }
+
+      find_redeem_id(search_id) {
+        // Search first key from buffer to push into display queue.
+        let start_key = null;
+        for (const item of this.queue) { // TODO might be slow
+          if (item.id == (search_id)) {
+            start_key = Number(item.id);
+            break;
+          }
+        }
+        return start_key;
+      }
+
+      find_next_ui_head_id() {
+        return this.find_redeem_id(this.ui_head_id + 1);
+      }
+
+      // Pop redeems from buffer.
+      try_pop_from_buffer() {
+        // Compare tail of display queue with last redeemed id.
+        while (this.size() && this.last_redeemed_id >= 0 && (this.last_redeemed_id >= this.tail_id())) {
+          this.pop();
+        }
+      }
+    }
+
+    const redeem_queue = new RedeemQueue();
+
+    // HTTP polling.
+    var timeoutHandle
+    var poll = function () {
+      // const listItems = document.getElementsByClassName("list-item");
+      const redeem_container = document.getElementById("redeem_container")
+
+      // TODO
+      // Each redeems gets an ID (increasing)
+      // GET request sends last received ID
+      // Server respons with list of all redeems above the ID
+      // returned ID is used for next request
+      // keep a redeem buffer since we only want to display x number of redeems to prevent overflows.
+      // The GET response also retunrs the ID of the last spawned redeems, that way we know how many redeems we have to pop from list.
+      // GET response also includes time until next redeem gets spawned.
+
+      // We may want to reset redeem IDs, probably when mission ends => think about that later....
+      // We also need a clear response if mission ends and not all redeems have been processed.
+
+      $.ajax({
+        type: "GET",
+        url: "http://localhost:8000/queued-redeems",
+        dataType: "json",
+        data: { "head-redeem-id": redeem_queue.head_id() },
+        success: function (resp) {
+          if (timeoutHandle) {
+            clearTimeout(timeoutHandle)
+            timeoutHandle = undefined;
+          }
+
+          // Parse response body.
+          const data = JSON.parse(resp);
+          const redeems = data["redeems"];
+          const first_redeem_id = data["first_redeem_id"];
+          const last_redeemed_id = data["last_redeemed_id"];
+          const timer = data["timer"];
+
+          const head_id = redeem_queue.head_id();
+
+          // Add received redeems to buffer.
+          for (const [local_id, redeem] of Object.entries(redeems)) {
+            redeem_queue.push(redeem, Number(first_redeem_id) + Number(local_id));
+          }
+
+          redeem_queue.timer_value = timer;
+          redeem_queue.last_redeemed_id = Math.max(redeem_queue.last_redeemed_id, last_redeemed_id);
+
+          redeem_queue.try_pop_from_buffer();
+        },
+        error: function (xhr, status, error) {
+          console.log("AJAX request failed: ", status, error);
+        }
+      });
+    };
+
+    function update() {
+      if (redeem_queue.timer_value < 6 || 1) {
+        if (!timer.classList.contains("flash")) {
+          timer.classList.add("flash");
+        }
+      }
+      else {
+        if (timer.classList.contains("flash")) {
+          timer.classList.remove("flash");
+        }
+      }
+      timer.innerText = redeem_queue.timer_value + "s";
+      try_push_to_redeem_queue();
+      try_pop_from_redeem_queue();
+    }
+
+    function try_push_to_redeem_queue() {
+      if (redeem_queue.size() > 0 && redeem_queue.ui_head_id <= redeem_queue.head_id()) {
+        // Search first key from buffer to push into display queue.
+        const start_key = redeem_queue.find_next_ui_head_id();
+
+        // If we found a valid key, add it to display queue.
+        if (start_key != null) {
+          for (let key = start_key; key < redeem_queue.queue.length; key++) {
+            // Display on a number of redeems.
+            if (redeem_container.length >= MAX_LIST_ITEMS) {
+              break;
+            }
+
+            // Create new redeem list item.
+            const redeem = redeem_queue.queue[key];
+            const new_list_item = spawnListItem(redeem.id, redeem.data.title, redeem.data.title_color, redeem.data.user, redeem.data.user_color);
+
+            // Add new list item to display container.
+            redeem_container.appendChild(new_list_item);
+
+            // Trigger reflow to apply the initial style before animating
+            new_list_item.getBoundingClientRect();
+
+            // Keep track of head-id in display queue.
+            redeem_queue.ui_head_id = redeem.id;
+            break;
+          }
+        }
+      }
+    }
+
+    // Pop redeems from display queue via recursive calls.
+    function try_pop_from_redeem_queue() {
+      function pop_recursive() {
+        const redeem_container = document.getElementById("redeem_container")
+        if (redeem_container.children.length > 0) {
+          const topItem = redeem_container.firstChild.firstChild;
+          const display_tail_id = Number(topItem.id.slice(5)); // Cut away "Title"
+          if (display_tail_id <= redeem_queue.last_redeemed_id) {
+            popListItem();
+            setTimeout(() => { pop_recursive(); }, 250);
+          }
+        }
+      }
+      pop_recursive();
+    }
+
+    // Pool in fixed interval
+    // TODO: maybe long polling?
+    $(document).ready(function () {
+      setInterval(poll, 1000);
+      setInterval(update, 250);
+    })
+
+  </script>
+</body>
+
+</html>

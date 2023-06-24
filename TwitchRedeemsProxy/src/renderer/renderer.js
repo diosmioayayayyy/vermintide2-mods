@@ -144,7 +144,9 @@ function push_console_message(severity, message) {
       case "log":     logEntry.className = "console-message log"; break;
       default: console.error("Unknown severity: ", severity);
     }
-  
+
+    // TODO: stack messages if they are the same
+
     logEntry.textContent = message;
     consoleElement.appendChild(logEntry);
     consoleElement.scrollTop = consoleElement.scrollHeight; // Auto-scroll to the bottom
