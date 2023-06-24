@@ -391,17 +391,23 @@
     };
 
     function update() {
-      if (redeem_queue.timer_value < 6 || 1) {
-        if (!timer.classList.contains("flash")) {
-          timer.classList.add("flash");
+      if (redeem_container.children.length > 0) {
+        if (redeem_queue.timer_value < 6) {
+          if (!timer.classList.contains("flash")) {
+            timer.classList.add("flash");
+          }
         }
+        else {
+          if (timer.classList.contains("flash")) {
+            timer.classList.remove("flash");
+          }
+        }
+        timer.innerText = `[${redeem_queue.timer_value}s]`;
       }
       else {
-        if (timer.classList.contains("flash")) {
-          timer.classList.remove("flash");
-        }
+        timer.innerText = "[empty]"
       }
-      timer.innerText = redeem_queue.timer_value + "s";
+
       try_push_to_redeem_queue();
       try_pop_from_redeem_queue();
     }
@@ -415,7 +421,7 @@
         if (start_key != null) {
           for (let key = start_key; key < redeem_queue.queue.length; key++) {
             // Display on a number of redeems.
-            if (redeem_container.length >= MAX_LIST_ITEMS) {
+            if (redeem_container.children.length >= MAX_LIST_ITEMS) {
               break;
             }
 
