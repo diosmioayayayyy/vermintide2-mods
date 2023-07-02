@@ -219,6 +219,20 @@ class TwitchHelixAPI {
     };
     return Requests.requests(options);
   }
+
+  async get_user_chat_color(user_id) {
+    // https://dev.twitch.tv/docs/api/reference/#get-user-chat-color
+    const options = {
+      method: 'GET',
+      hostname: this.url_helix_api,
+      path: `/helix/chat/color?user_id=${user_id}`,
+      headers: {
+        'Authorization': `Bearer ${twitch_auth.access_token}`,
+        'Client-Id': `${this.client_id}`,
+      }
+    };
+    return Requests.requests(options);
+  }
 }
 
 async function create_custom_reward(reward) {
@@ -237,6 +251,10 @@ async function update_custom_reward(custom_reward_id, redeem_update) {
   return twitch_api.update_custom_reward(custom_reward_id, redeem_update);
 }
 
+async function get_user_chat_color(user_id) {
+  return twitch_api.get_user_chat_color(user_id);
+}
+
 module.exports = {
   open,
   close,
@@ -248,4 +266,5 @@ module.exports = {
   update_custom_reward,
   delete_custom_reward,
   get_custom_rewards,
+  get_user_chat_color,
 };
