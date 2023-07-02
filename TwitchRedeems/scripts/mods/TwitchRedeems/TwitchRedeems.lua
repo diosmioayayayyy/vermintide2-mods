@@ -296,6 +296,7 @@ end
 
 mod.update = function(dt)
     mod.render_ui(dt)
+    mod.http_proxy_client:update(dt)
 end
 
 -- Toggle Redeem Configurator Gui.
