@@ -6,6 +6,7 @@ const ipc = require('./utils/ipc.js');
 const TwitchRedeemsHTTPProxy = require('./api/twitch_redeems_http_proxy.js');
 const TwitchHelixAPI = require('./api/twitch_helix_api.js');
 const TwitchEventSub = require('./api/twitch_even_sub.js');
+const { redeem_queue } = require('./redeem_queue.js');
 
 function createWindow() {
   global.main_window = new BrowserWindow({
@@ -113,5 +114,6 @@ app.on('before-quit', async () => {
 
 function cb(data) {
   // TODO this is the event callback
-  console.log(data.payload.event.reward.title)
+  const redeem = data.payload.event;
+  redeem_queue.push(redeem);
 }

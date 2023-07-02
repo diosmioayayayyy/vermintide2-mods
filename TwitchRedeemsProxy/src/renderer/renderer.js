@@ -127,6 +127,7 @@ function delete_twitch_auth_webview() {
   }
 }
 
+// TODO move stuff in files.
 
 // Console test stuff
 const console_messages = [["",""]];

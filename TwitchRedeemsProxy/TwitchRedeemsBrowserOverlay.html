@@ -20,7 +20,7 @@
 
     #content {
       height: 100vh;
-      width: 300px;
+      width: 600px;
       background-color: transparent;
       display: flex;
       flex-direction: column;
@@ -196,7 +196,7 @@
     // Dynamically add css styles for coloring text.
     function add_css_style_color(id, color) {
       const styleElement = document.createElement('style');
-      styleElement.textContent = `#${id} { color: #${color} }`;
+      styleElement.textContent = `#${id} { color: ${color} }`;
       document.head.appendChild(styleElement);
     }
 
@@ -265,6 +265,8 @@
     class RedeemQueue {
       constructor() {
         this.clear();
+
+        this.flashing_threshold = 3;
       }
 
       clear() {
@@ -288,9 +290,9 @@
 
       push(redeem, redeem_id) {
         // Only add new redeems to buffer.
-        if (this.last_redeemed_id < redeem_id && (this.head_id() < redeem_id)) {
-          redeem.title_color = redeem.title_color.slice(2); // TODO check what app sends
-          redeem.user_color = redeem.user_color.slice(2); // TODO check what app sends
+        if ((this.last_redeemed_id < redeem_id) && (this.head_id() < redeem_id)) {
+          redeem.title_color = redeem.title_color;
+          redeem.user_color = redeem.user_color;
           this.queue.push({ data: redeem, id: redeem_id });
         }
         // Keep track of highest seen redeem-id.
@@ -312,9 +314,9 @@
       find_redeem_id(search_id) {
         // Search first key from buffer to push into display queue.
         let start_key = null;
-        for (const item of this.queue) { // TODO might be slow
+        for (const [key, item] of Object.entries(this.queue)) { // TODO might be slow
           if (item.id == (search_id)) {
-            start_key = Number(item.id);
+            start_key = Number(key);
             break;
           }
         }
@@ -322,6 +324,11 @@
       }
 
       find_next_ui_head_id() {
+        // If ui head id is not in sync simply set it to tail id.
+        // Needed for e.g., restart of browser overlay.
+        if (this.ui_head_id < 0) {
+          this.ui_head_id = this.tail_id() - 1;
+        }
         return this.find_redeem_id(this.ui_head_id + 1);
       }
 
@@ -380,7 +387,10 @@
           }
 
           redeem_queue.timer_value = timer;
-          redeem_queue.last_redeemed_id = Math.max(redeem_queue.last_redeemed_id, last_redeemed_id);
+
+          if (last_redeemed_id != null) {
+            redeem_queue.last_redeemed_id = Math.max(redeem_queue.last_redeemed_id, last_redeemed_id);
+          }
 
           redeem_queue.try_pop_from_buffer();
         },
@@ -391,21 +401,29 @@
     };
 
     function update() {
-      if (redeem_container.children.length > 0) {
-        if (redeem_queue.timer_value < 6) {
-          if (!timer.classList.contains("flash")) {
+      function enable_timer_flash() {
+        if (!timer.classList.contains("flash")) {
             timer.classList.add("flash");
           }
-        }
-        else {
-          if (timer.classList.contains("flash")) {
+      }
+      function disable_timer_flash() {
+        if (timer.classList.contains("flash")) {
             timer.classList.remove("flash");
           }
+      }
+
+      if (redeem_container.children.length > 0) {
+        if (redeem_queue.timer_value < redeem_queue.flashing_threshold) {
+          enable_timer_flash();
+        }
+        else {
+          disable_timer_flash();
         }
         timer.innerText = `[${redeem_queue.timer_value}s]`;
       }
       else {
-        timer.innerText = "[empty]"
+        timer.innerText = "[empty]";
+        disable_timer_flash();
       }
 
       try_push_to_redeem_queue();

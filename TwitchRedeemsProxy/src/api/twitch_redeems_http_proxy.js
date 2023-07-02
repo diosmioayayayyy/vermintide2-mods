@@ -2,6 +2,7 @@ const http = require('http');
 const ipc = require('../utils/ipc.js');
 require('../utils/utils.js')
 const TwitchHelixAPI = require('./twitch_helix_api.js');
+const { redeem_queue } = require('../redeem_queue.js');
 
 let server;
 
@@ -138,9 +139,57 @@ async function handleRequestGet(request, response, body) {
   let status_code;
   let response_body;
 
+  const url = new URL(request.url, `http://${request.headers.host}`);
+
   try {
-    logRequestUrlError(request_type, request.url);
-    status_code = 400;
+    if (url.pathname == '/pop-redeem') {
+      const redeem = redeem_queue.pop();
+      if (redeem != null) {
+        // TODO WT
+      }
+    }
+    else if (url.pathname == '/queued-redeems') {
+      const head_redeem_id = url.searchParams.get("head-redeem-id")
+      let start_index = head_redeem_id < 0 ? 0 : redeem_queue.find_by_uid(head_redeem_id);
+
+      const redeems = [];
+      let first_redeem_uid = -1;
+      let last_redeem_uid = -1;
+
+      if (start_index != null && start_index < redeem_queue.size()) {
+        first_redeem_uid = redeem_queue.queue.items[start_index].twitch_redeems_uid;
+
+        for (let i = start_index; i < redeem_queue.size(); i++) {
+          const redeem = redeem_queue.queue.items[i];
+  
+          const r = {
+            "title": redeem.reward.title,
+            "title_color": redeem.reward.title_color,
+            "user": redeem.user_name,
+            "user_color": redeem.user_chat_color,
+            "uid": redeem.twitch_redeems_uid,
+          }
+
+          redeems.push(r)
+          last_redeem_uid = redeem.twitch_redeems_uid;
+        }
+      }
+
+      // Construct reponse body.
+      body = {
+        redeems: redeems,
+        first_redeem_id: first_redeem_uid,
+        last_redeemed_id: redeem_queue.last_redeemed_id,
+        timer: redeem_queue.queue_timer,
+      }
+
+      response_body = JSON.stringify(body);
+      status_code = 200;
+    }
+    else {
+      logRequestUrlError(request_type, request.url);
+      status_code = 400;
+    }
   }
   catch (error) {
     logHandleRequestError(request_type, error);
