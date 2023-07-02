@@ -33,10 +33,11 @@
       background-color: transparent;
       padding: 0px;
       margin: 0px;
+      height: 50px;
       white-space: nowrap;
       display: flex;
       flex-direction: row;
-      align-items: baseline;
+      align-items: flex-end;
       flex-wrap: nowrap;
       justify-content: center;
     }
@@ -53,7 +54,7 @@
     }
 
     #timer {
-      font-family: CaslonAntique, sans-serif;
+      font-family: monospace;
       color: #aeafaf;
       width: 90px;
       text-align: end;
@@ -94,7 +95,7 @@
 
     .list-container {
       text-align: right;
-      padding-top: 0px;
+      padding-top: 20px;
       position: relative;
       width: 100%;
       overflow-y: visible;
@@ -173,23 +174,16 @@
 </head>
 
 <body>
-  <div class="buttons-container">
-    <button id="addButton" class="button">Add Item</button>
-    <button id="deleteButton" class="button">Delete Item</button>
-  </div>
-
   <div id="content">
     <div id="title-bar">
       <div id="title">Twitch Redeems</div>
-      <div id="timer">69s</div>
+      <div id="timer"></div>
     </div>
     <div id="redeem_container" class="list-container"></div>
   </div>
 
   <script>
     // Browser overlay.
-    const addButton = document.getElementById("addButton");
-    const deleteButton = document.getElementById("deleteButton");
     const redeem_container = document.getElementById("redeem_container")
     const timer = document.getElementById("timer")
 
@@ -379,6 +373,12 @@
           const last_redeemed_id = data["last_redeemed_id"];
           const timer = data["timer"];
 
+          // Redeem queue got reseted, so we have to reset the overlay too.
+          if (data["reset"]) {
+            redeem_queue.clear();
+            return;
+          }
+
           const head_id = redeem_queue.head_id();
 
           // Add received redeems to buffer.
@@ -422,7 +422,7 @@
         timer.innerText = `[${redeem_queue.timer_value}s]`;
       }
       else {
-        timer.innerText = "[empty]";
+        timer.innerText = "";
         disable_timer_flash();
       }
 

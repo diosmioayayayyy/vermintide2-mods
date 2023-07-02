@@ -143,10 +143,22 @@ async function handleRequestGet(request, response, body) {
 
   try {
     if (url.pathname == '/pop-redeem') {
-      const redeem = redeem_queue.pop();
+      const redeem = redeem_queue.request_redeem();
       if (redeem != null) {
         // TODO WT
+        // mark redeem as fullfilled.
+        status_code = 200;
+
+        // Construct reponse.
+        body = {
+        }
       }
+      else {
+        status_code = 204;
+        body = {};
+      }
+
+      response_body = JSON.stringify(body);
     }
     else if (url.pathname == '/queued-redeems') {
       const head_redeem_id = url.searchParams.get("head-redeem-id")
@@ -161,7 +173,7 @@ async function handleRequestGet(request, response, body) {
 
         for (let i = start_index; i < redeem_queue.size(); i++) {
           const redeem = redeem_queue.queue.items[i];
-  
+
           const r = {
             "title": redeem.reward.title,
             "title_color": redeem.reward.title_color,
@@ -175,13 +187,16 @@ async function handleRequestGet(request, response, body) {
         }
       }
 
-      // Construct reponse body.
+      // Construct reponse.
       body = {
         redeems: redeems,
         first_redeem_id: first_redeem_uid,
         last_redeemed_id: redeem_queue.last_redeemed_id,
         timer: redeem_queue.queue_timer,
+        reset: redeem_queue.reset_browser_overlay,
       }
+
+      redeem_queue.reset_browser_overlay = false;
 
       response_body = JSON.stringify(body);
       status_code = 200;
@@ -340,7 +355,7 @@ function startHTTPProxyServer(port) {
 
 async function closeHTTPProxyServer() {
   if (server) {
-    server.close(() => {s
+    server.close(() => {
     });
   }
 }

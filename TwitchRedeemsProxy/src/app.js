@@ -2,11 +2,11 @@ const { app, BrowserWindow, ipcMain, protocol } = require('electron');
 const path = require('path');
 
 require('./utils/logging.js');
-const ipc = require('./utils/ipc.js');
 const TwitchRedeemsHTTPProxy = require('./api/twitch_redeems_http_proxy.js');
 const TwitchHelixAPI = require('./api/twitch_helix_api.js');
 const TwitchEventSub = require('./api/twitch_even_sub.js');
 const { redeem_queue } = require('./redeem_queue.js');
+const ipc = require('./utils/ipc.js');
 
 function createWindow() {
   global.main_window = new BrowserWindow({
@@ -64,11 +64,21 @@ function createWindow() {
         // Shut down app.
         const error = queryParams.get('error');
         if (error) {
-          console.error(`Shutting down: ${error}`)
+          console.error(`Shutting down: ${error}`);
         }
         app.quit();
       }
     }
+  });
+
+  // TODO WT move or del
+  ipcMain.on('popRedeem', (event) => {
+    redeem_queue.pop();
+  });
+
+  // TODO dont like that location
+  ipcMain.on('request_settings', (event) => {
+    redeem_queue.send_settings();
   });
 
   // Wait for the window to be ready

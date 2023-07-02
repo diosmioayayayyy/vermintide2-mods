@@ -18,13 +18,13 @@ function registerTitleButtonActions(app) {
       app.quit();
     }
   });
-  
+
   ipcMain.on("buttonWindowMaximizePressed", (event) => {
     if (global.main_window) {
       global.main_window.maximize();
     }
   });
-  
+
   ipcMain.on("buttonWindowMinimizePressed", (event) => {
     if (global.main_window) {
       global.main_window.minimize();

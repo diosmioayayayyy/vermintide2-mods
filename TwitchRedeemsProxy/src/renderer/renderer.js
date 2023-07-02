@@ -1,6 +1,11 @@
 const { ipcRenderer } = require('electron');
+const Controls = require('../src/renderer/controls.js');
+const Console = require('../src/renderer/console.js');
+const Settings = require('../src/renderer/settings.js');
+const TwitchAuth = require('../src/renderer/twitch_auth.js');
 
 // Main window elements.
+const menu = document.getElementById('menu');
 const content = document.getElementById('content');
 const twitch_authentication_image = document.getElementById('twitch-authentication-image');
 const twitch_eventsub_connection_image = document.getElementById('twitch-eventsub-connection-image');
@@ -8,29 +13,36 @@ const game_http_server_connection_image = document.getElementById('game-http-ser
 
 let current_content = "";
 let twitch_auth_url = "";
+let content_changed = false;
 
 // Load dynamic content.
-function loadContent(page) {
+function loadContent(div_element, page) {
   const url = `${page}.html`;
   current_content = page;
+  content_changed = true;
   fetch(url)
     .then(response => response.text())
     .then(html => {
-      content.innerHTML = html;
+      div_element.innerHTML = html;
     })
     .catch(error => {
       console.error(`Failed to load page: ${error}`);
     });
 }
 
-ipcRenderer.on('openTwitchAuth', (event, auth_url) => {
-  twitch_auth_url = auth_url;
-  loadContent('twitch_login');
-});
+function load_menu() {
+  loadContent(menu, "menu");
+}
+
+function changeContent(page) {
+  loadContent(content, page);
+}
+
 
 ipcRenderer.on('openMain', (event) => {
-  loadContent('main');
-  delete_twitch_auth_webview();
+  loadContent(content, 'main');
+  load_menu(); // TODO naming conventions.... xdd
+  TwitchAuth.delete_webview();
 });
 
 ipcRenderer.on('setTwitchAuthenticationState', (event, is_connected) => {
@@ -61,12 +73,36 @@ const observer = new MutationObserver(function (mutationsList, observer) {
       {
         const element = document.getElementById("webview_twitch_auth");
         if (element == null) {
-          load_content_twitch_auth();
+          TwitchAuth.load_content();
         }
         break;
       }
     case "main":
       {
+        break;
+      }
+    case "menu":
+      {
+        break;
+      }
+    case "controls":
+      {
+        break;
+      }
+    case "console":
+      {
+        if (content_changed) {
+          Console.reset_console_message_index();
+          Console.print_console_messages();
+        }
+        break;
+      }
+    case "settings":
+      {
+        if (content_changed) {
+          Settings.create_event_listeners();
+          Settings.request_settings();
+        }
         break;
       }
     default:
@@ -76,97 +112,24 @@ const observer = new MutationObserver(function (mutationsList, observer) {
         }
       }
   }
+  content_changed = false;
 });
 
 
 // Title bar buttons.
-document.getElementById("min-btn").addEventListener("click", function() {
+document.getElementById("min-btn").addEventListener("click", function () {
   ipcRenderer.send('buttonWindowMinimizePressed');
 });
 
-document.getElementById("max-btn").addEventListener("click", function() {
+document.getElementById("max-btn").addEventListener("click", function () {
   ipcRenderer.send('buttonWindowMaximizePressed');
 });
 
-document.getElementById("close-btn").addEventListener("click", function() {
+document.getElementById("close-btn").addEventListener("click", function () {
   ipcRenderer.send('buttonWindowClosePressed');
 });
 
 // Start observing changes to the body
 observer.observe(document.body, { childList: true, subtree: true });
 
-
-// TODO move content stuff into sep js?
-const webview_twitch_auth_id = "webview_twitch_auth";
-
-function load_content_twitch_auth() {
-  // Create a new WebView element
-  const webview = document.createElement('webview');
-  webview.id = webview_twitch_auth_id;
-
-  // Set the src attribute dynamically.
-  webview.src = twitch_auth_url;
-
-  // Append the webview to the container element.
-  const container = document.getElementById('webview-container');
-  container.appendChild(webview);
-
-  webview.addEventListener('dom-ready', () => {
-    webview.addEventListener('will-navigate', (event) => {
-      event.preventDefault(); // Does not work in webview...
-      ipcRenderer.send('twitch-auth-redirect-url', event.url);
-    });
-  })
-}
-
-function delete_twitch_auth_webview() {
-  const element = document.getElementById(webview_twitch_auth_id);
-  if (element != null) {
-    console.log("Removing twitch auth webview");
-    element.remove();
-  }
-}
-
 // TODO move stuff in files.
-
-// Console test stuff
-const console_messages = [["",""]];
-let console_messages_index = 0;
-
-function push_console_message(severity, message) {
-  const consoleElement = document.getElementById('console');
-  if (consoleElement) {
-    const logEntry = document.createElement('div');
-
-    switch (severity) {
-      case "info":    logEntry.className = "console-message info"; break;
-      case "warning": logEntry.className = "console-message warning"; break;
-      case "error":   logEntry.className = "console-message error"; break;
-      case "log":     logEntry.className = "console-message log"; break;
-      default: console.error("Unknown severity: ", severity);
-    }
-
-    // TODO: stack messages if they are the same
-
-    logEntry.textContent = message;
-    consoleElement.appendChild(logEntry);
-    consoleElement.scrollTop = consoleElement.scrollHeight; // Auto-scroll to the bottom
-  }
-}
-
-function add_console_message(severity, text) {
-  console_messages.push([severity, text]);
-
-  // Push new console messages into container.
-  for (let index = console_messages_index; index < console_messages.length; index++) {
-    if (console_messages_index < index) {
-      const [severity, text] = console_messages[index];
-      push_console_message(severity, text);
-      console_messages_index = index;
-    }
-  }
-}
-
-ipcRenderer.on('logToConsole', (event, severity, text) => {
-  add_console_message(severity, text);
-});

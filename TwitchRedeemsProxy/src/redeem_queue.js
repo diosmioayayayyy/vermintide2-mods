@@ -1,19 +1,28 @@
 require('./utils/logging.js');
 const FifoQueue = require('./utils/fifo_queue.js');
-const ipc = require('./utils/ipc.js');
 const TwitchRedeemsHTTPProxy = require('./api/twitch_redeems_http_proxy.js');
 const TwitchHelixAPI = require('./api/twitch_helix_api.js');
+const { ipcMain } = require('electron');
 
 class RedeemQueue {
   constructor() {
+    // Queue settings.
+    this.time_between_redeems = 5;
+
+    this.init();
+  }
+
+  init() {
     this.queue = new FifoQueue();
     this.next_redeem_id = 0;
     this.last_redeemed_id = null;
     this.user_colors = {};
-
-    // Queue settings.
-    this.time_between_redeems = 5;
     this.queue_timer = 0;
+    this.reset_browser_overlay = true;
+  }
+
+  send_settings() {
+    global.main_window.webContents.send('send_setting', "setting_time_between_redeems", String(this.time_between_redeems));
   }
 
   queue_timer_tick = () => {
@@ -57,6 +66,13 @@ class RedeemQueue {
     return null;
   }
 
+  request_redeem() {
+    if (this.queue_timer == 0) {
+      return this.pop();
+    }
+    return null;
+  }
+
   pop() {
     const redeem = this.queue.pop();
     if (redeem != null) {
@@ -88,6 +104,15 @@ class RedeemQueue {
 }
 
 const redeemQueueInstance = new RedeemQueue();
+
+// Settings from IPC.
+ipcMain.on("setting_time_between_redeems", (event, value) => {
+  redeemQueueInstance.time_between_redeems = Number(value);
+});
+
+ipcMain.on("resetRedeemQueue", (event, value) => {
+  redeemQueueInstance.init();
+});
 
 module.exports = {
   redeem_queue: redeemQueueInstance
