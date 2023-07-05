@@ -4,7 +4,7 @@ TwitchRedeemsHTTPProxyClient = class(TwitchRedeemsHTTPProxyClient)
 
 local REQ_NEXT_REDEEM = "/pop-redeem"
 local REQ_MAP_START = "/map_start"
-local REQ_MAP_END = "/map_start"
+local REQ_MAP_END = "/map_end"
 local REQ_KEEP_ENTER = "/keep_enter"
 local REQ_REDEEMS = "/redeems"
 --local REQ_PLAYER_JOINED = "/game_client"
@@ -85,7 +85,6 @@ TwitchRedeemsHTTPProxyClient.update = function(self, dt)
   if self.polling_timer ~= nil then
     self.polling_timer = self.polling_timer + dt
 
-    mod:info(self.polling_timer)
     if self.polling_timer > POLLING_INTERVAL and 0 then
       if mod.redeems_enabled then
         -- TODO add remaining time to response to increase polling timer?
@@ -99,11 +98,22 @@ end
 TwitchRedeemsHTTPProxyClient.request_next_reedem = function(self)
   Requests.get(self.url .. REQ_NEXT_REDEEM, {}, function(response)
     if response.success then
-      mod:echo(tostring(response.status_code))
-      mod:echo(tostring(response.headers))
-      mod:echo(tostring(response.data))
+      if response.status_code == 200 then
+        local json_str = string.sub(response.data, 2, -2)
+        json_str = string.gsub(json_str, "\\", "")
+        local success, data = pcall(cjson.decode, json_str)
+        if success then
+          local msg = string.format("%s redeemed %s", data.user, data.title)
+          if data.user_input ~= "" then
+            msg = msg .. string.format("\n '%s'", data.user_input)
+          end
+          mod:echo(msg)
+        else
+          mod:error("Failed parsing redeem")
+        end
+      end
     else
-      mod:error("HTTP Request failed")
+      mod:error("HTTP Request 'request_next_reedem' failed")
     end
   end)
 end
@@ -111,11 +121,9 @@ end
 TwitchRedeemsHTTPProxyClient.request_map_start = function(self)
   Requests.post(self.url .. REQ_MAP_START, {}, cjson.encode({}), function(response)
     if response.success then
-      mod:echo(tostring(response.status_code))
-      mod:echo(tostring(response.headers))
-      mod:echo(tostring(response.data))
+      -- Nothing to do here.
     else
-      mod:error("HTTP Request failed")
+      mod:error("HTTP Request 'request_map_start' failed")
     end
   end)
 end
@@ -123,11 +131,9 @@ end
 TwitchRedeemsHTTPProxyClient.request_map_end = function(self)
   Requests.post(self.url .. REQ_MAP_END, {}, cjson.encode({}), function(response)
     if response.success then
-      mod:echo(tostring(response.status_code))
-      mod:echo(tostring(response.headers))
-      mod:echo(tostring(response.data))
+      -- Nothing to do here.
     else
-      mod:error("HTTP Request failed")
+      mod:error("HTTP Request 'request_map_end' failed")
     end
   end)
 end
@@ -136,11 +142,9 @@ end
 TwitchRedeemsHTTPProxyClient.request_create_redeems = function(self, redeems)
   Requests.post(self.url .. REQ_REDEEMS, {}, cjson.encode(redeems), function(response)
     if response.success then
-      mod:echo(tostring(response.status_code))
-      mod:echo(tostring(response.headers))
-      mod:echo(tostring(response.data))
+      mod:echo("Redeems were created.")
     else
-      mod:error("HTTP Request failed")
+      mod:error("HTTP Request 'request_create_redeems' failed")
     end
   end)
 end
@@ -148,11 +152,9 @@ end
 TwitchRedeemsHTTPProxyClient.request_delete_redeems = function(self)
   Requests.delete(self.url .. REQ_REDEEMS, {}, cjson.encode({}), function(response)
     if response.success then
-      mod:echo(tostring(response.status_code))
-      mod:echo(tostring(response.headers))
-      mod:echo(tostring(response.data))
+      mod:echo("Redeems were deleted.")
     else
-      mod:error("HTTP Request failed")
+      mod:error("HTTP Request 'request_delete_redeems' failed")
     end
   end)
 end
@@ -160,11 +162,9 @@ end
 TwitchRedeemsHTTPProxyClient.request_update_redeems = function(self, body)
   Requests.patch(self.url .. REQ_REDEEMS, {}, cjson.encode(body), function(response)
     if response.success then
-      mod:echo(tostring(response.status_code))
-      mod:echo(tostring(response.headers))
-      mod:echo(tostring(response.data))
+      mod:echo("Redeems were updated.")
     else
-      mod:error("HTTP Request failed")
+      mod:error("HTTP Request 'request_update_redeems' failed")
     end
   end)
 end
