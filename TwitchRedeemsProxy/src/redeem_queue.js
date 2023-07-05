@@ -53,7 +53,7 @@ class RedeemQueue {
 
     redeem.user_chat_color = this.user_colors[redeem.user_id];
     redeem.twitch_redeems_uid = this.next_redeem_id++;
-    console.log(`Added redeem to queue with uid ${redeem.twitch_redeems_uid}`);
+    console.log(`Added redeem '${redeem.reward.title}' to queue with uid ${redeem.twitch_redeems_uid}`);
     this.queue.push(redeem);
   }
   
@@ -77,6 +77,7 @@ class RedeemQueue {
     const redeem = this.queue.pop();
     if (redeem != null) {
       this.last_redeemed_id = redeem.twitch_redeems_uid;
+      console.info(`Redeem '${redeem.reward.title}' got popped`)
     }
     if (this.size() > 0) {
       this.start_queue_timer();

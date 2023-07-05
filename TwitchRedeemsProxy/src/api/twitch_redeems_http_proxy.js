@@ -8,9 +8,10 @@ let server;
 
 const TWITCH_REDEEM_REWARD_TOKEN = "[Twitch Redeem]" // TODO move?
 
-function logResponseError(func, response) {
+function logResponseError(func, response, msg = "") {
   const response_body = JSON.parse(response.data);
-  console.error(`Twitch Helix API response '${func.name}' failed with status code ${response.statusCode} - '${response_body['message']}'`);
+  if (msg) msg = "- " + msg
+  console.error(`Twitch Helix API response '${func.name}' failed with status code ${response.statusCode} - '${response_body['message']}' ${msg}`);
 }
 
 function logRequestError(func, error) {
@@ -43,7 +44,7 @@ async function create_redeems(body) {
         console.log(`Created redeem '${redeem.title}'`);
       }
       else {
-        logResponseError(create_redeems, response); // TODO still a lot of dup code, can we handle that in HelixAPI file?
+        logResponseError(create_redeems, response, redeem.title); // TODO still a lot of dup code, can we handle that in HelixAPI file?
       }
       responses.push(response);
     }
@@ -145,12 +146,14 @@ async function handleRequestGet(request, response, body) {
     if (url.pathname == '/pop-redeem') {
       const redeem = redeem_queue.request_redeem();
       if (redeem != null) {
-        // TODO WT
-        // mark redeem as fullfilled.
+        // TODO mark redeem as fullfilled.
         status_code = 200;
 
         // Construct reponse.
         body = {
+          "title": redeem.reward.title,
+          "user": redeem.user_name,
+          "user_input": redeem.user_input,
         }
       }
       else {
