@@ -1,12 +1,13 @@
 const http = require('http');
 const ipc = require('../utils/ipc.js');
+const { ipcMain } = require('electron');
 require('../utils/utils.js')
 const TwitchHelixAPI = require('./twitch_helix_api.js');
 const { redeem_queue } = require('../redeem_queue.js');
 
 let server;
 
-const TWITCH_REDEEM_REWARD_TOKEN = "[Twitch Redeem]" // TODO move?
+const TWITCH_REDEEM_REWARD_TOKEN = "[Twitch Redeem]";
 
 function logResponseError(func, response, msg = "") {
   const response_body = JSON.parse(response.data);
@@ -124,6 +125,45 @@ async function delete_redeems() {
   }
   catch (error) { logRequestError(delete_redeems, error); }
   return responses;
+}
+
+async function cancel_all_unfulfilled_redeems() {
+  var responses = [];
+  try {
+    // Get channel redeems.
+    const response = await TwitchHelixAPI.get_custom_rewards();
+    if (response.statusCode == 200) {
+      async function process(redeem) {
+        try {
+          // Get unfulfilled redemptions for specific reward.
+          const response = await TwitchHelixAPI.get_unfulfilled_reward_redemptions(redeem.id);
+          if (response.statusCode == 200) {
+            const response_body = JSON.parse(response.data);
+            // Cancel each redemption.
+            for (const redemption of response_body.data) {
+              TwitchHelixAPI.update_redemption_status_canceled(redemption);
+            }
+          }
+          else {
+            logResponseError(cancel_all_unfulfilled_redeems, response); // TODO still a lot of dup code, can we handle that in HelixAPI file?
+          }
+          responses.push(response);
+        }
+        catch (error) {
+          logRequestError(cancel_all_unfulfilled_redeems, error);
+        }
+      }
+      // Iterate over redeems and only process the ones which are marked as twitch redeems.
+      const response_body = JSON.parse(response.data);
+      console.log("Canceling all redemptions...")
+      for (const redeem of response_body['data']) {
+        if (redeem.prompt.includes(TWITCH_REDEEM_REWARD_TOKEN)) {
+          await process(redeem);
+        }
+      }
+    }
+  }
+  catch (error) { logRequestError(cancel_all_unfulfilled_redeems, error); }
 }
 
 function check_response_status_codes(responses, success_code) {
@@ -361,6 +401,15 @@ async function closeHTTPProxyServer() {
     });
   }
 }
+
+ipcMain.on("refundChannelPoints", (event) => {
+  cancel_all_unfulfilled_redeems();
+});
+
+ipcMain.on("resetRedeemQueue", (event) => {
+  cancel_all_unfulfilled_redeems();
+  redeem_queue.init();
+});
 
 module.exports = {
   startHTTPProxyServer,

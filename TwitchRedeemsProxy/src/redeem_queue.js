@@ -77,7 +77,8 @@ class RedeemQueue {
     const redeem = this.queue.pop();
     if (redeem != null) {
       this.last_redeemed_id = redeem.twitch_redeems_uid;
-      console.info(`Redeem '${redeem.reward.title}' got popped`)
+      this.set_redeem_fulfilled(redeem);
+      
     }
     if (this.size() > 0) {
       this.start_queue_timer();
@@ -115,10 +116,6 @@ class RedeemQueue {
     }
   }
 
-  clear() {
-    return this.queue.clear();
-  }
-
   size() {
     return this.queue.size();
   }
@@ -139,10 +136,6 @@ const redeemQueueInstance = new RedeemQueue();
 // Settings from IPC.
 ipcMain.on("setting_time_between_redeems", (event, value) => {
   redeemQueueInstance.time_between_redeems = Number(value);
-});
-
-ipcMain.on("resetRedeemQueue", (event, value) => {
-  redeemQueueInstance.init();
 });
 
 module.exports = {

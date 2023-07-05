@@ -271,6 +271,20 @@ class TwitchHelixAPI {
     const body = { 'status' : 'FULFILLED'}
     return await this.update_redemption_status(redeem.id,redeem.reward.id, body);
   }
+
+  async get_unfulfilled_reward_redemptions(reward_id) {
+    // https://dev.twitch.tv/docs/api/reference/#get-custom-reward-redemption
+    const options = {
+      method: 'GET',
+      hostname: this.url_helix_api,
+      path: `/helix/channel_points/custom_rewards/redemptions?broadcaster_id=${twitch_auth.user_id}&reward_id=${reward_id}&status=UNFULFILLED`,
+      headers: {
+        'Authorization': `Bearer ${twitch_auth.access_token}`,
+        'Client-Id': `${this.client_id}`,
+      }
+    };
+    return Requests.requests(options);
+  }
 }
 
 async function create_custom_reward(reward) {
@@ -301,6 +315,10 @@ async function update_redemption_status_fulfilled(redeem) {
   return twitch_api.update_redemption_status_fulfilled(redeem);
 }
 
+async function get_unfulfilled_reward_redemptions(reward_id) {
+  return twitch_api.get_unfulfilled_reward_redemptions(reward_id);
+}
+
 module.exports = {
   open,
   close,
@@ -315,4 +333,5 @@ module.exports = {
   get_user_chat_color,
   update_redemption_status_canceled,
   update_redemption_status_fulfilled,
+  get_unfulfilled_reward_redemptions,
 };
