@@ -18,6 +18,7 @@ class RedeemQueue {
     this.last_redeemed_id = null;
     this.user_colors = {};
     this.queue_timer = 0;
+    this.queue_timer_is_running = false;
     this.reset_browser_overlay = true;
   }
 
@@ -28,8 +29,9 @@ class RedeemQueue {
   queue_timer_tick = () => {
     if (this.queue_timer >= 0) {
       if (this.queue_timer === 0) {
-        // Nothing to do here I guess.
-      } else {
+        this.queue_timer_is_running = false;
+      }
+      else {
         this.queue_timer--;
         setTimeout(this.queue_timer_tick, 1000);
       }
@@ -37,8 +39,11 @@ class RedeemQueue {
   }
 
   start_queue_timer() {
-    this.queue_timer = this.time_between_redeems;
-    this.queue_timer_tick();
+    if (!this.queue_timer_is_running) {
+      this.queue_timer_is_running = true;
+      this.queue_timer = this.time_between_redeems;
+      this.queue_timer_tick();
+    }
   }
 
   async push(redeem) {
@@ -47,7 +52,7 @@ class RedeemQueue {
       await this.get_user_chat_color(redeem.user_id);
     }
 
-    if (this.queue.size() == 0) {
+    if (this.queue.size() == 0 && !this.queue_timer_is_running) {
       this.start_queue_timer();
     }
 
@@ -67,7 +72,7 @@ class RedeemQueue {
   }
 
   request_redeem() {
-    if (this.queue_timer == 0) {
+    if (!this.queue_timer_is_running) {
       return this.pop();
     }
     return null;

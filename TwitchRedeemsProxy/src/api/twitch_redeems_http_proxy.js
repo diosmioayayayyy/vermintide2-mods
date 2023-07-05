@@ -266,6 +266,16 @@ async function handleRequestPost(request, response, body) {
       const responses = await create_redeems(body);
       status_code = check_response_status_codes(responses, 200);
     }
+    else if (request.url == '/map_start') {
+      console.log("Game is starting...");
+      status_code = 200;
+    }
+    else if (request.url == '/map_end') {
+      console.log("Game is ending...");
+      redeem_queue.init();
+      cancel_all_unfulfilled_redeems();
+      status_code = 200;
+    }
     else {
       logRequestUrlError(request_type, request.url);
       status_code = 400;

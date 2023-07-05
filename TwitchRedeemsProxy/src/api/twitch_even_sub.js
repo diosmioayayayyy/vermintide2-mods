@@ -28,7 +28,7 @@ class TwitchEventSubAPI {
   }
 
   reset_timer() {
-    console.log("Eventsub keep-alive message received")
+    //console.log("Eventsub keep-alive message received")
     clearTimeout(this.timeout_id)
     this.start_timeout()
   }
@@ -57,7 +57,6 @@ class TwitchEventSubAPI {
   }
 
   on_event_received(data){
-    console.log(`Event received: ${data.metadata.subscription_type}`)
     this.event_callback(data);
   }
 
