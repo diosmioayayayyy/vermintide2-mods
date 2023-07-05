@@ -245,13 +245,13 @@ class TwitchHelixAPI {
     return Requests.requests(options);
   }
 
-  async update_redemption_status(reward_id, body_data) {
+  async update_redemption_status(id, reward_id, body_data) {
     // https://dev.twitch.tv/docs/api/reference/#update-redemption-status
     const body = JSON.stringify(body_data);
     const options = {
       method: 'PATCH',
       hostname: this.url_helix_api,
-      path: `/helix/channel_points/custom_rewards/redemptions?broadcaster_id=${twitch_auth.user_id}&reward_id=${reward_id}`,
+      path: `/helix/channel_points/custom_rewards/redemptions?broadcaster_id=${twitch_auth.user_id}&reward_id=${reward_id}&id=${id}`,
       headers: {
         'Authorization': `Bearer ${twitch_auth.access_token}`,
         'Client-Id': `${this.client_id}`,
@@ -262,16 +262,14 @@ class TwitchHelixAPI {
     return Requests.requests(options, body);
   }
 
-  async update_redemption_status_canceled(reward_id) {
-    // https://dev.twitch.tv/docs/api/reference/#update-redemption-status
+  async update_redemption_status_canceled(redeem) {
     const body = { 'status' : 'CANCELED'}
-    return await update_redemption_status(reward_id, body);
+    return await this.update_redemption_status(redeem.id, redeem.reward.id, body);
   }
 
-  async update_redemption_status_fulfilled(reward_id) {
-    // https://dev.twitch.tv/docs/api/reference/#update-redemption-status
+  async update_redemption_status_fulfilled(redeem) {
     const body = { 'status' : 'FULFILLED'}
-    return await update_redemption_status(reward_id, body);
+    return await this.update_redemption_status(redeem.id,redeem.reward.id, body);
   }
 }
 
@@ -295,6 +293,14 @@ async function get_user_chat_color(user_id) {
   return twitch_api.get_user_chat_color(user_id);
 }
 
+async function update_redemption_status_canceled(redeem) {
+  return twitch_api.update_redemption_status_canceled(redeem);
+}
+
+async function update_redemption_status_fulfilled(redeem) {
+  return twitch_api.update_redemption_status_fulfilled(redeem);
+}
+
 module.exports = {
   open,
   close,
@@ -307,4 +313,6 @@ module.exports = {
   delete_custom_reward,
   get_custom_rewards,
   get_user_chat_color,
+  update_redemption_status_canceled,
+  update_redemption_status_fulfilled,
 };

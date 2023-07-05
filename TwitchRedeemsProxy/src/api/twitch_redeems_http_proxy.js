@@ -146,7 +146,6 @@ async function handleRequestGet(request, response, body) {
     if (url.pathname == '/pop-redeem') {
       const redeem = redeem_queue.request_redeem();
       if (redeem != null) {
-        // TODO mark redeem as fullfilled.
         status_code = 200;
 
         // Construct reponse.

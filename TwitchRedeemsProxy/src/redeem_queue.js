@@ -85,6 +85,36 @@ class RedeemQueue {
     return redeem;
   }
 
+  async set_redeem_fulfilled(redeem) {
+    try {
+      const response = await TwitchHelixAPI.update_redemption_status_fulfilled(redeem);
+      if (response.statusCode == 200) {
+        console.info(`Redeem '${redeem.reward.title}' got fulfilled (${redeem.id})`);
+      }
+      else {
+        console.error(`Error fulfilling redeem '${redeem.reward.title}' with status code '${response.statusCode}'`);
+      }
+    }
+    catch (error) {
+      console.error(`Error request setting redeem fulfilled: '${error.message}'`);
+    }
+  }
+
+  async set_redeem_canceled(redeem) {
+    try {
+      const response = await TwitchHelixAPI.update_redemption_status_canceled(redeem);
+      if (response.statusCode == 200) {
+        console.info(`Redeem '${redeem.reward.title}' got canceled (${redeem.id})`);
+      }
+      else {
+        console.error(`Error canceling redeem '${redeem.reward.title}' with status code '${response.statusCode}'`);
+      }
+    }
+    catch (error) {
+      console.error(`Error request setting redeem canceled: '${error.message}'`);
+    }
+  }
+
   clear() {
     return this.queue.clear();
   }
