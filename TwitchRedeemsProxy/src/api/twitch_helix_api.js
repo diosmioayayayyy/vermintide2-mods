@@ -160,6 +160,17 @@ class TwitchHelixAPI {
 
   async create_custom_reward(reward) {
     // https://dev.twitch.tv/docs/api/reference/#create-custom-rewards
+
+    /* Body
+    title: str
+    cost: int
+    prompt: str
+    background_color: str
+    is_user_input_required: bool
+    is_global_cooldown_enabled: bool
+    global_cooldown_seconds: int
+    */
+
     const body = JSON.stringify(reward);
     const options = {
       method: 'POST',
@@ -232,6 +243,35 @@ class TwitchHelixAPI {
       }
     };
     return Requests.requests(options);
+  }
+
+  async update_redemption_status(reward_id, body_data) {
+    // https://dev.twitch.tv/docs/api/reference/#update-redemption-status
+    const body = JSON.stringify(body_data);
+    const options = {
+      method: 'PATCH',
+      hostname: this.url_helix_api,
+      path: `/helix/channel_points/custom_rewards/redemptions?broadcaster_id=${twitch_auth.user_id}&reward_id=${reward_id}`,
+      headers: {
+        'Authorization': `Bearer ${twitch_auth.access_token}`,
+        'Client-Id': `${this.client_id}`,
+        'Content-Type': `application/json`,
+        'Content-Length': Buffer.byteLength(body),
+      }
+    };
+    return Requests.requests(options, body);
+  }
+
+  async update_redemption_status_canceled(reward_id) {
+    // https://dev.twitch.tv/docs/api/reference/#update-redemption-status
+    const body = { 'status' : 'CANCELED'}
+    return await update_redemption_status(reward_id, body);
+  }
+
+  async update_redemption_status_fulfilled(reward_id) {
+    // https://dev.twitch.tv/docs/api/reference/#update-redemption-status
+    const body = { 'status' : 'FULFILLED'}
+    return await update_redemption_status(reward_id, body);
   }
 }
 
