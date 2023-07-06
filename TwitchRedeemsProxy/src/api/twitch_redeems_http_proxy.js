@@ -4,6 +4,7 @@ const { ipcMain } = require('electron');
 require('../utils/utils.js')
 const TwitchHelixAPI = require('./twitch_helix_api.js');
 const { redeem_queue } = require('../redeem_queue.js');
+const { unpauseRedeems } = require('../renderer/controls.js');
 
 let server;
 let twitch_redeems = [];
@@ -163,6 +164,7 @@ async function delete_redeems() {
           await process(redeem);
         }
       }
+      twitch_redeems = []
     }
   }
   catch (error) { logRequestError(delete_redeems, error); }
@@ -472,6 +474,22 @@ ipcMain.on("refundChannelPoints", (event) => {
 ipcMain.on("resetRedeemQueue", (event) => {
   cancel_all_unfulfilled_redeems();
   redeem_queue.init();
+});
+
+ipcMain.on("getTwitchRedeems", (event) => {
+  get_twitch_redeems();
+});
+
+ipcMain.on("deleteRedeems", (event) => {
+  delete_redeems();
+});
+
+ipcMain.on("pauseRedeems", (event) => {
+  pause_redeems(true);
+});
+
+ipcMain.on("unpauseRedeems", (event) => {
+  pause_redeems(false);
 });
 
 module.exports = {

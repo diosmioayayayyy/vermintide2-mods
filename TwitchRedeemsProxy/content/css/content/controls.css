@@ -1,3 +1,8 @@
+.controls-container {
+  display: flex;
+  flex-direction: column;
+}
+
 .controls-button {
   background-color: #8da8f0;
   color: #D0D8EE;
