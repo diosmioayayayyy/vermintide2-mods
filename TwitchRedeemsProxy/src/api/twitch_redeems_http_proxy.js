@@ -6,6 +6,7 @@ const TwitchHelixAPI = require('./twitch_helix_api.js');
 const { redeem_queue } = require('../redeem_queue.js');
 
 let server;
+let twitch_redeems = [];
 
 const TWITCH_REDEEM_REWARD_TOKEN = "[Twitch Redeem]";
 
@@ -25,6 +26,47 @@ function logRequestUrlError(request_type, url) {
 
 function logHandleRequestError(request_type, error) {
   console.error(`Handling '${request_type}' request : '${error}'`);
+}
+
+async function get_twitch_redeems() {
+  var redeems = null;
+  try {
+    // Get channel redeems.
+    const response = await TwitchHelixAPI.get_custom_rewards();
+    if (response.statusCode == 200) {
+      // Iterate over redeems and only process the ones which are marked as twitch redeems.
+      const response_body = JSON.parse(response.data);
+
+      // Only add redeems from mod.
+      redeems= []
+      for (const redeem of response_body['data']) {
+        if (redeem.prompt.includes(TWITCH_REDEEM_REWARD_TOKEN)) {
+          redeems.push(redeem);
+        }
+      }
+    }
+    else {
+      logResponseError(get_twitch_redeems, response, "Error requesting redeems from Twitch");
+    }
+  }
+  catch (error) { logRequestError(update_redeems, error); }
+  return redeems;
+}
+
+async function pause_redeems(paused) {
+  for (const redeem of twitch_redeems) {
+    if (redeem.prompt.includes(TWITCH_REDEEM_REWARD_TOKEN)) {
+      await TwitchHelixAPI.pause_custom_reward(redeem.id, paused);
+    }
+  }
+}
+
+async function enable_redeems(enabled) {
+  for (const redeem of twitch_redeems) {
+    if (redeem.prompt.includes(TWITCH_REDEEM_REWARD_TOKEN)) {
+      await TwitchHelixAPI.enable_custom_reward(redeem.id, enabled);
+    }
+  }
 }
 
 async function create_redeems(body) {
@@ -265,15 +307,23 @@ async function handleRequestPost(request, response, body) {
     if (request.url == '/redeems') {
       const responses = await create_redeems(body);
       status_code = check_response_status_codes(responses, 200);
+
+      if (status_code == 200) {
+        twitch_redeems = await get_twitch_redeems();
+      }
     }
     else if (request.url == '/map_start') {
       console.log("Game is starting...");
+      console.log("Unpausing redeems...");
+      pause_redeems(false);
       status_code = 200;
     }
     else if (request.url == '/map_end') {
       console.log("Game is ending...");
       redeem_queue.init();
       cancel_all_unfulfilled_redeems();
+      console.log("Pausing redeems...");
+      pause_redeems(true);
       status_code = 200;
     }
     else {
@@ -351,7 +401,10 @@ async function handleRequestPatch(request, response, body) {
   return [status_code, response_body];
 }
 
-function startHTTPProxyServer(port) {
+async function startHTTPProxyServer(port) {
+  // Get current twitch redeems.
+  twitch_redeems = await get_twitch_redeems();
+
   server = http.createServer(function (request, response) {
     // Set response header.
     response.setHeader('Content-Type', 'application/json');

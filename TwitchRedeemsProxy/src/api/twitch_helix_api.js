@@ -303,6 +303,20 @@ async function update_custom_reward(custom_reward_id, redeem_update) {
   return twitch_api.update_custom_reward(custom_reward_id, redeem_update);
 }
 
+async function pause_custom_reward(custom_reward_id, is_paused) {
+  const redeem_update = {
+    "is_paused": is_paused ? true : false
+  };
+  return twitch_api.update_custom_reward(custom_reward_id, redeem_update);
+}
+
+async function enable_custom_reward(custom_reward_id, is_enabled) {
+  const redeem_update = {
+    "is_enabled": is_enabled ? true : false
+  };
+  return twitch_api.update_custom_reward(custom_reward_id, redeem_update);
+}
+
 async function get_user_chat_color(user_id) {
   return twitch_api.get_user_chat_color(user_id);
 }
@@ -328,6 +342,8 @@ module.exports = {
   revoke_authentication,
   create_custom_reward,
   update_custom_reward,
+  pause_custom_reward,
+  enable_custom_reward,
   delete_custom_reward,
   get_custom_rewards,
   get_user_chat_color,
