@@ -144,6 +144,8 @@ RedeemConfiguration.render_ui = function (self)
             end
         end
 
+        Imgui.separator()
+
         if Imgui.button("Pool Redeem") then
             mod.http_proxy_client:request_next_reedem()
         end
@@ -157,12 +159,14 @@ RedeemConfiguration.render_ui = function (self)
         end
 
         if Imgui.button("Create Redeems") then
-            local redeems = {}
-            table.insert(redeems, { title="TEST1", cost="1" })
-            table.insert(redeems, { title="TEST2", cost="2" })
-            table.insert(redeems, { title="TEST3", cost="3" })
+            -- local redeems = {}
+            -- table.insert(redeems, { title="TEST1", cost="1" })
+            -- table.insert(redeems, { title="TEST2", cost="2" })
+            -- table.insert(redeems, { title="TEST3", cost="3" })
 
-            mod.http_proxy_client:request_create_redeems(redeems)
+            -- mod.http_proxy_client:request_create_redeems(redeems)
+
+            mod.setup_twitch_redeems()
         end
         Imgui.same_line()
         if Imgui.button("Delete Redeems") then

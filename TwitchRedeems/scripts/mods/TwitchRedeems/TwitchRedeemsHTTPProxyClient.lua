@@ -7,6 +7,8 @@ local REQ_MAP_START = "/map_start"
 local REQ_MAP_END = "/map_end"
 local REQ_KEEP_ENTER = "/keep_enter"
 local REQ_REDEEMS = "/redeems"
+local REQ_PAUSE_REDEEMS = "/pause_redeems"
+local REQ_UNPAUSE_REDEEMS = "/unpause_redeems"
 --local REQ_PLAYER_JOINED = "/game_client"
 --local REQ_PLAYER_LEFT = "/game_client"
 
@@ -134,6 +136,26 @@ TwitchRedeemsHTTPProxyClient.request_map_end = function(self)
       -- Nothing to do here.
     else
       mod:error("HTTP Request 'request_map_end' failed")
+    end
+  end)
+end
+
+TwitchRedeemsHTTPProxyClient.request_pause_redeems = function(self)
+  Requests.post(self.url .. REQ_PAUSE_REDEEMS, {}, cjson.encode({}), function(response)
+    if response.success then
+      -- Nothing to do here.
+    else
+      mod:error("HTTP Request 'request_pause_redeems' failed")
+    end
+  end)
+end
+
+TwitchRedeemsHTTPProxyClient.request_unpause_redeems = function(self)
+  Requests.post(self.url .. REQ_UNPAUSE_REDEEMS, {}, cjson.encode({}), function(response)
+    if response.success then
+      -- Nothing to do here.
+    else
+      mod:error("HTTP Request 'request_unpause_redeems' failed")
     end
   end)
 end

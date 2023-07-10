@@ -1,5 +1,7 @@
 local mod = get_mod("TwitchRedeems")
 
+INCLUDE_GUARDS = {}
+
 mod:dofile("scripts/mods/TwitchRedeems/BreedEditor")
 mod:dofile("scripts/mods/TwitchRedeems/RedeemConfiguration")
 mod:dofile("scripts/mods/TwitchRedeems/SettingsRedeems")
