@@ -25,7 +25,7 @@ if not INCLUDE_GUARDS.REDEEM_UNIT then
     if other and type(other) == 'table' then
       for key, value in pairs(other) do
         if key == "amount" then
-          self.amount = Amount:new(value)
+          self.data.amount = Amount:new(value)
         else
           self.data[key] = other[key]
         end
@@ -43,7 +43,7 @@ if not INCLUDE_GUARDS.REDEEM_UNIT then
     data.desc = self.data.desc
     data.breed_name = self.data.breed_name
     data.breed_index = self.data.breed_index
-    data.amount = self.data.amount
+    data.amount = self.data.amount:serialize()
     return data
   end
 
@@ -53,8 +53,10 @@ if not INCLUDE_GUARDS.REDEEM_UNIT then
     if window_open then
       self.data.name = Imgui.input_text("Name##" .. tostring(self), self.data.name)
 
+      self.data.breed_index = Imgui.combo("Breed", self.data.breed_index, GuiDropdownBaseBreedsLocalized, 10) -- TODO add custom breeds
+      self.data.breed_name = GuiDropdownBaseBreeds[self.data.breed_index]
+
       self.data.amount:render_ui()
-      --self.data.amount = Imgui.input_int("Amount", self.data.amount)
 
       self.imgui_window:end_window()
     end

@@ -87,7 +87,6 @@ RedeemConfiguration.render_ui = function (self)
         if Imgui.button("New Redeem") then
             local new_redeem = Redeem:new()
             table.insert(mod.redeems, new_redeem)
-            mod:dump(mod.redeems, "mod.redeems", 1)
         end
 
         Imgui.same_line()
@@ -159,15 +158,9 @@ RedeemConfiguration.render_ui = function (self)
         end
 
         if Imgui.button("Create Redeems") then
-            -- local redeems = {}
-            -- table.insert(redeems, { title="TEST1", cost="1" })
-            -- table.insert(redeems, { title="TEST2", cost="2" })
-            -- table.insert(redeems, { title="TEST3", cost="3" })
-
-            -- mod.http_proxy_client:request_create_redeems(redeems)
-
             mod.setup_twitch_redeems()
         end
+
         Imgui.same_line()
         if Imgui.button("Delete Redeems") then
             mod.http_proxy_client:request_delete_redeems()
@@ -213,9 +206,6 @@ RedeemConfiguration.render_ui = function (self)
 
         -- Redeem delete popup.
         if Imgui.begin_popup("popup_delete_redeem") then
-
-            mod:echo(mod.redeem_key_to_delete)
-            mod:dump(mod.redeems, "mod.redeems", 1)
 
             Imgui.text("Do you really want to delete the redeem '" .. mod.redeems[mod.redeem_key_to_delete].data.name .. "'?")
 

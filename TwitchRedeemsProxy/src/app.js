@@ -125,5 +125,7 @@ app.on('before-quit', async () => {
 function cb(data) {
   // TODO this is the event callback
   const redeem = data.payload.event;
+  //const redeem_settings = global.twitch_redeems_settings[redeem.reward.title];
+
   redeem_queue.push(redeem);
 }

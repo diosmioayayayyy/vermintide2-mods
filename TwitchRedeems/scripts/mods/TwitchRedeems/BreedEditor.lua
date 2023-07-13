@@ -122,8 +122,8 @@ if not INCLUDE_GUARDS.BREED_EDITOR then
           if prev_name ~= self.redeem_breed.data.name then
             self.gui_dropdown_redeem_breed = create_redeem_breeds_gui_dropdown_list() -- TODO
           end
-          self.redeem_breed.data.breed_index = Imgui.combo("Base Breed", self.redeem_breed.data.breed_index, GuiDropdownBreedsLocalized, 5)
-          self.redeem_breed.data.breed_name = GuiDropdownBreeds[self.redeem_breed.data.breed_index] -- Breeds[GuiDropdownBreeds[self.redeem_breed.data.breed_index]]
+          self.redeem_breed.data.breed_index = Imgui.combo("Base Breed", self.redeem_breed.data.breed_index, GuiDropdownBaseBreedsLocalized, 5)
+          self.redeem_breed.data.breed_name = GuiDropdownBaseBreeds[self.redeem_breed.data.breed_index] -- Breeds[GuiDropdownBaseBreeds[self.redeem_breed.data.breed_index]]
         end
 
         Imgui.separator()

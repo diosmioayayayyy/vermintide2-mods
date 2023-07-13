@@ -52,20 +52,18 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "chaos_raider_tutorial",
   }
 
-  GuiDropdownBreeds = {}
-  GuiDropdownBreedsLocalized = {}
+  GuiDropdownBaseBreeds = {}
+  GuiDropdownBaseBreedsLocalized = {}
 
   for breed_name, data in pairs(Breeds) do
     if not table.contains(breed_backlist, breed_name) then
-      table.insert(GuiDropdownBreeds, breed_name)
+      table.insert(GuiDropdownBaseBreeds, breed_name)
     end
   end
 
-  table.sort(GuiDropdownBreeds, function(a, b) return a < b end)
+  table.sort(GuiDropdownBaseBreeds, function(a, b) return a < b end)
 
-  for _, breed_name in pairs(GuiDropdownBreeds) do
-    table.insert(GuiDropdownBreedsLocalized, Localize(breed_name))
+  for _, breed_name in pairs(GuiDropdownBaseBreeds) do
+    table.insert(GuiDropdownBaseBreedsLocalized, Localize(breed_name))
   end
-
-  mod:dump(GuiDropdownBreedsLocalized, "GuiDropdownBreedsLocalized", 0)
 end

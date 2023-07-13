@@ -53,6 +53,19 @@ if not INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS then
     return number > 0 and 1 or (number == 0 and 0 or -1)
   end
 
+  function to_hex_color(red, green, blue)
+    local function toHex(value)
+      value = math.floor(value * 255)
+      return string.format("%02X", value)
+    end
+
+    local redHex = toHex(red)
+    local greenHex = toHex(green)
+    local blueHex = toHex(blue)
+
+    return "#" .. redHex .. greenHex .. blueHex
+  end
+
   function breed_name_valid(breed_name)
     local breed = Breeds[breed_name]
     return breed ~= nil

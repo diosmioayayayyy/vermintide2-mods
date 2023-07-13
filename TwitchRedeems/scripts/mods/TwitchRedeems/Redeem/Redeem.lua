@@ -22,31 +22,14 @@ if not INCLUDE_GUARDS.REDEEM then
       key                               = "",
       name                              = "New Redeem",
       desc                              = "",
+      user_input                        = false,
+      cost                              = 1,
+      background_color                  = { 1, 1, 1 },
+      override_queue_timer              = false,
+      queue_timer_duration              = 5,
       hordes                            = {},
       mutators                          = {},
-      ignore_global_cooldown            = false, -- TODO setting below? what to do with them. needed?
-      ignore_user_cooldown              = false,
-      override_global_cooldown          = false,
-      override_global_cooldown_duration = 5,
-      override_user_cooldown            = false,
-      override_user_cooldown_duration   = 5,
     }
-
-    -- self.key  = ""
-    -- self.name = "New Redeem"
-    -- self.desc = ""
-    -- self.hordes = {}
-    -- self.mutators = {}
-    -- self.ignore_global_cooldown = false
-    -- self.ignore_user_cooldown = false
-    -- self.override_global_cooldown = false
-    -- self.override_global_cooldown_duration = 5
-    -- self.override_user_cooldown = false
-    -- self.override_user_cooldown_duration = 5
-
-    -- Create classes from raw data.
-    -- Loaded classes from disk don't have any methods. 
-    -- Therefore we have to create new objects and initialize them with the raw values.
 
     if other and type(other) == 'table' then
       for key, value in pairs(other) do
@@ -62,7 +45,7 @@ if not INCLUDE_GUARDS.REDEEM then
     end
 
     -- Gui variables.
-    self.selected_horde = nil -- TODO HMMMMM
+    self.selected_horde = nil
   end
 
   Redeem.serialize = function(self)
@@ -70,6 +53,11 @@ if not INCLUDE_GUARDS.REDEEM then
     data.key = self.data.key
     data.name = self.data.name
     data.desc = self.data.desc
+    data.user_input = self.data.user_input
+    data.cost = self.data.cost
+    data.background_color = self.data.background_color
+    data.override_queue_timer = self.data.override_queue_timer
+    data.queue_timer_duration = self.data.queue_timer_duration
     data.hordes = {}
     for key, horde in pairs(self.data.hordes) do
       data.hordes[key] = horde:serialize()
@@ -100,7 +88,6 @@ if not INCLUDE_GUARDS.REDEEM then
   end
 
   Redeem.toggle_gui_window = function(self)
-    -- TODO code dedup
     self.imgui_window.show_window = not self.imgui_window.show_window
   end
 
@@ -110,31 +97,24 @@ if not INCLUDE_GUARDS.REDEEM then
     if window_open then
       self.data.name = Imgui.input_text("Name##" .. tostring(self), self.data.name)
 
+      Imgui.same_line()
       if Imgui.button("Redeem##" .. tostring(self)) then
         -- TODO
       end
 
       Imgui.separator()
 
-      self.data.ignore_global_cooldown = Imgui.checkbox("Ignore Global Cooldown##" .. tostring(self), self.data.ignore_global_cooldown)
+      self.data.user_input = Imgui.checkbox("User Input##" .. tostring(self), self.data.user_input)
+      self.data.cost = Imgui.input_int("Cost##" .. tostring(self), self.data.cost)
+      self.data.background_color[1], self.data.background_color[2], self.data.background_color[3] = Imgui.color_picker_3("Color##" .. tostring(self), self.data.background_color[1], self.data.background_color[2], self.data.background_color[3])
 
-      if not self.data.ignore_global_cooldown then
-        Imgui.same_line()
-        self.data.override_global_cooldown = Imgui.checkbox("Override##global" .. tostring(self), self.data.override_global_cooldown)
-        if self.data.override_global_cooldown then
-          self.data.override_global_cooldown_duration = Imgui.input_int("Global Cooldown Duration", self.data.override_global_cooldown_duration)
-        end
-      end
+      Imgui.separator()
 
-      self.data.ignore_user_cooldown = Imgui.checkbox("Ignore User Cooldown  ##" .. tostring(self),
-        self.data.ignore_user_cooldown)
+      self.data.override_queue_timer = Imgui.checkbox("Override Queue Timer##" .. tostring(self), self.data.override_queue_timer)
 
-      if not self.data.ignore_user_cooldown then
-        Imgui.same_line()
-        self.data.override_user_cooldown = Imgui.checkbox("Override##User" .. tostring(self), self.data.override_user_cooldown)
-        if self.data.override_user_cooldown_duration then
-          self.data.override_user_cooldown_duration = Imgui.input_int("User Cooldown Duration", self.data.override_user_cooldown_duration)
-        end
+      if self.data.override_queue_timer then
+        self.data.queue_timer_duration = Imgui.input_int("Duration##global" .. tostring(self), self.data.queue_timer_duration)
+        self.data.queue_timer_duration = math.max(self.data.queue_timer_duration, 0)
       end
 
       Imgui.separator()

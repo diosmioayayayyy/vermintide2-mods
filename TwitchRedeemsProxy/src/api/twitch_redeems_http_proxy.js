@@ -7,7 +7,8 @@ const { redeem_queue } = require('../redeem_queue.js');
 const { unpauseRedeems } = require('../renderer/controls.js');
 
 let server;
-let twitch_redeems = [];
+global.twitch_redeems = {};
+global.twitch_redeems_settings = {};
 
 const TWITCH_REDEEM_REWARD_TOKEN = "[Twitch Redeem]";
 
@@ -39,10 +40,10 @@ async function get_twitch_redeems() {
       const response_body = JSON.parse(response.data);
 
       // Only add redeems from mod.
-      redeems= []
+      redeems = {}
       for (const redeem of response_body['data']) {
         if (redeem.prompt.includes(TWITCH_REDEEM_REWARD_TOKEN)) {
-          redeems.push(redeem);
+          redeems[redeem.title] = redeem;
         }
       }
     }
@@ -55,7 +56,8 @@ async function get_twitch_redeems() {
 }
 
 async function pause_redeems(paused) {
-  for (const redeem of twitch_redeems) {
+  for (var key in  twitch_redeems) {
+    const redeem = twitch_redeems[key];
     if (redeem.prompt.includes(TWITCH_REDEEM_REWARD_TOKEN)) {
       await TwitchHelixAPI.pause_custom_reward(redeem.id, paused);
     }
@@ -63,7 +65,8 @@ async function pause_redeems(paused) {
 }
 
 async function enable_redeems(enabled) {
-  for (const redeem of twitch_redeems) {
+  for (var key in  twitch_redeems) {
+    const redeem = twitch_redeems[key];
     if (redeem.prompt.includes(TWITCH_REDEEM_REWARD_TOKEN)) {
       await TwitchHelixAPI.enable_custom_reward(redeem.id, enabled);
     }
@@ -81,6 +84,11 @@ async function create_redeems(body) {
     else {
       redeem['prompt'] = TWITCH_REDEEM_REWARD_TOKEN;
     }
+
+    if ('additional_setings' in redeem) {
+      global.twitch_redeems_settings[redeem.title] = redeem['additional_setings'];
+    }
+
     try {
       // Create redeems.
       const response = await TwitchHelixAPI.create_custom_reward(redeem)
@@ -164,7 +172,7 @@ async function delete_redeems() {
           await process(redeem);
         }
       }
-      twitch_redeems = []
+      global.twitch_redeems = []
     }
   }
   catch (error) { logRequestError(delete_redeems, error); }
@@ -311,7 +319,7 @@ async function handleRequestPost(request, response, body) {
       status_code = check_response_status_codes(responses, 200);
 
       if (status_code == 200) {
-        twitch_redeems = await get_twitch_redeems();
+        global.twitch_redeems = await get_twitch_redeems();
       }
     }
     else if (request.url == '/map_start') {
@@ -405,7 +413,7 @@ async function handleRequestPatch(request, response, body) {
 
 async function startHTTPProxyServer(port) {
   // Get current twitch redeems.
-  twitch_redeems = await get_twitch_redeems();
+  global.twitch_redeems = await get_twitch_redeems();
 
   server = http.createServer(function (request, response) {
     // Set response header.
@@ -494,5 +502,5 @@ ipcMain.on("unpauseRedeems", (event) => {
 
 module.exports = {
   startHTTPProxyServer,
-  closeHTTPProxyServer
+  closeHTTPProxyServer,
 };

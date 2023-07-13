@@ -24,8 +24,7 @@ if not INCLUDE_GUARDS.REDEEM_HORDE then
       for key, value in pairs(other) do
         if key == "units" then
           for key, raw_unit in pairs(value) do
-            local unit = RedeemUnit:new(raw_unit)
-            self.data.units[key] = unit
+            self.data.units[key] = RedeemUnit:new(raw_unit)
           end
         else
           self.data[key] = other[key]

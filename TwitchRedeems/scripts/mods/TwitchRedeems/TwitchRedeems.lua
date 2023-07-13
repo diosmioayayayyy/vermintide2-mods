@@ -382,16 +382,19 @@ end
 mod.setup_twitch_redeems = function()
   local twitch_redeems = {}
   for _, redeem in ipairs(mod.redeems) do
+    local hex_color = to_hex_color(redeem.data.background_color[1], redeem.data.background_color[2], redeem.data.background_color[3])
+
     local twitch_redeem = {
       title = redeem.data.name,
-      cost = 1,  -- TODO
+      cost = redeem.data.cost,
       prompt = redeem.data.desc,
-      is_user_input_required = false, -- TODO
-      background_color = "#ffffff", -- TODO
-      is_global_cooldown_enabled = true, -- TODO
-      global_cooldown_seconds = 5, -- TODO
+      is_user_input_required = redeem.data.user_input,
+      background_color = hex_color,
+      additional_setings = {
+        override_queue_timer = redeem.data.override_queue_timer,
+        queue_timer_duration = redeem.data.queue_timer_duration,
+      }
     }
-    mod:dump(twitch_redeem,"twitch_redeem",1)
     table.insert(twitch_redeems, twitch_redeem)
   end
 
