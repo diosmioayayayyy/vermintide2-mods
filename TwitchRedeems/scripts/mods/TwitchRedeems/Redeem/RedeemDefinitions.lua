@@ -9,14 +9,19 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     ONE = 3,
   }
 
+  GuiDropdownSpawnType = {
+    "Horde", "Hidden", "One"
+  }
+
   SpawnPosition = {
     FRONT = 1,
     BACK = 2,
     RANDOM = 3,
   }
 
-  GuiDropdownBreeds = {}
-  GuiDropdownBreedsLocalized = {}
+  GuiDropdownSpawnPosition = {
+    "Front", "Back", "Random"
+  }
 
   local breed_backlist = {
     "beastmen_ungor_dummy",
@@ -46,6 +51,9 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "chaos_tentacle",
     "chaos_raider_tutorial",
   }
+
+  GuiDropdownBreeds = {}
+  GuiDropdownBreedsLocalized = {}
 
   for breed_name, data in pairs(Breeds) do
     if not table.contains(breed_backlist, breed_name) then

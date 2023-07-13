@@ -24,7 +24,7 @@ if not INCLUDE_GUARDS.REDEEM then
       desc                              = "",
       hordes                            = {},
       mutators                          = {},
-      ignore_global_cooldown            = false,
+      ignore_global_cooldown            = false, -- TODO setting below? what to do with them. needed?
       ignore_user_cooldown              = false,
       override_global_cooldown          = false,
       override_global_cooldown_duration = 5,
@@ -47,7 +47,8 @@ if not INCLUDE_GUARDS.REDEEM then
     -- Create classes from raw data.
     -- Loaded classes from disk don't have any methods. 
     -- Therefore we have to create new objects and initialize them with the raw values.
-    if other then
+
+    if other and type(other) == 'table' then
       for key, value in pairs(other) do
         if key == "hordes" then
           for key, raw_horde in pairs(value) do
@@ -62,6 +63,22 @@ if not INCLUDE_GUARDS.REDEEM then
 
     -- Gui variables.
     self.selected_horde = nil -- TODO HMMMMM
+  end
+
+  Redeem.serialize = function(self)
+    local data = {}
+    data.key = self.data.key
+    data.name = self.data.name
+    data.desc = self.data.desc
+    data.hordes = {}
+    for key, horde in pairs(self.data.hordes) do
+      data.hordes[key] = horde:serialize()
+    end
+    data.mutators = {}
+    for key, mutator in pairs(self.data.mutators) do
+      --data.mutators = mutator:serialize()
+    end
+    return data
   end
 
   Redeem.num_hordes = function(self)
@@ -99,16 +116,13 @@ if not INCLUDE_GUARDS.REDEEM then
 
       Imgui.separator()
 
-      self.data.ignore_global_cooldown = Imgui.checkbox("Ignore Global Cooldown##" .. tostring(self),
-        self.data.ignore_global_cooldown)
+      self.data.ignore_global_cooldown = Imgui.checkbox("Ignore Global Cooldown##" .. tostring(self), self.data.ignore_global_cooldown)
 
       if not self.data.ignore_global_cooldown then
         Imgui.same_line()
-        self.data.override_global_cooldown = Imgui.checkbox("Override##global" .. tostring(self),
-          self.data.override_global_cooldown)
+        self.data.override_global_cooldown = Imgui.checkbox("Override##global" .. tostring(self), self.data.override_global_cooldown)
         if self.data.override_global_cooldown then
-          self.data.override_global_cooldown_duration = Imgui.input_int("Global Cooldown Duration",
-            self.data.override_global_cooldown_duration)
+          self.data.override_global_cooldown_duration = Imgui.input_int("Global Cooldown Duration", self.data.override_global_cooldown_duration)
         end
       end
 
@@ -117,29 +131,26 @@ if not INCLUDE_GUARDS.REDEEM then
 
       if not self.data.ignore_user_cooldown then
         Imgui.same_line()
-        self.data.override_user_cooldown = Imgui.checkbox("Override##User" .. tostring(self),
-          self.data.override_user_cooldown)
+        self.data.override_user_cooldown = Imgui.checkbox("Override##User" .. tostring(self), self.data.override_user_cooldown)
         if self.data.override_user_cooldown_duration then
-          self.data.override_user_cooldown_duration = Imgui.input_int("User Cooldown Duration",
-            self.data.override_user_cooldown_duration)
+          self.data.override_user_cooldown_duration = Imgui.input_int("User Cooldown Duration", self.data.override_user_cooldown_duration)
         end
       end
 
       Imgui.separator()
 
-      Imgui.text("Enemies")
+      Imgui.text("Hordes")
       Imgui.same_line()
-      if Imgui.button("+##AddHorde") then
+      if Imgui.button("+##" .. tostring(self)) then
         self:new_horde()
       end
 
       local horde_to_delete = nil
       for key, horde in pairs(self.data.hordes) do
         if Imgui.button(horde.data.name .. "##" .. key) then
+          horde:toggle_gui_window()
           mod.selected_horde = key
         end
-
-        horde:render_ui()
 
         Imgui.same_line()
         if Imgui.button("[x]##" .. key) then
@@ -162,6 +173,11 @@ if not INCLUDE_GUARDS.REDEEM then
 
       self.imgui_window:end_window()
     end
+
+    for _, horde in ipairs(self.data.hordes) do
+      if horde:render_ui() then window_open = true end
+    end
+
     return window_open
   end
 end

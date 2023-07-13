@@ -214,7 +214,8 @@ mod.store_twitch_redeems_to_file = function(filename)
 
   local data_to_save = {}
   for _, redeem in ipairs(mod.redeems) do
-    table.insert(data_to_save, redeem.data)
+    local data = redeem:serialize()
+    table.insert(data_to_save, data)
   end
 
   Managers.save:auto_save(filename, data_to_save, nil, true)
