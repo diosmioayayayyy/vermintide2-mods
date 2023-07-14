@@ -83,6 +83,11 @@ SettingsTwitch.render_ui = function (self)
             end
         end
 
+        local redeem_mode_state_txt = mod.redeems_enabled and " Redeems Enabled" or "Redeems Disabled"
+        if Imgui.button(redeem_mode_state_txt) then
+          mod.enable_redeems(not mod.redeems_enabled)
+        end
+
         Imgui.separator()
 
         Imgui.text(string.format("Current Vote Timings: %d/%d/%d", TwitchSettings.initial_downtime, TwitchSettings.default_vote_time, TwitchSettings.default_downtime))

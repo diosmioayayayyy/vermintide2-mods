@@ -54,7 +54,7 @@ mod.SETTING_ID_REDEEM_GLOBAL_COOLDOWN_DURATION = "GLOBAL_COOLDOWN_DURATION"
 mod.SETTING_ID_REDEEM_USER_COOLDOWN = "USER_COOLDOWN"
 mod.SETTING_ID_REDEEM_USER_COOLDOWN_DURATION = "USER_COOLDOWN_DURATION"
 
-
+-- TODO DELETE
 local function cb_twitch_chat_message(key, message_type, user_name, message, parameter)
   local is_redeem_bot = (string.lower(user_name) == string.lower(mod.redeem_twitch_user_name))
   mod:info(user_name .. message)
@@ -86,42 +86,6 @@ local function cb_twitch_chat_message(key, message_type, user_name, message, par
     end
   end
 end
-
--- TODO move to GUI
-local function cmd_connect_to_twitch_chat()
-  mod.enable_redeems(not mod.redeems_enabled)
-end
-
-local function cmd_twitch_connect()
-  mod.redeem_twitch_channel_name = mod:get(mod.SETTING_ID_TWITCH_CHANNEL_NAME)
-
-  if mod.redeem_twitch_channel_name == nil then
-    mod:error("No twitch channel name specified!")
-  else
-    --Managers.twitch:connect(mod.redeem_twitch_channel_name) --, callback("cb_connection_callback"))
-    Managers.twitch:connect(mod.redeem_twitch_channel_name, callback(mod, "cb_connection_error_callback"),
-      callback(mod, "cb_connection_success_callback"))
-    --Managers.twitch:connect(mod.redeem_twitch_channel_name, callback(Managers.twitch, "cb_connection_error_callback"), callback(self, "cb_connection_success_callback"))
-    mod:echo("Connected to twitch channel '" .. mod.redeem_twitch_channel_name .. "'")
-  end
-end
-
-local function cmd_twitch_disconnect()
-  Managers.twitch:disconnect()
-  mod:echo("Disconnected from current twitch channel!")
-end
-
-if in_modded_realm then
-  mod:command("twitch_redeems", "Toogle twitch redeems", cmd_connect_to_twitch_chat)
-  mod:command("twitch_votes_start", "Enable twitch votes", cmd_enable_twitch_votes)
-  mod:command("twitch_votes_end", "Disable twitch votes", cmd_disable_twitch_votes)
-  mod:command("twitch_redeem_trigger", "Trigger twitch redeem", cmd_trigger_twitch_redeem)
-end
-
-mod:command("twitch_redeem_name", "Get/set twitch redeem bot name", cmd_twitch_name)
-mod:command("twitch_channel_name", "Get/set twitch channel name", cmd_twitch_channel_name)
-mod:command("twitch_connect", "Connect to twitch channel", cmd_twitch_connect)
-mod:command("twitch_disconnect", "Disconnect from twitch channel", cmd_twitch_disconnect)
 
 mod.cb_load_twitch_redeems_from_file_done = function(_, result)
   local data = result.data
@@ -235,29 +199,19 @@ mod.enable_redeems = function(enable)
   if is_server and mod.redeems_enabled ~= enable then
     mod.redeems_enabled = enable
     mod:echo("Twitch redeems are " .. (enable and "ON" or "OFF"))
-    mod.reset_redeem_queues()
-
-    if enable then
-      Managers.irc:register_message_callback("TwitchChat", Irc.CHANNEL_MSG, callback(cb_twitch_chat_message))
-      mod:echo("Connected to twitch chat")
-    else
-      Managers.irc:unregister_message_callback("TwitchChat")
-      mod:echo("Disconnected from twitch chat")
-    end
   end
 end
 
 mod.setup_twitch_redeems = function()
   local twitch_redeems = {}
   for _, redeem in ipairs(mod.redeems) do
-    local hex_color = to_hex_color(redeem.data.background_color[1], redeem.data.background_color[2], redeem.data.background_color[3])
-
+    -- Prepare twitch redeem and add to list.
     local twitch_redeem = {
       title = redeem.data.name,
       cost = redeem.data.cost,
       prompt = redeem.data.desc,
       is_user_input_required = redeem.data.user_input,
-      background_color = hex_color,
+      background_color = to_hex_color(redeem.data.background_color[1], redeem.data.background_color[2], redeem.data.background_color[3]),
       additional_setings = {
         skip_queue_timer = redeem.data.skip_queue_timer,
         override_queue_timer = redeem.data.override_queue_timer,
