@@ -68,7 +68,7 @@ class RedeemQueue {
     redeem.twitch_redeems_uid = this.next_redeem_id++;
     console.log(`Added redeem '${redeem.reward.title}' to queue with uid ${redeem.twitch_redeems_uid}`);
 
-    if (redeem_settings.skip_queue_timer) {
+    if (redeem_settings && redeem_settings.skip_queue_timer) {
       // Redeems landing here will skip the redeem queue.
       this.skip_queue.push(redeem);
     }

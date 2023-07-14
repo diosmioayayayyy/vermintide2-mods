@@ -13,8 +13,6 @@ mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_utils")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeemsHTTPProxyClient")
 require("scripts/mods/TwitchRedeems/TwitchRedeems_buffs")
 
---local pl = require'pl.import_into'()
-
 local in_modded_realm = script_data["eac-untrusted"]
 local Managers = Managers
 local TwitchRedeemTemplates = TwitchRedeemTemplates
@@ -28,8 +26,7 @@ mod.redeem_twitch_user_name = nil
 mod.redeem_twitch_channel_name = nil
 mod.redeems_enabled = false
 
-mod.global_redeem_queue = RedeemQueue:new()
-mod.user_redeem_queues = {}
+mod.redeem_queue = RedeemQueue:new()
 
 mod.redeems = {}
 mod.redeem_breeds = {}
@@ -55,37 +52,37 @@ mod.SETTING_ID_REDEEM_USER_COOLDOWN = "USER_COOLDOWN"
 mod.SETTING_ID_REDEEM_USER_COOLDOWN_DURATION = "USER_COOLDOWN_DURATION"
 
 -- TODO DELETE
-local function cb_twitch_chat_message(key, message_type, user_name, message, parameter)
-  local is_redeem_bot = (string.lower(user_name) == string.lower(mod.redeem_twitch_user_name))
-  mod:info(user_name .. message)
-  if mod.redeems_enabled and is_redeem_bot then
-    -- Returns the text between two ":" and ";"
-    local redeem_key = string.match(message, ':([^:]+)')
-    local redeem_user = string.match(message, '-([^-]+)')
-    local redeem_param = string.match(message, '|([^|]+)')
+-- local function cb_twitch_chat_message(key, message_type, user_name, message, parameter)
+--   local is_redeem_bot = (string.lower(user_name) == string.lower(mod.redeem_twitch_user_name))
+--   mod:info(user_name .. message)
+--   if mod.redeems_enabled and is_redeem_bot then
+--     -- Returns the text between two ":" and ";"
+--     local redeem_key = string.match(message, ':([^:]+)')
+--     local redeem_user = string.match(message, '-([^-]+)')
+--     local redeem_param = string.match(message, '|([^|]+)')
 
-    -- If we get a valid redeem key we add it to the redeem queue which will be handled later on.
-    if redeem_key ~= nil then
-      local redeem = {}
-      redeem.key = string.lower(redeem_key)
-      redeem.param = redeem_param
-      redeem.user = redeem_user
+--     -- If we get a valid redeem key we add it to the redeem queue which will be handled later on.
+--     if redeem_key ~= nil then
+--       local redeem = {}
+--       redeem.key = string.lower(redeem_key)
+--       redeem.param = redeem_param
+--       redeem.user = redeem_user
 
-      if mod.user_redeem_cooldown then
-        if mod.user_redeem_queues[redeem.user] == nil then
-          mod.user_redeem_queues[redeem.user] = RedeemQueue:new()
-          mod.user_redeem_queues[redeem.user]:set_cooldown(mod.user_cooldown_duration)
-        end
-        mod.user_redeem_queues[redeem.user]:push(redeem)
-      else
-        mod.global_redeem_queue:push(redeem)
-      end
+--       if mod.user_redeem_cooldown then
+--         if mod.user_redeem_queues[redeem.user] == nil then
+--           mod.user_redeem_queues[redeem.user] = RedeemQueue:new()
+--           mod.user_redeem_queues[redeem.user]:set_cooldown(mod.user_cooldown_duration)
+--         end
+--         mod.user_redeem_queues[redeem.user]:push(redeem)
+--       else
+--         mod.global_redeem_queue:push(redeem)
+--       end
 
-      --mod.redeem_queue:push_back(redeem)
-      print("Added to queue: " .. user_name .. " : " .. message)
-    end
-  end
-end
+--       --mod.redeem_queue:push_back(redeem)
+--       print("Added to queue: " .. user_name .. " : " .. message)
+--     end
+--   end
+-- end
 
 mod.cb_load_twitch_redeems_from_file_done = function(_, result)
   local data = result.data

@@ -103,15 +103,10 @@ TwitchRedeemsHTTPProxyClient.request_next_reedem = function(self)
       if response.status_code == 200 then
         local json_str = string.sub(response.data, 2, -2)
         json_str = string.gsub(json_str, "\\", "")
-        local success, data = pcall(cjson.decode, json_str)
+        local success, redemption = pcall(cjson.decode, json_str)
         if success then
-          local msg = string.format("%s redeemed %s", data.user, data.title)
-          if data.user_input ~= "" then
-            msg = msg .. string.format("\n '%s'", data.user_input)
-          end
-          mod:echo(msg)
-        else
-          mod:error("Failed parsing redeem")
+          mod.redeem_queue:push(redemption) -- Add redeem to queue.
+          mod:dump(mod.redeem_queue._queue, "QUEUE", 2)
         end
       end
     else

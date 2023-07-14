@@ -3,7 +3,7 @@ local mod = get_mod("TwitchRedeems")
 -- This hook processes the redeems and applies them.
 mod:hook_safe(TwitchManager, "update", function(self, dt, t)
     local is_server = Managers.state.network and Managers.state.network.is_server
-    if is_server and Managers.state.entity ~= nil then
+    if is_server and mod.redeems_enabled and Managers.state.entity ~= nil then
 
         -- Setup buff which lets the enemy eyes glow purple.
         local buff_system = Managers.state.entity:system("buff_system")
@@ -11,6 +11,32 @@ mod:hook_safe(TwitchManager, "update", function(self, dt, t)
         optional_data.spawned_func = function (unit, breed, optional_data)
             buff_system:add_buff(unit, "twitch_redeem_buff_eye_glow", unit)
         end
+
+        -- Process redeems.
+        if mod.redeem_queue ~= nil and mod.redeem_queue:size() > 0 then
+          local redeem = mod.redeem_queue:pop()
+          if redeem then
+            local msg = string.format("%s redeemed %s", redeem.user, redeem.title)
+            if redeem.user_input ~= "" then
+              msg = msg .. string.format("\n '%s'", redeem.user_input)
+            end
+            mod:echo(msg)
+            -- TODO do stuff
+          end
+        end
+
+        -- TODO move to update
+        -- if success then
+        --   local msg = string.format("%s redeemed %s", data.user, data.title)
+        --   if data.user_input ~= "" then
+        --     msg = msg .. string.format("\n '%s'", data.user_input)
+        --   end
+        --   mod:echo(msg)
+        -- else
+        --   mod:error("Failed parsing redeem")
+        -- end
+
+        --mod:dump(mod.redeem_queue._queue, "QUEUE", 2)
 
         -- -- We process both user and global queue. 
         -- -- This makes sure all redeems are handled even when mode was switched.
