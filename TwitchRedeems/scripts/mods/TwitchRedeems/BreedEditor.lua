@@ -65,7 +65,7 @@ if not INCLUDE_GUARDS.BREED_EDITOR then
   BreedEditor.render_ui = function(self)
     local window_open = self.imgui_window:begin_window()
     if window_open then
-      if Imgui.button("New Breed") then
+      if Imgui.button("   New Breed    ") then
         table.insert(mod.redeem_breeds, RedeemUnit:new())
         table.sort(mod.redeem_breeds, function(a, b) return a.data.name < b.data.name end)
         self.gui_dropdown_redeem_breed = create_redeem_breeds_gui_dropdown_list()     -- TODO code dedup
@@ -80,7 +80,7 @@ if not INCLUDE_GUARDS.BREED_EDITOR then
 
       Imgui.same_line()
 
-      if self.redeem_breed and Imgui.button("Clear Breeds") then
+      if self.redeem_breed and Imgui.button("  Clear Breeds  ") then
         mod.redeem_breeds = {}
         self.gui_dropdown_redeem_breed = create_redeem_breeds_gui_dropdown_list()     -- TODO code dedup
         self.gui_dropdown_redeem_breed_index = math.min(self.gui_dropdown_redeem_breed_index,
@@ -89,19 +89,19 @@ if not INCLUDE_GUARDS.BREED_EDITOR then
 
       Imgui.separator()
 
-      if Imgui.button("Save Breeds") then
+      if Imgui.button("  Save Breeds   ") then
         self:save_settings()
       end
 
       Imgui.same_line()
 
-      if Imgui.button("Load Breeds") then
+      if Imgui.button("  Load Breeds   ") then
         self:load_settings()
       end
 
       Imgui.same_line()
 
-      if self.redeem_breed and Imgui.button("Delete Breed") then
+      if self.redeem_breed and Imgui.button("  Delete Breed  ") then
         table.remove(mod.redeem_breeds, self.gui_dropdown_redeem_breed_index)
         self.gui_dropdown_redeem_breed = create_redeem_breeds_gui_dropdown_list()     -- TODO code dedup
         self.gui_dropdown_redeem_breed_index = math.min(self.gui_dropdown_redeem_breed_index,

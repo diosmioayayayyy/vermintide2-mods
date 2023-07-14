@@ -57,18 +57,18 @@ SettingsTwitch.render_ui = function (self)
             Imgui.text("Connecting...")
         else
             if Managers.twitch:is_connected() then
-                if Imgui.button("Disconnect") then
+                if Imgui.button("   Disconnect   ") then
                     Managers.twitch:disconnect()
                 end
 
                 Imgui.same_line()
 
                 if Managers.twitch:is_activated() or Managers.twitch._twitch_game_mode then
-                    if Imgui.button("Disable Votes##" .. tostring(self)) then
+                    if Imgui.button("  Disable Votes ##" .. tostring(self)) then
                         Managers.twitch:deactivate_twitch_game_mode()
                     end
                 else
-                    if Imgui.button("Enable Votes##" .. tostring(self)) then
+                    if Imgui.button("  Enable Votes  ##" .. tostring(self)) then
                         local game_mode_key = Managers.state.game_mode:game_mode_key()
                         if game_mode_key == "inn" then game_mode_key = "adventure" end
                         Managers.twitch:activate_twitch_game_mode(Managers.state.game_mode.network_event_delegate, game_mode_key)
@@ -76,7 +76,7 @@ SettingsTwitch.render_ui = function (self)
                     end
                 end
             else
-                if Imgui.button("Connect") then
+                if Imgui.button("    Connect     ") then
                     Managers.twitch:connect(self.channel_account, callback(mod, "cb_connection_error_callback"), callback(mod, "cb_connection_success_callback"))
                     mod:info("Connecting to Twitch Channel: " .. self.channel_account)
                 end
@@ -129,13 +129,13 @@ SettingsTwitch.render_ui = function (self)
 
         Imgui.separator()
 
-        if Imgui.button("Save##" .. tostring(self)) then
+        if Imgui.button("      Save      ##" .. tostring(self)) then
             self:save_settings()
         end
 
         Imgui.same_line()
 
-        if Imgui.button("Load##" .. tostring(self)) then
+        if Imgui.button("      Load      ##" .. tostring(self)) then
             self:load_settings()
         end
 
