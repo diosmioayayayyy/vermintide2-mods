@@ -12,32 +12,29 @@ mod:hook_safe(TwitchManager, "update", function(self, dt, t)
             buff_system:add_buff(unit, "twitch_redeem_buff_eye_glow", unit)
         end
 
-        -- User to remove. Used to clean up user redeem queues.
-        local users_to_remove = GrowQueue:new()
+        -- -- We process both user and global queue. 
+        -- -- This makes sure all redeems are handled even when mode was switched.
 
-        -- We process both user and global queue. 
-        -- This makes sure all redeems are handled even when mode was switched.
+        -- -- Process queues.
+        -- for user_name, redeem_queue in pairs(mod.user_redeem_queues) do
+        --     if redeem_queue ~= nil then
+        --         redeem_queue:update(dt)
+        --         mod.process_redeem_queue(redeem_queue, optional_data)
 
-        -- Process queues.
-        for user_name, redeem_queue in pairs(mod.user_redeem_queues) do
-            if redeem_queue ~= nil then
-                redeem_queue:update(dt)
-                mod.process_redeem_queue(redeem_queue, optional_data)
+        --         if redeem_queue:empty() and not redeem_queue:is_on_cooldown() then
+        --             users_to_remove:push_back(user_name)
+        --         end
+        --     end
+        -- end
 
-                if redeem_queue:empty() and not redeem_queue:is_on_cooldown() then
-                    users_to_remove:push_back(user_name)
-                end
-            end
-        end
+        -- while users_to_remove:size() > 0 do
+        --     local user_name = users_to_remove:pop_first()
+        --     mod.user_redeem_queues[user_name] = nil
+        -- end
 
-        while users_to_remove:size() > 0 do
-            local user_name = users_to_remove:pop_first()
-            mod.user_redeem_queues[user_name] = nil
-        end
-
-        -- Process global queue.
-        mod.global_redeem_queue:update(dt)
-        mod.process_redeem_queue(mod.global_redeem_queue, optional_data)
+        -- -- Process global queue.
+        -- mod.global_redeem_queue:update(dt)
+        -- mod.process_redeem_queue(mod.global_redeem_queue, optional_data)
     end
 end)
 
@@ -74,13 +71,13 @@ end)
 --     mod:echo("HOOKED StateTitleScreenMainMenu")
 -- end)
 
-local function assigned(a, b)
-	if a == nil then
-		return b
-	else
-		return a
-	end
-end
+-- local function assigned(a, b)
+-- 	if a == nil then
+-- 		return b
+-- 	else
+-- 		return a
+-- 	end
+-- end
 
 -- mod:hook(OptionsView, "cb_twitch_vote_time_saved_value", function(func, self, widget)
 --     mod:echo("PLS HELP")

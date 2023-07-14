@@ -3,6 +3,12 @@ mod:dofile("scripts/mods/TwitchRedeems/Gui/ImguiWindow")
 
 local Managers = Managers
 
+mod.cb_connection_error_callback = function(self, message)
+end
+
+mod.cb_connection_success_callback = function(self, message)
+end
+
 SettingsTwitch = class(SettingsTwitch)
 
 SettingsTwitch.init = function (self)

@@ -315,6 +315,7 @@ async function handleRequestPost(request, response, body) {
 
   try {
     if (request.url == '/redeems') {
+      await delete_redeems();
       const responses = await create_redeems(body);
       status_code = check_response_status_codes(responses, 200);
 
