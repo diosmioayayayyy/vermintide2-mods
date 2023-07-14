@@ -391,6 +391,7 @@ mod.setup_twitch_redeems = function()
       is_user_input_required = redeem.data.user_input,
       background_color = hex_color,
       additional_setings = {
+        skip_queue_timer = redeem.data.skip_queue_timer,
         override_queue_timer = redeem.data.override_queue_timer,
         queue_timer_duration = redeem.data.queue_timer_duration,
       }

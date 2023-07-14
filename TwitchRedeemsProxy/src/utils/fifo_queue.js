@@ -8,6 +8,10 @@ class FifoQueue {
     this.items.push(element);
   }
 
+  push_to_front(element) {
+    this.items.unshift(element);
+  }
+
   pop() {
     return this.isEmpty() ? null : this.items.shift();
   }

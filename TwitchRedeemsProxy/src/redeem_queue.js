@@ -14,6 +14,7 @@ class RedeemQueue {
 
   init() {
     this.queue = new FifoQueue();
+    this.skip_queue = new FifoQueue();
     this.next_redeem_id = 0;
     this.last_redeemed_id = null;
     this.user_colors = {};
@@ -61,14 +62,21 @@ class RedeemQueue {
     if (!(redeem.user_id in this.user_colors)) {
       await this.get_user_chat_color(redeem.user_id);
     }
+    const redeem_settings = global.twitch_redeems_settings[redeem.reward.title];
 
     redeem.user_chat_color = this.user_colors[redeem.user_id];
     redeem.twitch_redeems_uid = this.next_redeem_id++;
     console.log(`Added redeem '${redeem.reward.title}' to queue with uid ${redeem.twitch_redeems_uid}`);
-    this.queue.push(redeem);
 
-    if (this.queue.size() == 1 && !this.queue_timer_is_running) {
-      this.start_queue_timer();
+    if (redeem_settings.skip_queue_timer) {
+      // Redeems landing here will skip the redeem queue.
+      this.skip_queue.push(redeem);
+    }
+    else {
+      this.queue.push(redeem);
+      if (this.queue.size() == 1 && !this.queue_timer_is_running) {
+        this.start_queue_timer();
+      }
     }
   }
   
@@ -82,6 +90,14 @@ class RedeemQueue {
   }
 
   request_redeem() {
+    if (!this.skip_queue.isEmpty()) {
+      const redeem = this.skip_queue.pop()
+      if (redeem != null) {
+        this.set_redeem_fulfilled(redeem);
+        return redeem;
+      }
+    }
+
     if (!this.queue_timer_is_running) {
       return this.pop();
     }

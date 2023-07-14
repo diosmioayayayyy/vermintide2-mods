@@ -25,6 +25,7 @@ if not INCLUDE_GUARDS.REDEEM then
       user_input                        = false,
       cost                              = 1,
       background_color                  = { 1, 1, 1 },
+      skip_queue_timer                  = false,
       override_queue_timer              = false,
       queue_timer_duration              = 5,
       hordes                            = {},
@@ -56,6 +57,7 @@ if not INCLUDE_GUARDS.REDEEM then
     data.user_input = self.data.user_input
     data.cost = self.data.cost
     data.background_color = self.data.background_color
+    data.skip_queue_timer = self.data.skip_queue_timer
     data.override_queue_timer = self.data.override_queue_timer
     data.queue_timer_duration = self.data.queue_timer_duration
     data.hordes = {}
@@ -103,18 +105,25 @@ if not INCLUDE_GUARDS.REDEEM then
       end
 
       Imgui.separator()
+      Imgui.text("Twitch Settings")
 
       self.data.user_input = Imgui.checkbox("User Input##" .. tostring(self), self.data.user_input)
       self.data.cost = Imgui.input_int("Cost##" .. tostring(self), self.data.cost)
-      self.data.background_color[1], self.data.background_color[2], self.data.background_color[3] = Imgui.color_picker_3("Color##" .. tostring(self), self.data.background_color[1], self.data.background_color[2], self.data.background_color[3])
+      self.data.background_color[1], self.data.background_color[2], self.data.background_color[3] = Imgui.color_edit_3("Color##" .. tostring(self), self.data.background_color[1], self.data.background_color[2], self.data.background_color[3])
 
       Imgui.separator()
+      Imgui.text("Queue Settings")
 
-      self.data.override_queue_timer = Imgui.checkbox("Override Queue Timer##" .. tostring(self), self.data.override_queue_timer)
+      self.data.skip_queue_timer = Imgui.checkbox("Skip Queue Timer##" .. tostring(self), self.data.skip_queue_timer)
 
-      if self.data.override_queue_timer then
-        self.data.queue_timer_duration = Imgui.input_int("Duration##global" .. tostring(self), self.data.queue_timer_duration)
-        self.data.queue_timer_duration = math.max(self.data.queue_timer_duration, 0)
+      if not self.data.skip_queue_timer then
+        Imgui.same_line()
+        self.data.override_queue_timer = Imgui.checkbox("Override Queue Timer##" .. tostring(self), self.data.override_queue_timer)
+
+        if self.data.override_queue_timer then
+          self.data.queue_timer_duration = Imgui.input_int("Duration##global" .. tostring(self), self.data.queue_timer_duration)
+          self.data.queue_timer_duration = math.max(self.data.queue_timer_duration, 0)
+        end
       end
 
       Imgui.separator()
