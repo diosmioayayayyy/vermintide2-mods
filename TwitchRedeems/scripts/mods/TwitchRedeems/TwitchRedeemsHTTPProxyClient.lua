@@ -106,7 +106,6 @@ TwitchRedeemsHTTPProxyClient.request_next_reedem = function(self)
         local success, redemption = pcall(cjson.decode, json_str)
         if success then
           mod.redeem_queue:push(redemption) -- Add redeem to queue.
-          mod:dump(mod.redeem_queue._queue, "QUEUE", 2)
         end
       end
     else

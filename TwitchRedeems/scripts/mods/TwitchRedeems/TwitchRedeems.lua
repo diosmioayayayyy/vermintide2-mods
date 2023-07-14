@@ -29,6 +29,7 @@ mod.redeems_enabled = false
 mod.redeem_queue = RedeemQueue:new()
 
 mod.redeems = {}
+mod.redeem_lookup = {}
 mod.redeem_breeds = {}
 
 mod.redeem_configuration = RedeemConfiguration:new()
@@ -114,6 +115,15 @@ mod.store_twitch_redeems_to_file = function(filename)
   end
 
   Managers.save:auto_save(filename, data_to_save, nil, true)
+end
+
+mod.create_redeems_lookup_table = function()
+  mod.redeem_lookup = {}
+  for key, redeem in pairs(mod.redeems) do
+      if redeem ~= nil then
+        mod.redeem_lookup[string.lower(redeem.data.name)] = (type(key) == "string") and string.lower(key) or key
+      end
+  end
 end
 
 mod.on_enabled = function(initial_call)
@@ -221,6 +231,8 @@ mod.setup_twitch_redeems = function()
   if next(twitch_redeems) ~= nil then
     mod.http_proxy_client:request_create_redeems(twitch_redeems)
   end
+
+  mod.create_redeems_lookup_table()
 end
 
 -- Load hooks.

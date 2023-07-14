@@ -1,5 +1,26 @@
 local mod = get_mod("TwitchRedeems")
 
+local function fulfill_redeem(redemption)
+  local redeem_index = mod.redeem_lookup[string.lower(redemption.title)]
+  if redeem_index ~= nil then
+    local redeem = mod.redeems[redeem_index]
+    if redeem ~= nil then
+      -- Hordes.
+      for _, horde in ipairs(redeem.data.hordes) do
+        mod:dump(horde, "horde", 3) -- TODO
+      end
+      -- Mutators.
+      for _, mutator in ipairs(redeem.data.mutators) do
+        mod:dump(mutator, "mutator", 3) -- TODO
+      end
+      -- Buffs.
+      for _, buff in ipairs(redeem.data.buffs) do
+        mod:dump(buff, "buff", 3) -- TODO
+      end
+    end
+  end
+end
+
 -- This hook processes the redeems and applies them.
 mod:hook_safe(TwitchManager, "update", function(self, dt, t)
     local is_server = Managers.state.network and Managers.state.network.is_server
@@ -21,7 +42,7 @@ mod:hook_safe(TwitchManager, "update", function(self, dt, t)
               msg = msg .. string.format("\n '%s'", redeem.user_input)
             end
             mod:echo(msg)
-            -- TODO do stuff
+            fulfill_redeem(redeem)
           end
         end
 
@@ -35,8 +56,6 @@ mod:hook_safe(TwitchManager, "update", function(self, dt, t)
         -- else
         --   mod:error("Failed parsing redeem")
         -- end
-
-        --mod:dump(mod.redeem_queue._queue, "QUEUE", 2)
 
         -- -- We process both user and global queue. 
         -- -- This makes sure all redeems are handled even when mode was switched.

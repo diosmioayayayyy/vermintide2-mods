@@ -28,13 +28,6 @@ RedeemConfiguration.toggle_gui_window = function(self)
   self.imgui_window.show_window = not self.imgui_window.show_window
 end
 
--- TODO JUST A TEST
-RedeemConfiguration._cb_redeem = function(self, success, return_code, headers, data, userdata)
-  mod:echo("XDDBABY i got a message")
-  mod:echo(tostring(success))
-  mod:echo(tostring(return_code))
-end
-
 RedeemConfiguration.render_ui = function(self)
   local window_open = self.imgui_window:begin_window()   -- TODO code dedup
   if window_open then

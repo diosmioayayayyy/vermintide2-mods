@@ -30,6 +30,7 @@ if not INCLUDE_GUARDS.REDEEM then
       queue_timer_duration              = 5,
       hordes                            = {},
       mutators                          = {},
+      buffs                             = {},
     }
 
     if other and type(other) == 'table' then
@@ -66,7 +67,11 @@ if not INCLUDE_GUARDS.REDEEM then
     end
     data.mutators = {}
     for key, mutator in pairs(self.data.mutators) do
-      --data.mutators = mutator:serialize()
+      --data.mutators[key] = mutator:serialize()
+    end
+    data.buffs = {}
+    for key, buff in pairs(self.data.buffs) do
+      --data.buffs[key] = buff:serialize()
     end
     return data
   end
