@@ -212,6 +212,8 @@ end
 mod.setup_twitch_redeems = function()
   local twitch_redeems = {}
   for _, redeem in ipairs(mod.redeems) do
+    redeem:prepare()
+
     -- Prepare twitch redeem and add to list.
     local twitch_redeem = {
       title = redeem.data.name,

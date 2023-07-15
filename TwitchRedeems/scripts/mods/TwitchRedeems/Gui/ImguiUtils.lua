@@ -3,6 +3,8 @@ local mod = get_mod("TwitchRedeems")
 if not INCLUDE_GUARDS.IMGUI_UTILS then
   INCLUDE_GUARDS.IMGUI_UTILS = true
 
+  ShowCursorStack.pop() -- TODO fix cursor stuck
+
   function enable_gui_control()
     local input_manager = Managers.input
     local input_service_name = "twitch_redeem_view"

@@ -5,20 +5,10 @@ local Vector2Box = stingray.Vector2Box
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/Redeem")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_utils")
 mod:dofile("scripts/mods/TwitchRedeems/Gui/ImguiUtils")
---mod:dofile("scripts/mods/TwitchRedeems/Gui/ImguiWindow")
-
---TwitchRedeemsUI = class(TwitchRedeemsUI)
---
---TwitchRedeemsUI.init = function (self)
---end
---
---TwitchRedeemsUI.render_ui = function (self)
---end
 
 mod.show_redeem_configurator_ui = false
 mod.redeem_key_to_delete = nil
 
-mod.test = false -- TODO HUH
 mod.drag_key = nil
 
 -- local function get_mouse_position()

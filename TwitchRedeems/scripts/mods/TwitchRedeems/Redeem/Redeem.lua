@@ -1,5 +1,6 @@
 local mod = get_mod("TwitchRedeems")
 
+mod:dofile("scripts/mods/TwitchRedeems/RedeemFunctions")
 mod:dofile("scripts/mods/TwitchRedeems/Gui/ImguiWindow")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemDefinitions")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemHorde")
@@ -19,18 +20,18 @@ if not INCLUDE_GUARDS.REDEEM then
     self.imgui_window.key = self
 
     self.data = {
-      key                               = "",
-      name                              = "New Redeem",
-      desc                              = "",
-      user_input                        = false,
-      cost                              = 1,
-      background_color                  = { 1, 1, 1 },
-      skip_queue_timer                  = false,
-      override_queue_timer              = false,
-      queue_timer_duration              = 5,
-      hordes                            = {},
-      mutators                          = {},
-      buffs                             = {},
+      key                  = "",
+      name                 = "New Redeem",
+      desc                 = "",
+      user_input           = false,
+      cost                 = 1,
+      background_color     = { 1, 1, 1 },
+      skip_queue_timer     = false,
+      override_queue_timer = false,
+      queue_timer_duration = 5,
+      hordes               = {},
+      mutators             = {},
+      buffs                = {},
     }
 
     if other and type(other) == 'table' then
@@ -106,7 +107,12 @@ if not INCLUDE_GUARDS.REDEEM then
 
       Imgui.same_line()
       if Imgui.button("Redeem##" .. tostring(self)) then
-        -- TODO
+        local redemption = {
+          title = self.data.name,
+          user = "TestRedeem",
+          user_input = "[TEST]"
+        }
+        mod.redeem_queue:push(redemption)
       end
 
       Imgui.separator()
@@ -114,7 +120,9 @@ if not INCLUDE_GUARDS.REDEEM then
 
       self.data.user_input = Imgui.checkbox("User Input##" .. tostring(self), self.data.user_input)
       self.data.cost = Imgui.input_int("Cost##" .. tostring(self), self.data.cost)
-      self.data.background_color[1], self.data.background_color[2], self.data.background_color[3] = Imgui.color_edit_3("Color##" .. tostring(self), self.data.background_color[1], self.data.background_color[2], self.data.background_color[3])
+      self.data.background_color[1], self.data.background_color[2], self.data.background_color[3] = Imgui.color_edit_3(
+      "Color##" .. tostring(self), self.data.background_color[1], self.data.background_color[2],
+        self.data.background_color[3])
 
       Imgui.separator()
       Imgui.text("Queue Settings")
@@ -123,10 +131,12 @@ if not INCLUDE_GUARDS.REDEEM then
 
       if not self.data.skip_queue_timer then
         Imgui.same_line()
-        self.data.override_queue_timer = Imgui.checkbox("Override Queue Timer##" .. tostring(self), self.data.override_queue_timer)
+        self.data.override_queue_timer = Imgui.checkbox("Override Queue Timer##" .. tostring(self),
+          self.data.override_queue_timer)
 
         if self.data.override_queue_timer then
-          self.data.queue_timer_duration = Imgui.input_int("Duration##global" .. tostring(self), self.data.queue_timer_duration)
+          self.data.queue_timer_duration = Imgui.input_int("Duration##global" .. tostring(self),
+            self.data.queue_timer_duration)
           self.data.queue_timer_duration = math.max(self.data.queue_timer_duration, 0)
         end
       end
@@ -173,5 +183,33 @@ if not INCLUDE_GUARDS.REDEEM then
     end
 
     return window_open
+  end
+
+  Redeem.prepare = function(self)
+    for _, horde in ipairs(self.data.hordes) do
+      horde:prepare()
+    end
+
+    for _, mutator in ipairs(self.data.mutators) do
+      --mutator:create_redeem()
+    end
+
+    for _, buff in ipairs(self.data.buffs) do
+      --buff:create_redeem()
+    end
+  end
+
+  Redeem.redeem = function(self)
+    for _, horde in ipairs(self.data.hordes) do
+      process_horde_redeem(horde.redeem)
+    end
+
+    for _, mutator in ipairs(self.data.mutators) do
+      apply_mutator(mutator.redeem)
+    end
+
+    for _, buff in ipairs(self.data.buffs) do
+      apply_mutator(buff.redeem)
+    end
   end
 end

@@ -27,6 +27,10 @@ if not INCLUDE_GUARDS.AMOUNT then
     return data
   end
 
+  Amount.get = function(self)
+    return self.data.random and math.random(self.data.min, self.data.max) or self.data.min
+  end
+
   Amount.render_ui = function(self)
     Imgui.text("Amount")
     Imgui.same_line()

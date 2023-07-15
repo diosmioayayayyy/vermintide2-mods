@@ -1,5 +1,7 @@
 local mod = get_mod("TwitchRedeems")
 
+ -- TODO move to Utils folder
+
 if not INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS then
   INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS = true
 
@@ -69,6 +71,21 @@ if not INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS then
   function breed_name_valid(breed_name)
     local breed = Breeds[breed_name]
     return breed ~= nil
+  end
+
+  function add_spawn_func(optional_data, spawn_func)
+    optional_data = optional_data or {}
+
+    if optional_data.spawned_func then
+      local previous_spawned_func = optional_data.spawned_func
+
+      optional_data.spawned_func = function(unit, breed, optional_data)
+        previous_spawned_func(unit, breed, optional_data)
+        spawn_func(unit, breed, optional_data)
+      end
+    else
+      optional_data.spawned_func = spawn_func
+    end
   end
 
   function mod.add_buff_template(buff_name, buff_data, extra_data, override_index)

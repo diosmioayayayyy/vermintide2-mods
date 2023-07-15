@@ -20,6 +20,8 @@ if not INCLUDE_GUARDS.REDEEM_HORDE then
       spawn_pos = SpawnPosition.RANDOM,
     }
 
+    self.redeem = {}
+
     if other and type(other) == 'table' then
       for key, value in pairs(other) do
         if key == "units" then
@@ -66,8 +68,6 @@ if not INCLUDE_GUARDS.REDEEM_HORDE then
       self.data.spawn_type = Imgui.combo("Spawn Type", self.data.spawn_type, GuiDropdownSpawnType, 3)
       self.data.spawn_pos  = Imgui.combo("Spawn Position", self.data.spawn_pos, GuiDropdownSpawnPosition, 3)
 
-
-
       Imgui.separator()
       Imgui.text("Units")
       Imgui.same_line()
@@ -101,5 +101,22 @@ if not INCLUDE_GUARDS.REDEEM_HORDE then
     end
 
     return window_open
+  end
+
+  RedeemHorde.prepare = function(self)
+    self.redeem = {}
+    self.redeem.side_id = Managers.state.side:get_side_from_name("dark_pact").side_id
+    self.redeem.spawn_type = self.data.spawn_type
+    self.redeem.spawn_pos  = self.data.spawn_pos
+    self.redeem.spawn_list = {}
+
+    for _, unit in pairs(self.data.units) do
+      local spawn_list_entry = unit:create_spawn_list_entry()
+      table.insert(self.redeem.spawn_list, spawn_list_entry)
+    end
+  end
+
+  RedeemHorde.redeem = function(self)
+      -- TOOD
   end
 end
