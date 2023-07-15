@@ -4,6 +4,7 @@ mod:dofile("scripts/mods/TwitchRedeems/RedeemFunctions")
 mod:dofile("scripts/mods/TwitchRedeems/Gui/ImguiWindow")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemDefinitions")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemHorde")
+mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemMutator")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemUnit")
 
 if not INCLUDE_GUARDS.REDEEM then
@@ -41,6 +42,11 @@ if not INCLUDE_GUARDS.REDEEM then
             local horde = RedeemHorde:new(raw_horde)
             self.data.hordes[key] = horde
           end
+        elseif key == "mutators" then
+          for key, raw_mutator in pairs(value) do
+            local mutator = RedeemMutator:new(raw_mutator)
+            self.data.mutators[key] = mutator
+          end
         else
           self.data[key] = other[key]
         end
@@ -49,6 +55,8 @@ if not INCLUDE_GUARDS.REDEEM then
 
     -- Gui variables.
     self.selected_horde = nil
+    self.selected_mutator = nil
+    self.selected_buff = nil
   end
 
   Redeem.serialize = function(self)
@@ -68,7 +76,7 @@ if not INCLUDE_GUARDS.REDEEM then
     end
     data.mutators = {}
     for key, mutator in pairs(self.data.mutators) do
-      --data.mutators[key] = mutator:serialize()
+      data.mutators[key] = mutator:serialize()
     end
     data.buffs = {}
     for key, buff in pairs(self.data.buffs) do
@@ -93,6 +101,12 @@ if not INCLUDE_GUARDS.REDEEM then
     local horde = RedeemHorde:new()
     table.insert(self.data.hordes, horde)
     return horde
+  end
+
+  Redeem.new_mutator = function(self)
+    local mutator = RedeemMutator:new()
+    table.insert(self.data.mutators, mutator)
+    return mutator
   end
 
   Redeem.toggle_gui_window = function(self)
@@ -121,7 +135,7 @@ if not INCLUDE_GUARDS.REDEEM then
       self.data.user_input = Imgui.checkbox("User Input##" .. tostring(self), self.data.user_input)
       self.data.cost = Imgui.input_int("Cost##" .. tostring(self), self.data.cost)
       self.data.background_color[1], self.data.background_color[2], self.data.background_color[3] = Imgui.color_edit_3(
-      "Color##" .. tostring(self), self.data.background_color[1], self.data.background_color[2],
+        "Color##" .. tostring(self), self.data.background_color[1], self.data.background_color[2],
         self.data.background_color[3])
 
       Imgui.separator()
@@ -145,7 +159,7 @@ if not INCLUDE_GUARDS.REDEEM then
 
       Imgui.text("Hordes")
       Imgui.same_line()
-      if Imgui.button("+##" .. tostring(self)) then
+      if Imgui.button("+##Horde" .. tostring(self)) then
         self:new_horde()
       end
 
@@ -157,7 +171,7 @@ if not INCLUDE_GUARDS.REDEEM then
         end
 
         Imgui.same_line()
-        if Imgui.button("[x]##" .. key) then
+        if Imgui.button("[x]##Horde" .. key) then
           horde_to_delete = key
         end
       end
@@ -165,6 +179,23 @@ if not INCLUDE_GUARDS.REDEEM then
       Imgui.separator()
 
       Imgui.text("Mutators")
+      Imgui.same_line()
+      if Imgui.button("+##Mutator" .. tostring(self)) then
+        self:new_mutator()
+      end
+
+      local mutator_to_delete = nil
+      for key, mutator in pairs(self.data.mutators) do
+        if Imgui.button(mutator.data.name .. "##" .. key) then
+          mutator:toggle_gui_window()
+          mod.selected_mutator = key
+        end
+
+        Imgui.same_line()
+        if Imgui.button("[x]##Mutator" .. key) then
+          mutator_to_delete = key
+        end
+      end
 
       Imgui.separator()
 
@@ -175,11 +206,20 @@ if not INCLUDE_GUARDS.REDEEM then
         table.remove(self.data.hordes, horde_to_delete)
       end
 
+      -- Delete mutator.
+      if mutator_to_delete then
+        table.remove(self.data.mutators, mutator_to_delete)
+      end
+
       self.imgui_window:end_window()
     end
 
     for _, horde in ipairs(self.data.hordes) do
       if horde:render_ui() then window_open = true end
+    end
+
+    for _, mutator in ipairs(self.data.mutators) do
+      if mutator:render_ui() then window_open = true end
     end
 
     return window_open
@@ -205,7 +245,7 @@ if not INCLUDE_GUARDS.REDEEM then
     end
 
     for _, mutator in ipairs(self.data.mutators) do
-      --apply_mutator(mutator.redeem)
+      mutator:apply()
     end
 
     for _, buff in ipairs(self.data.buffs) do

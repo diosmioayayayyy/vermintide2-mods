@@ -5,10 +5,10 @@ if not INCLUDE_GUARDS.AMOUNT then
 
   Amount = class(Amount)
 
-  Amount.init = function(self, other)
+  Amount.init = function(self, other, min, max)
     self.data = {
-      min = 1,
-      max = 1,
+      min = min or 1,
+      max = max or 1,
       random = false,
     }
 
@@ -31,8 +31,9 @@ if not INCLUDE_GUARDS.AMOUNT then
     return self.data.random and math.random(self.data.min, self.data.max) or self.data.min
   end
 
-  Amount.render_ui = function(self)
-    Imgui.text("Amount")
+  Amount.render_ui = function(self, text)
+    text = text or "Amount"
+    Imgui.text(text)
     Imgui.same_line()
     self.data.random = Imgui.checkbox("Random##" .. tostring(self), self.data.random)
     Imgui.same_line()

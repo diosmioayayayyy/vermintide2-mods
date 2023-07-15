@@ -23,6 +23,45 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "Front", "Back", "Random"
   }
 
+  MutatorType = {
+    COMRADESHIP = 1,
+    DARKNESS = 2,
+    LIGHTNING = 3,
+    TICKING_BOMB = 4,
+    TWINS = 5,
+    SLAYER_CURSE = 6,
+    BLOODLUST = 7,
+    ACT_ON_INSTINCT = 8,
+    CHASING_SPIRITS = 9,
+    WEAPONS_ABLAZE = 10,
+  }
+
+  MutatorName = {
+    "leash",
+    "twitch_darkness",
+    "lightning_strike",
+    "ticking_bomb",
+    "splitting_enemies",
+    "slayer_curse",
+    "bloodlust",
+    "realism",
+    "chasing_spirits",
+    "flames",
+  }
+
+  GuiDropdownMutators = {
+    "Curse of Comradeship",
+    "Darkness",
+    "Lightning",
+    "Ticking Bomb",
+    "Twins",
+    "Mark of Khorne",
+    "Curse of Tainted Blood",
+    "Act on Instinct",
+    "Chasing Spirit",
+    "Weapons Ablaze",
+  }
+
   local breed_backlist = {
     "beastmen_ungor_dummy",
     "skaven_storm_vermin_commander",
