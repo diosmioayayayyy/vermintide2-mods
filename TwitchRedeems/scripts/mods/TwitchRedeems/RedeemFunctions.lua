@@ -42,11 +42,12 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
     return success, blob_pos, to_player_dir
   end
 
-  local function spawn_horde(horde_redeem)
+  function spawn_redeem_horde(horde_redeem)
     -- Get horde spawn position.
     local success, blob_pos, to_player_dir = get_horde_spawn_position(horde_redeem)
 
     if not success then
+      mod:debug("Failed get horde spawn position")
       return
     end
 
@@ -97,7 +98,7 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
     end
   end
 
-  local function spawn_hidden(horde_redeem)
+  function spawn_redeem_hidden(horde_redeem)
     local conflict_director = Managers.state.conflict
 
     for key, unit in ipairs(horde_redeem.spawn_list) do
@@ -110,7 +111,7 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
     end
   end
 
-  local function spawn_one(horde_redeem)
+  function spawn_redeem_one(horde_redeem)
     local conflict_director = Managers.state.conflict
 
     for key, unit in ipairs(horde_redeem.spawn_list) do
@@ -120,27 +121,5 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
         conflict_director:spawn_one(unit.breed, nil, nil, unit.ptional_data)
       end
     end
-  end
-
-  function process_horde_redeem(horde_redeem)
-    mod:echo("process_horde_redeem horde inside")
-    mod:dump(horde_redeem, "horde_redeem", 3)
-    -- Decide on spawn function.
-    if horde_redeem.spawn_type == SpawnType.HIDDEN then
-      mod:echo("SpawnType.HIDDEN")
-      spawn_hidden(horde_redeem)
-    elseif horde_redeem.spawn_type == SpawnType.HORDE then
-      mod:echo("SpawnType.HORDE")
-      spawn_horde(horde_redeem)
-    elseif horde_redeem.spawn_type == SpawnType.ONE then
-      mod:echo("SpawnType.ONE")
-      spawn_one(horde_redeem)
-    end
-  end
-
-  function apply_mutator(mutator_redeem)
-  end
-
-  function apply_buff(buff_redeem)
   end
 end

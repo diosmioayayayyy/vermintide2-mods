@@ -201,15 +201,15 @@ if not INCLUDE_GUARDS.REDEEM then
 
   Redeem.redeem = function(self)
     for _, horde in ipairs(self.data.hordes) do
-      process_horde_redeem(horde.redeem)
+      horde:spawn()
     end
 
     for _, mutator in ipairs(self.data.mutators) do
-      apply_mutator(mutator.redeem)
+      --apply_mutator(mutator.redeem)
     end
 
     for _, buff in ipairs(self.data.buffs) do
-      apply_mutator(buff.redeem)
+      --apply_mutator(buff.redeem)
     end
   end
 end

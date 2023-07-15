@@ -14,14 +14,6 @@ end
 mod:hook_safe(TwitchManager, "update", function(self, dt, t)
     local is_server = Managers.state.network and Managers.state.network.is_server
     if is_server and mod.redeems_enabled and Managers.state.entity ~= nil then
-
-        -- Setup buff which lets the enemy eyes glow purple.
-        local buff_system = Managers.state.entity:system("buff_system")
-        local optional_data = {}
-        optional_data.spawned_func = function (unit, breed, optional_data)
-            buff_system:add_buff(unit, "twitch_redeem_buff_eye_glow", unit)
-        end
-
         -- Process redeems.
         if mod.redeem_queue ~= nil and mod.redeem_queue:size() > 0 then
           local redeem = mod.redeem_queue:pop()
