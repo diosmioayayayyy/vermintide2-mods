@@ -3,6 +3,7 @@ local mod = get_mod("TwitchRedeems")
 mod:dofile("scripts/mods/TwitchRedeems/RedeemFunctions")
 mod:dofile("scripts/mods/TwitchRedeems/Gui/ImguiWindow")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemDefinitions")
+mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemEvent")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemHorde")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemMutator")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemUnit")
@@ -33,6 +34,7 @@ if not INCLUDE_GUARDS.REDEEM then
       hordes               = {},
       mutators             = {},
       buffs                = {},
+      events               = {},
     }
 
     if other and type(other) == 'table' then
@@ -47,6 +49,11 @@ if not INCLUDE_GUARDS.REDEEM then
             local mutator = RedeemMutator:new(raw_mutator)
             self.data.mutators[key] = mutator
           end
+        elseif key == "events" then
+          for key, raw_event in pairs(value) do
+            local event = RedeemEvent:new(raw_event)
+            self.data.events[key] = event
+          end
         else
           self.data[key] = other[key]
         end
@@ -57,6 +64,7 @@ if not INCLUDE_GUARDS.REDEEM then
     self.selected_horde = nil
     self.selected_mutator = nil
     self.selected_buff = nil
+    self.selected_event = nil
   end
 
   Redeem.serialize = function(self)
@@ -81,6 +89,10 @@ if not INCLUDE_GUARDS.REDEEM then
     data.buffs = {}
     for key, buff in pairs(self.data.buffs) do
       --data.buffs[key] = buff:serialize()
+    end
+    data.events = {}
+    for key, event in pairs(self.data.events) do
+      data.events[key] = event:serialize()
     end
     return data
   end
@@ -109,6 +121,12 @@ if not INCLUDE_GUARDS.REDEEM then
     return mutator
   end
 
+  Redeem.new_event = function(self)
+    local event = RedeemEvent:new()
+    table.insert(self.data.events, event)
+    return event
+  end
+
   Redeem.toggle_gui_window = function(self)
     self.imgui_window.show_window = not self.imgui_window.show_window
   end
@@ -117,6 +135,7 @@ if not INCLUDE_GUARDS.REDEEM then
     self.imgui_window.title = self.data.name
     local window_open = self.imgui_window:begin_window()
     if window_open then
+      -- ----------------------------------------------------
       self.data.name = Imgui.input_text("Name##" .. tostring(self), self.data.name)
 
       Imgui.same_line()
@@ -129,6 +148,7 @@ if not INCLUDE_GUARDS.REDEEM then
         mod.redeem_queue:push(redemption)
       end
 
+      -- ----------------------------------------------------
       Imgui.separator()
       Imgui.text("Twitch Settings")
 
@@ -155,8 +175,8 @@ if not INCLUDE_GUARDS.REDEEM then
         end
       end
 
+      -- ----------------------------------------------------
       Imgui.separator()
-
       Imgui.text("Hordes")
       Imgui.same_line()
       if Imgui.button("+##Horde" .. tostring(self)) then
@@ -176,8 +196,8 @@ if not INCLUDE_GUARDS.REDEEM then
         end
       end
 
+      -- ----------------------------------------------------
       Imgui.separator()
-
       Imgui.text("Mutators")
       Imgui.same_line()
       if Imgui.button("+##Mutator" .. tostring(self)) then
@@ -197,9 +217,33 @@ if not INCLUDE_GUARDS.REDEEM then
         end
       end
 
+      -- ----------------------------------------------------
       Imgui.separator()
-
       Imgui.text("Buffs")
+      -- TODO
+
+      -- ----------------------------------------------------
+      Imgui.separator() 
+      Imgui.text("Events")
+      Imgui.same_line()
+      if Imgui.button("+##Event" .. tostring(self)) then
+        self:new_event()
+      end
+
+      local event_to_delete = nil
+      for key, event in pairs(self.data.events) do
+        if Imgui.button(event.data.name .. "##" .. key) then
+          event:toggle_gui_window()
+          mod.selected_event = key
+        end
+
+        Imgui.same_line()
+        if Imgui.button("[x]##Event" .. key) then
+          event_to_delete = key
+        end
+      end
+
+      -- ----------------------------------------------------
 
       -- Delete horde.
       if horde_to_delete then
@@ -209,6 +253,11 @@ if not INCLUDE_GUARDS.REDEEM then
       -- Delete mutator.
       if mutator_to_delete then
         table.remove(self.data.mutators, mutator_to_delete)
+      end
+
+      -- Delete event.
+      if mutator_to_delete then
+        table.remove(self.data.events, event_to_delete)
       end
 
       self.imgui_window:end_window()
@@ -222,6 +271,10 @@ if not INCLUDE_GUARDS.REDEEM then
       if mutator:render_ui() then window_open = true end
     end
 
+    for _, event in ipairs(self.data.events) do
+      if event:render_ui() then window_open = true end
+    end
+
     return window_open
   end
 
@@ -231,11 +284,15 @@ if not INCLUDE_GUARDS.REDEEM then
     end
 
     for _, mutator in ipairs(self.data.mutators) do
-      --mutator:create_redeem()
+      mutator:prepare()
     end
 
     for _, buff in ipairs(self.data.buffs) do
-      --buff:create_redeem()
+      --buff:prepare()
+    end
+
+    for _, event in ipairs(self.data.events) do
+      event:prepare()
     end
   end
 
@@ -250,6 +307,10 @@ if not INCLUDE_GUARDS.REDEEM then
 
     for _, buff in ipairs(self.data.buffs) do
       --apply_mutator(buff.redeem)
+    end
+
+    for _, event in ipairs(self.data.events) do
+      event:apply()
     end
   end
 end

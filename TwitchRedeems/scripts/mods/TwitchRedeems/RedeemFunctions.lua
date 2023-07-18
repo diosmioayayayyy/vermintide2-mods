@@ -42,7 +42,7 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
     return success, blob_pos, to_player_dir
   end
 
-  function spawn_redeem_horde(horde_redeem)
+  function spawn_custom_redeem_horde(horde_redeem)
     -- Get horde spawn position.
     local success, blob_pos, to_player_dir = get_horde_spawn_position(horde_redeem)
 
@@ -121,5 +121,27 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
         conflict_director:spawn_one(unit.breed, nil, nil, unit.ptional_data)
       end
     end
+  end
+
+  function spawn_redeem_horde(horde_type)
+    local conflict_director = Managers.state.conflict
+    local side_id = conflict_director.default_enemy_side_id
+    local horde_settings = CurrentHordeSettings
+
+    local wave = "single"
+    local optional_wave_composition = nil
+    local composition = horde_type == "vector" and horde_settings.vector_composition or horde_type == "vector_blob" and horde_settings.vector_blob_composition or horde_settings.ambush_composition
+
+    if wave and type(composition) == "table" then
+      optional_wave_composition = composition[math.random(#composition)]
+    end
+
+    local extra_data = {
+      twitch_redeem_horde = true,
+      horde_wave = wave,
+      optional_wave_composition = optional_wave_composition
+    }
+
+    conflict_director.horde_spawner:horde(horde_type, extra_data, side_id)
   end
 end

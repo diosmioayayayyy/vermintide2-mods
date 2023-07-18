@@ -128,6 +128,7 @@ if not INCLUDE_GUARDS.BREED_EDITOR then
 
         Imgui.separator()
         Imgui.text("Properties")
+        -- TODO
       end
 
       self.imgui_window:end_window()

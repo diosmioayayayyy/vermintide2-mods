@@ -62,6 +62,20 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "Weapons Ablaze",
   }
 
+  EventType = {
+    HORDE = 1,
+    HORDE_BLOB = 2,
+    AMBUSH = 3,
+    RANDOM_HORDE = 4,
+  }
+
+  GuiDropdownEvents = {
+    "Horde",
+    "Horde Blob",
+    "Ambush",
+    "Random Horde"
+  }
+
   local breed_backlist = {
     "beastmen_ungor_dummy",
     "skaven_storm_vermin_commander",

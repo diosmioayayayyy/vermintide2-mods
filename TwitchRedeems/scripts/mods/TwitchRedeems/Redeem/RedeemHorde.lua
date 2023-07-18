@@ -121,7 +121,7 @@ if not INCLUDE_GUARDS.REDEEM_HORDE then
     if self.redeem.spawn_type == SpawnType.HIDDEN then
       spawn_redeem_hidden(self.redeem)
     elseif self.redeem.spawn_type == SpawnType.HORDE then
-      spawn_redeem_horde(self.redeem)
+      spawn_custom_redeem_horde(self.redeem)
     elseif self.redeem.spawn_type == SpawnType.ONE then
       spawn_redeem_one(self.redeem)
     end

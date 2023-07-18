@@ -1,6 +1,7 @@
 local mod = get_mod("TwitchRedeems")
 
 mod:dofile("scripts/mods/TwitchRedeems/RedeemFunctions")
+mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_utils")
 
 local function fulfill_redeem(redemption)
   local redeem_index = mod.redeem_lookup[string.lower(redemption.title)]
@@ -43,4 +44,32 @@ mod:hook(BreedFreezer, "try_unfreeze_breed", function(func, self, breed, data)
         return nil
     end
     return func(self, breed, data)
+end)
+-- Twitch Redeems horde spawns.
+local function add_twitch_redeems_eye_glow_buff_to_horde(hordes)
+  local buff_system = Managers.state.entity:system("buff_system")
+  local horde_id = #hordes
+  hordes[horde_id].optional_data = hordes[horde_id].optional_data or {}
+  add_spawn_func(hordes[horde_id].optional_data, function (unit) buff_system:add_buff(unit, "twitch_redeem_buff_eye_glow", unit) end)
+end
+
+mod:hook_safe(HordeSpawner, "execute_vector_horde", function(self, extra_data, side_id, fallback)
+  if extra_data.twitch_redeem_horde == true then
+    mod:info("Twitch Redeem Vector Horde is spawning")
+    add_twitch_redeems_eye_glow_buff_to_horde(self.hordes)
+  end
+end)
+
+mod:hook_safe(HordeSpawner, "execute_vector_blob_horde", function(self, extra_data, side_id, fallback)
+  if extra_data.twitch_redeem_horde == true then
+    mod:info("Twitch Redeem Vector Blob Horde is spawning")
+    add_twitch_redeems_eye_glow_buff_to_horde(self.hordes) -- TODO NOT WORKING. optional_data is not used in vector blob hordes
+  end
+end)
+
+mod:hook_safe(HordeSpawner, "execute_ambush_horde", function(self, extra_data, side_id, fallback, override_epicenter_pos, optional_data)
+  if extra_data.twitch_redeem_horde == true then
+    mod:info("Twitch Redeem Ambush Horde is spawning")
+    add_twitch_redeems_eye_glow_buff_to_horde(self.hordes)
+  end
 end)
