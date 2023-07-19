@@ -5,16 +5,18 @@
   "main": "src/app.js",
   "scripts": {
     "start": "electron .",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "build": "electron-builder"
   },
   "keywords": [],
-  "author": "",
-  "license": "ISC",
+  "author": "diosmio",
+  "license": "MIT",
   "devDependencies": {
     "@twurple/auth": "^6.2.1",
     "axios": "^1.4.0",
     "ejs": "^3.1.9",
     "electron": "^25.1.1",
+    "electron-builder": "^24.4.0",
     "electron-oauth2": "^3.0.0",
     "electron-pug": "^2.0.0",
     "electron-webpack": "^2.8.2",
@@ -25,5 +27,44 @@
     "sync-request": "^6.1.0",
     "ws": "^8.13.0",
     "zeromq": "^6.0.0-beta.17"
+  },
+  "dependencies": {
+    "@twurple/auth": "^6.2.1",
+    "axios": "^1.4.0",
+    "ejs": "^3.1.9",
+    "electron-oauth2": "^3.0.0",
+    "electron-pug": "^2.0.0",
+    "electron-webpack": "^2.8.2",
+    "handlebars": "^4.7.7",
+    "https": "^1.0.0",
+    "node-twitch": "^0.5.0",
+    "open": "^9.1.0",
+    "sync-request": "^6.1.0",
+    "ws": "^8.13.0",
+    "zeromq": "^6.0.0-beta.17"
+  },
+  "build": {
+    "appId": "com.xdd.twitchredeems",
+    "extends": null,
+    "productName": "TwitchRedeemsProxy",
+    "directories": {
+      "output": "dist"
+    },
+    "mac": {
+      "target": "dmg",
+      "icon": "./content/images/twitch_redeems_symbol.png"
+    },
+    "win": {
+      "target": "nsis",
+      "icon": "./content/images/twitch_redeems_symbol.png"
+    },
+    "linux": {
+      "target": "AppImage",
+      "icon": "./content/images/twitch_redeems_symbol.png"
+    },
+    "nsis": {
+      "oneClick": false,
+      "allowToChangeInstallationDirectory": true
+    }
   }
 }
