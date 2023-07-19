@@ -24,6 +24,7 @@ mod:hook_safe(TwitchManager, "update", function(self, dt, t)
               msg = msg .. string.format("\n '%s'", redeem.user_input)
             end
             mod:chat_broadcast(msg)
+            Managers.state.event:trigger("twitch_redeem_ui", redeem)
             fulfill_redeem(redeem)
           end
         end
@@ -231,4 +232,32 @@ mod:hook(HordeSpawner, "execute_vector_blob_horde", function(func, self, extra_d
 	self.num_paced_hordes = self.num_paced_hordes + 1
 
 	print("vector blob horde has started")
+end)
+
+-- UI hooks.
+mod:hook_safe(IngameHud, "init", function(self, ingame_ui_context)
+  mod:echo("IngameHud INIT")
+  mod:echo("CREATE _twitch_redeems_ui")
+  self._twitch_redeems_ui = TwitchRedeemUI:new(ingame_ui_context)
+end)
+
+local TODO_cnt = 0
+
+mod:hook_safe(IngameHud, "update", function(self, dt , t)
+  if self._twitch_redeems_ui then
+    if TODO_cnt % 1000 == 0 then
+      mod:echo("UPDATE _twitch_redeems_ui")
+    end
+    self._twitch_redeems_ui:update(dt)
+  end
+
+  TODO_cnt = TODO_cnt + 1
+end)
+
+mod:hook_safe(IngameHud, "destroy", function(self)
+  -- if self._twitch_redeems_ui then
+  --   mod:echo("DESTROY _twitch_redeems_ui")
+  --   self._twitch_redeems_ui:destroy()
+  --   self._twitch_redeems_ui = nil
+  -- end
 end)

@@ -11,6 +11,7 @@ mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_templates")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_ui")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_utils")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeemsHTTPProxyClient")
+mod:dofile("scripts/mods/TwitchRedeems/Gui/twitch_redeem_ui")
 require("scripts/mods/TwitchRedeems/TwitchRedeems_buffs")
 
 local in_modded_realm = script_data["eac-untrusted"]
