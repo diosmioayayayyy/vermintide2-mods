@@ -28,8 +28,6 @@ if not INCLUDE_GUARDS.BREED_EDITOR then
     self.gui_dropdown_redeem_breed = {}
     self.gui_dropdown_redeem_breed_index = nil
     self.redeem_breed = nil
-
-    self:load_settings()
   end
 
   BreedEditor.toggle_gui_window = function(self)
@@ -59,7 +57,9 @@ if not INCLUDE_GUARDS.BREED_EDITOR then
   end
 
   BreedEditor.load_settings = function(self)
-    Managers.save:auto_load(save_filename, callback(self, "cb_load_twitch_redeem_breeds_from_file_done"), false)
+    if Managers.save ~= nil then
+      Managers.save:auto_load(save_filename, callback(self, "cb_load_twitch_redeem_breeds_from_file_done"), false)
+    end
   end
 
   BreedEditor.render_ui = function(self)

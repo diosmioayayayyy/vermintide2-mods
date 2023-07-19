@@ -139,6 +139,7 @@ mod.on_all_mods_loaded = function(status, state_name)
   mod.apply_settings()
   mod.settings_twitch:load_settings()
   mod.settings_redeems:load_settings()
+  mod.breed_editor:load_settings()
   mod.redeem_twitch_user_name = mod:get(mod.SETTING_ID_TWITCH_REDEEM_USER)
   mod.redeem_twitch_channel_name = mod:get(mod.SETTING_ID_TWITCH_CHANNEL_NAME)
 

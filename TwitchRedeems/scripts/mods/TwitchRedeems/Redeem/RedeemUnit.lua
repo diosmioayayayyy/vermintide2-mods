@@ -8,13 +8,6 @@ mod:dofile("scripts/mods/TwitchRedeems/Utils/Amount")
 if not INCLUDE_GUARDS.REDEEM_UNIT then
   INCLUDE_GUARDS.REDEEM_UNIT = true
 
-  local BUFF_SYSTEM = Managers.state.entity:system("buff_system")
-
-  local OPTIONAL_DATA = {}
-  OPTIONAL_DATA.spawned_func = function(unit, breed, optional_data)
-    BUFF_SYSTEM:add_buff(unit, "twitch_redeem_buff_eye_glow", unit)
-  end
-
   RedeemUnit = class(RedeemUnit)
 
   RedeemUnit.init = function(self, other)
@@ -28,7 +21,7 @@ if not INCLUDE_GUARDS.REDEEM_UNIT then
       breed_name = "skaven_clan_rat",
       breed_index = 1,
       amount = Amount:new(),
-      max_health_modifier = Amount:new(),
+      max_health_modifier = 1.0,
       taggable = false,
     }
 
@@ -36,8 +29,6 @@ if not INCLUDE_GUARDS.REDEEM_UNIT then
       for key, value in pairs(other) do
         if key == "amount" then
           self.data.amount = Amount:new(value)
-        elseif key == "max_health_modifier" then
-          self.data.max_health_modifier = Amount:new(value)
         else
           self.data[key] = other[key]
         end
@@ -56,7 +47,7 @@ if not INCLUDE_GUARDS.REDEEM_UNIT then
     data.breed_name = self.data.breed_name
     data.breed_index = self.data.breed_index
     data.amount = self.data.amount:serialize()
-    data.max_health_modifier = self.data.max_health_modifier:serialize()
+    data.max_health_modifier = self.data.max_health_modifier
     data.taggable = self.taggable
     return data
   end
@@ -72,20 +63,31 @@ if not INCLUDE_GUARDS.REDEEM_UNIT then
 
       self.data.amount:render_ui()
 
+      self.data.max_health_modifier = Imgui.input_float("Max Health Modifier", self.data.max_health_modifier, "%.2f")
+
       self.imgui_window:end_window()
     end
     return window_open
   end
 
   RedeemUnit.create_spawn_list_entry = function(self)
+    local buff_system = Managers.state.entity:system("buff_system")
+
     local entry = {}
-    entry.breed = Breeds[self.data.breed_name]
+    entry.breed = table.clone(Breeds[self.data.breed_name])
+    entry.breed.is_twitch_redeem = true
     entry.amount = self.data.amount
     entry.max_health_modifier = self.data.max_health_modifier
-    entry.optional_data = table.clone(OPTIONAL_DATA)
+    entry.optional_data = {}
+    entry.optional_data.max_health_modifier = self.data.max_health_modifier
+
+    -- Apply purple eyes.
+    entry.optional_data.spawned_func = function(unit, breed, optional_data)
+      buff_system:add_buff(unit, "twitch_redeem_buff_eye_glow", unit)
+    end
 
     if self.taggable then
-      add_spawn_func(entry.optional_data, function (unit) BUFF_SYSTEM:add_buff(unit, "twitch_redeem_buff_pingable", unit) end)
+      add_spawn_func(entry.optional_data, function (unit) buff_system:add_buff(unit, "twitch_redeem_buff_pingable", unit) end)
     end
 
     local side = Managers.state.side:get_side_from_name("dark_pact")

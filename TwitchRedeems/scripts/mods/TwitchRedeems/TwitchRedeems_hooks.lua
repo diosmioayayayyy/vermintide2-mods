@@ -23,7 +23,7 @@ mod:hook_safe(TwitchManager, "update", function(self, dt, t)
             if redeem.user_input ~= "" then
               msg = msg .. string.format("\n '%s'", redeem.user_input)
             end
-            mod:echo(msg)
+            mod:chat_broadcast(msg)
             fulfill_redeem(redeem)
           end
         end
@@ -72,4 +72,13 @@ mod:hook_safe(HordeSpawner, "execute_ambush_horde", function(self, extra_data, s
     mod:info("Twitch Redeem Ambush Horde is spawning")
     add_twitch_redeems_eye_glow_buff_to_horde(self.hordes)
   end
+end)
+
+
+-- Health extension fixes: This extension is behaving weird, freezed units with max_health_modifier will keep their max health when unfreezed...
+mod:hook_safe(GenericHealthExtension, "reset", function(self)
+  self.is_invincible = false
+end)
+
+mod:hook_safe(GenericHealthExtension, "init", function(self, extension_init_context, unit, extension_init_data)
 end)
