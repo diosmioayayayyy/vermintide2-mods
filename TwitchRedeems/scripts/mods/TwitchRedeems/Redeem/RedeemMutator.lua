@@ -65,9 +65,17 @@ if not INCLUDE_GUARDS.REDEEM_MUTATOR then
     local mutator_name = MutatorName[self.data.mutator_type]
     local duration = self.data.duration:get()
 
-    mutator_handler:initialize_mutators({
-      mutator_name
-    })
-    mutator_handler:activate_mutator(mutator_name, duration, "activated_by_twitch")
+    if not mutator_handler:has_activated_mutator(mutator_name) then
+      mutator_handler:initialize_mutators({
+        mutator_name
+      })
+      mutator_handler:activate_mutator(mutator_name, duration)
+    else
+      mod:info("Mutator already active '" .. mutator_name .. "'")
+    end
   end
+  
+  -- TODO display active mutators
+ 
+  -- TODO add deactivate all mutators redeem
 end

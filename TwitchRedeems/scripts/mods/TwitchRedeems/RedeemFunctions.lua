@@ -118,7 +118,7 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
       local amount = unit.amount:get()
 
       for i = 1, amount, 1 do
-        conflict_director:spawn_one(unit.breed, nil, nil, unit.ptional_data)
+        conflict_director:spawn_one(unit.breed, nil, nil, unit.optional_data)
       end
     end
   end

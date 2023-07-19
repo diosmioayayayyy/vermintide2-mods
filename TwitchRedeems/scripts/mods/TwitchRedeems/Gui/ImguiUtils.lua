@@ -3,7 +3,9 @@ local mod = get_mod("TwitchRedeems")
 if not INCLUDE_GUARDS.IMGUI_UTILS then
   INCLUDE_GUARDS.IMGUI_UTILS = true
 
-  ShowCursorStack.pop() -- TODO fix cursor stuck
+  if ShowCursorStack.cursor_active() then
+    ShowCursorStack.pop() -- fixes stuck cursor on mod reload.
+  end
 
   function enable_gui_control()
     local input_manager = Managers.input

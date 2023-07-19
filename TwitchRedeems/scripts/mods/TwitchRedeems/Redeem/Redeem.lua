@@ -256,7 +256,7 @@ if not INCLUDE_GUARDS.REDEEM then
       end
 
       -- Delete event.
-      if mutator_to_delete then
+      if event_to_delete then
         table.remove(self.data.events, event_to_delete)
       end
 
