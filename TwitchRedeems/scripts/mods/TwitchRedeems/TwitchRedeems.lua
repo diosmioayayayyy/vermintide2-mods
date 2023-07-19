@@ -86,6 +86,13 @@ mod.SETTING_ID_REDEEM_USER_COOLDOWN_DURATION = "USER_COOLDOWN_DURATION"
 --   end
 -- end
 
+UIManager.reload_twitch_redeem_ui = function (self)
+  -- TODO should we keep that? was needed for setup of ui.
+  if self._ingame_ui_context then
+    self._twitch_redeems_ui = TwitchRedeemUI:new(self._ingame_ui_context)
+  end
+end
+
 mod.cb_load_twitch_redeems_from_file_done = function(_, result)
   local data = result.data
   if data then
@@ -138,6 +145,7 @@ end
 
 mod.on_all_mods_loaded = function(status, state_name)
   mod.apply_settings()
+  mod.redeem_configuration:load_settings()
   mod.settings_twitch:load_settings()
   mod.settings_redeems:load_settings()
   mod.breed_editor:load_settings()
@@ -163,6 +171,8 @@ mod.on_all_mods_loaded = function(status, state_name)
     local is_in_inn_level = Managers.level_transition_handler:in_hub_level()
     mod.enable_redeems(not is_in_inn_level)
   end
+
+  Managers.ui:reload_ingame_ui(false) -- TODO DEL
 end
 
 mod.apply_settings = function()

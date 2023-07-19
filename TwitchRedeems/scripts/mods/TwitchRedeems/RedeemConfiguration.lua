@@ -8,8 +8,6 @@ RedeemConfiguration.init = function(self)
   self.imgui_window = ImguiWindow:new()
   self.imgui_window.title = "Redeem Configuration"
   self.imgui_window.key = self
-
-  self:load_settings()
 end
 
 RedeemConfiguration.is_window_open = function(self)
@@ -21,7 +19,7 @@ RedeemConfiguration.save_settings = function(self)
 end
 
 RedeemConfiguration.load_settings = function(self)
-  -- TODO load redeems here
+  mod.load_twitch_redeems_from_file()
 end
 
 RedeemConfiguration.toggle_gui_window = function(self)
