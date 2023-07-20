@@ -4,6 +4,7 @@ INCLUDE_GUARDS = {}
 
 mod:dofile("scripts/mods/TwitchRedeems/BreedEditor")
 mod:dofile("scripts/mods/TwitchRedeems/RedeemConfiguration")
+mod:dofile("scripts/mods/TwitchRedeems/Networking")
 mod:dofile("scripts/mods/TwitchRedeems/SettingsRedeems")
 mod:dofile("scripts/mods/TwitchRedeems/SettingsTwitch")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_redeem_queue")
@@ -40,6 +41,8 @@ mod.settings_redeems = SettingsRedeems:new()
 mod.gui_control = false
 
 mod.http_proxy_client = TwitchRedeemsHTTPProxyClient:new()
+
+mod.twitch_redemption_ui_settings_dirty = false
 
 -- Mod settings ids.
 mod.SETTING_ID_TWITCH_REDEEM_USER = "TWITCH_REDEEM_USER"
@@ -178,8 +181,9 @@ end
 mod.apply_settings = function()
 end
 
-mod.on_setting_changed = function()
+mod.on_setting_changed = function(setting_id)
   mod.apply_settings()
+  mod.twitch_redemption_ui_settings_dirty = true
 end
 
 mod.on_game_state_changed = function(status, state_name)

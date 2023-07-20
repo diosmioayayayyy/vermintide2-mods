@@ -24,6 +24,24 @@ return {
                 keybind_type    = "function_call",
                 function_name   = "toggle_twitch_gui",
             },
+            {
+              setting_id  = "twitch_redemption_ui_offset",
+              type        = "group",
+              sub_widgets = {
+                {
+                  setting_id = "twitch_redemption_ui_offset_x",
+                  type = "numeric",
+                  default_value = 0,
+                  range = {-5000, 5000},
+                },
+                {
+                  setting_id = "twitch_redemption_ui_offset_y",
+                  type = "numeric",
+                  default_value = 0,
+                  range = {-5000, 5000},
+                },
+              }
+            }
         }
       }
 }

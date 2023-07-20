@@ -23,8 +23,8 @@ mod:hook_safe(TwitchManager, "update", function(self, dt, t)
             if redeem.user_input ~= "" then
               msg = msg .. string.format("\n '%s'", redeem.user_input)
             end
-            mod:chat_broadcast(msg)
-            Managers.state.event:trigger("twitch_redeem_ui", redeem)
+            --mod:chat_broadcast(msg)
+            mod:network_send("new-redemption", "all", redeem)
             fulfill_redeem(redeem)
           end
         end
@@ -245,8 +245,13 @@ local TODO_cnt = 0
 
 mod:hook_safe(IngameHud, "update", function(self, dt , t)
   if self._twitch_redeems_ui then
+    if mod.twitch_redemption_ui_settings_dirty then
+      self._twitch_redeems_ui:update_ui_settings()
+      mod.twitch_redemption_ui_settings_dirty = false
+    end
+
     if TODO_cnt % 1000 == 0 then
-      mod:echo("UPDATE _twitch_redeems_ui")
+      --mod:echo("UPDATE _twitch_redeems_ui") -- TODO DEL
     end
     self._twitch_redeems_ui:update(dt)
   end

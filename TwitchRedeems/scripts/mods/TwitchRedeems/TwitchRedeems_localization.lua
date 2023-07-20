@@ -23,4 +23,15 @@ return {
 	user_redeem_cooldown = {
 		en = "Cooldown per user",
 	},
+
+  -- UI settings.
+  twitch_redemption_ui_offset = {
+    en = "Redemption UI Offsets"
+  },
+  twitch_redemption_ui_offset_x = {
+    en = "X Offset"
+  },
+  twitch_redemption_ui_offset_y = {
+    en = "Y Offset"
+  },
 }
