@@ -72,7 +72,6 @@ SettingsTwitch.render_ui = function (self)
                         local game_mode_key = Managers.state.game_mode:game_mode_key()
                         if game_mode_key == "inn" then game_mode_key = "adventure" end
                         Managers.twitch:activate_twitch_game_mode(Managers.state.game_mode.network_event_delegate, game_mode_key)
-                        mod:echo(game_mode_key)
                     end
                 end
             else

@@ -245,6 +245,7 @@ async function handleRequestGet(request, response, body) {
           "title": redeem.reward.title,
           "user": redeem.user_name,
           "user_input": redeem.user_input,
+          "user_color": redeem.user_chat_color
         }
       }
       else {

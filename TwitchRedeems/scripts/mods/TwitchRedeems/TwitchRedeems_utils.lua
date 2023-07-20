@@ -68,6 +68,23 @@ if not INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS then
     return "#" .. redHex .. greenHex .. blueHex
   end
 
+  function to_rgb_color(hex_str, alpha)
+    -- Remove the '#' symbol if present
+    hex_str = string.gsub(hex_str, "#", "")
+
+    -- Check if the hexadecimal value is valid
+    if #hex_str ~= 6 then
+        mod:error("Invalid hexadecimal color format: " .. hex_str)
+    end
+
+    -- Convert the hexadecimal color to RGB values
+    local red = tonumber(hex_str:sub(1, 2), 16)
+    local green = tonumber(hex_str:sub(3, 4), 16)
+    local blue = tonumber(hex_str:sub(5, 6), 16)
+
+    return {alpha and alpha or 255, red, green, blue}
+  end
+
   function breed_name_valid(breed_name)
     local breed = Breeds[breed_name]
     return breed ~= nil

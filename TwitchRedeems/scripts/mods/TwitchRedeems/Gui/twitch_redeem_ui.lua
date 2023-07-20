@@ -196,7 +196,9 @@ TwitchRedeemUI._show_twitch_redemption = function(self)
   timer_widget.content.text = self._active_redeem.title
   self._widgets.text_redeemed_by.content.text = "redeemed by"
   self._widgets.vote_text_a.content.text = self._active_redeem.user
-  self._widgets.vote_text_a.style.text.text_color = { 255, 0, 255, 255 } -- TODO user color
+  if self._active_redeem.user_color then
+    self._widgets.vote_text_a.style.text.text_color = to_rgb_color(self._active_redeem.user_color)
+  end
 
   self:_play_standard_vote_start()  -- TODO does this work?
 end

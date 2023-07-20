@@ -181,8 +181,6 @@ vote_text_left_style.font_size = 20
 
 local streaming_icon = "twitch_icon_small"
 
-mod:echo("REBUILD UI TITWHTC REDEEM")
-
 return {
 	vote_texts = VOTE_TEXTS,
 	scenegraph_definition = scenegraph_definition,
