@@ -25,6 +25,9 @@ return {
 	},
 
   -- UI settings.
+  twitch_redemption_ui_duration = {
+    en = "Redemption UI Duration"
+  },
   twitch_redemption_ui_offset = {
     en = "Redemption UI Offsets"
   },

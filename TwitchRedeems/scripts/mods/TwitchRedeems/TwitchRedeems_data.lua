@@ -25,6 +25,12 @@ return {
                 function_name   = "toggle_twitch_gui",
             },
             {
+              setting_id = "twitch_redemption_ui_duration",
+              type = "numeric",
+              default_value = 4,
+              range = {1, 60},
+            },
+            {
               setting_id  = "twitch_redemption_ui_offset",
               type        = "group",
               sub_widgets = {

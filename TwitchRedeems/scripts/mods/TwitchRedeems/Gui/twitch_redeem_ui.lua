@@ -28,6 +28,7 @@ TwitchRedeemUI.update_ui_settings = function(self)
     --mod:dump(self._ui_scenegraph, "self._ui_scenegraph", 5) --TODO to lookup table stuff
     self._ui_scenegraph.base_area.position[1] = mod:get("twitch_redemption_ui_offset_x")
     self._ui_scenegraph.base_area.position[2] = mod:get("twitch_redemption_ui_offset_y")
+    self._timer.duration = mod:get("twitch_redemption_ui_duration")
   end
 end
 
