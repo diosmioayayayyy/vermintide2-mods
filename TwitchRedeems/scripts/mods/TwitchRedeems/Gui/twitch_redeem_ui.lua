@@ -213,5 +213,5 @@ TwitchRedeemUI._update_twitch_redemption = function(self, dt)
 end
 
 TwitchRedeemUI._play_standard_vote_start = function(self)
-  WwiseWorld.trigger_event(self.wwise_world, "Play_twitch_vote_standard_buff_start")
+  WwiseWorld.trigger_event(self.wwise_world, "enemy_grudge_cursed_enter")
 end
