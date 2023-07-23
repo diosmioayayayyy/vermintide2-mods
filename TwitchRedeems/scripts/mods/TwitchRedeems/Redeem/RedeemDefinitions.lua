@@ -34,6 +34,22 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     ACT_ON_INSTINCT = 8,
     CHASING_SPIRITS = 9,
     WEAPONS_ABLAZE = 10,
+
+  --   LIFE = 20,
+  --   METAL = 21,
+  --   HEAVENS = 22,
+  --   LIGHT = 23,
+  --   SHADOW = 24,
+  --   FIRE = 25,
+  --   DEATH = 26,
+  --   BEASTS = 27,
+
+    CORPSE_EXPLOSION = 40,
+    POWERFUL_ELITES = 41,
+    HIGH_INTENSITY = 42,
+    SHARED_HEALTH_POOL = 43,
+
+    GRAVITY = 100,
   }
 
   MutatorName = {
@@ -47,6 +63,22 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "realism",
     "chasing_spirits",
     "flames",
+
+    -- "life",
+    -- "metal",
+    -- "heavens",
+    -- "light",
+    -- "shadow",
+    -- "fire",
+    -- "death",
+    -- "beasts",
+
+    "corpse_explosion",
+    "powerful_elites",
+    "high_intensity",
+    "shared_health_pool",
+
+    "twitch_redeems_gravity_mutator",
   }
 
   GuiDropdownMutators = {
@@ -60,6 +92,22 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "Act on Instinct",
     "Chasing Spirit",
     "Weapons Ablaze",
+
+    -- "life",
+    -- "metal",
+    -- "heavens",
+    -- "light",
+    -- "shadow",
+    -- "fire",
+    -- "death",
+    -- "beasts",
+
+    "Explosive Corpses",
+    "Powerful Elites",
+    "High Intensity",
+    "Shared Health Pool",
+
+    "Gravity",
   }
 
   EventType = {

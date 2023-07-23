@@ -13,11 +13,12 @@ mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_ui")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_utils")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeemsHTTPProxyClient")
 mod:dofile("scripts/mods/TwitchRedeems/Gui/twitch_redeem_ui")
-require("scripts/mods/TwitchRedeems/TwitchRedeems_buffs")
+mod:dofile("scripts/mods/TwitchRedeems/mutator_handler_ext")
+mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_buffs")
+mod:dofile("scripts/mods/TwitchRedeems/MutatorTemplates")
 
 local in_modded_realm = script_data["eac-untrusted"]
 local Managers = Managers
-local TwitchRedeemTemplates = TwitchRedeemTemplates
 
 -- Load purple eye material.
 Managers.package:load("resource_packages/levels/dlcs/morris/belakor_common", "global")

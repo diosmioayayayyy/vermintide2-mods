@@ -43,6 +43,11 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
   end
 
   function spawn_custom_redeem_horde(horde_redeem)
+    mod:info("spawn_custom_redeem_horde") -- TODO DEBUG
+    mod:dump(horde_redeem, "horde_redeem", 5)
+
+    local buff_system = Managers.state.entity:system("buff_system")
+
     -- Get horde spawn position.
     local success, blob_pos, to_player_dir = get_horde_spawn_position(horde_redeem)
 
@@ -99,6 +104,10 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
   end
 
   function spawn_redeem_hidden(horde_redeem)
+    mod:info("spawn_redeem_hidden") -- TODO DEBUG
+    mod:dump(horde_redeem, "horde_redeem", 5)
+
+    local buff_system = Managers.state.entity:system("buff_system")
     local conflict_director = Managers.state.conflict
 
     for key, unit in ipairs(horde_redeem.spawn_list) do
@@ -112,6 +121,10 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
   end
 
   function spawn_redeem_one(horde_redeem)
+    mod:info("spawn_redeem_one") -- TODO DEBUG
+    mod:dump(horde_redeem, "horde_redeem", 5)
+
+    local buff_system = Managers.state.entity:system("buff_system")
     local conflict_director = Managers.state.conflict
 
     for key, unit in ipairs(horde_redeem.spawn_list) do
@@ -124,6 +137,9 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
   end
 
   function spawn_redeem_horde(horde_type)
+    mod:info("spawn_redeem_horde. type=" .. horde_type)-- TODO DEBUG
+
+    local buff_system = Managers.state.entity:system("buff_system")
     local conflict_director = Managers.state.conflict
     local side_id = conflict_director.default_enemy_side_id
     local horde_settings = CurrentHordeSettings

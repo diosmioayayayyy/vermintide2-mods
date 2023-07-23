@@ -74,7 +74,7 @@ if not INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS then
 
     -- Check if the hexadecimal value is valid
     if #hex_str ~= 6 then
-        mod:error("Invalid hexadecimal color format: " .. hex_str)
+        mod:error("Invalid hexadecimal color format: " .. hex_str .. "/".. type(hex_str) .. "/" .. tostring(hex_str))
     end
 
     -- Convert the hexadecimal color to RGB values
@@ -106,6 +106,7 @@ if not INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS then
   end
 
   function mod.add_buff_template(buff_name, buff_data, extra_data, override_index)
+    -- Add to buff templates
     if BuffTemplates[buff_name] == nil then
       local new_buff = {
         buffs = {
@@ -117,14 +118,39 @@ if not INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS then
       end
 
       BuffTemplates[buff_name] = new_buff
-      local index = override_index or #NetworkLookup.buff_templates + 1
+    end
 
-      if not table.contains(NetworkLookup.buff_templates, index) then
-        NetworkLookup.buff_templates[index] = buff_name
-        NetworkLookup.buff_templates[buff_name] = index
-        --mod:echo("Buff template: '" .. buff_name .. "' at index " .. index .. " was added")
+    -- Add to network lookup.
+    local index = override_index or #NetworkLookup.buff_templates + 1
+    if not table.contains(NetworkLookup.buff_templates, index) then
+      NetworkLookup.buff_templates[index] = buff_name
+      NetworkLookup.buff_templates[buff_name] = index
+      mod:info(string.format("Adding buff template '%s' at index %i", buff_name, index))
+    else
+      local buff_name_at_index = NetworkLookup.buff_templates[index]
+      if buff_name_at_index ~= buff_name then
+        mod:error(string.format("Cannot add buff template '%s' at index %i. Already taken by '%s'", buff_name, index, buff_name_at_index))
       else
-        mod:error("Buff template: '" .. buff_name .. "' at index " .. index .. " already exists!")
+        mod:info(string.format("Buff template '%s' at index %i already exists", buff_name, index))
+      end
+    end
+  end
+
+  function mod.add_mutator_template(mutator_name, mutator_template, override_index)
+    mod.mutator_templates[mutator_name] = mutator_template
+
+    local index = override_index or #NetworkLookup.mutator_templates + 1
+
+    if not table.contains(NetworkLookup.mutator_templates, index) then
+      NetworkLookup.mutator_templates[index] = mutator_name
+      NetworkLookup.mutator_templates[mutator_name] = index
+      mod:info(string.format("Adding mutator template '%s' at index %i", mutator_name, index))
+    else
+      local mutator_name_at_index = NetworkLookup.mutator_templates[index]
+      if mutator_name_at_index ~= mutator_name then
+        mod:error(string.format("Cannot add mutator template '%s' at index %i. Already taken by '%s'", mutator_name, index, mutator_name_at_index))
+      else
+        mod:info(string.format("Mutator template '%s' at index %i already exists", mutator_name, index))
       end
     end
   end

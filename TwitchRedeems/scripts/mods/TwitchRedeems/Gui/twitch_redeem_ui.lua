@@ -5,7 +5,8 @@ mod:dofile("scripts/mods/TwitchRedeems/Utils/Timer")
 
 TwitchRedeemUI = class(TwitchRedeemUI)
 
-TwitchRedeemUI.init = function(self, ingame_ui_context)
+TwitchRedeemUI.init = function(self, parent, ingame_ui_context)
+  self._parent = parent
   self._ui_renderer = ingame_ui_context.ui_renderer
   self._ingame_ui = ingame_ui_context.ingame_ui
   self._input_manager = ingame_ui_context.input_manager
@@ -25,10 +26,27 @@ end
 
 TwitchRedeemUI.update_ui_settings = function(self)
   if self._ui_scenegraph then
+    mod:info("Updating TwitchRedeemUI settings.")
     --mod:dump(self._ui_scenegraph, "self._ui_scenegraph", 5) --TODO to lookup table stuff
     self._ui_scenegraph.base_area.position[1] = mod:get("twitch_redemption_ui_offset_x")
     self._ui_scenegraph.base_area.position[2] = mod:get("twitch_redemption_ui_offset_y")
     self._timer.duration = mod:get("twitch_redemption_ui_duration")
+    -- TODO scaling?
+    -- local scale = 2.0
+    -- self._ui_scenegraph.base_area.size[1] = self._ui_scenegraph.base_area.size[1] * scale
+    -- self._ui_scenegraph.base_area.size[2] = self._ui_scenegraph.base_area.size[2] * scale
+
+    -- self._ui_scenegraph.timer_rect.size[1] = self._ui_scenegraph.timer_rect.size[1] * scale
+    -- self._ui_scenegraph.timer_rect.size[2] = self._ui_scenegraph.timer_rect.size[2] * scale
+
+    -- self._ui_scenegraph.sv_timer_rect.size[1] = self._ui_scenegraph.sv_timer_rect.size[1] * scale
+    -- self._ui_scenegraph.sv_timer_rect.size[2] = self._ui_scenegraph.sv_timer_rect.size[2] * scale
+
+    -- self._ui_scenegraph.text_redeemed_by.size[1] = self._ui_scenegraph.text_redeemed_by.size[1] * scale
+    -- self._ui_scenegraph.text_redeemed_by.size[2] = self._ui_scenegraph.text_redeemed_by.size[2] * scale
+
+    -- self._ui_scenegraph.vote_text_rect_a.size[1] = self._ui_scenegraph.vote_text_rect_a.size[1] * scale
+    -- self._ui_scenegraph.vote_text_rect_a.size[2] = self._ui_scenegraph.vote_text_rect_a.size[2] * scale
   end
 end
 
@@ -53,6 +71,10 @@ TwitchRedeemUI._create_elements = function(self)
   self:update_ui_settings()
   self._widgets = {}
   UIRenderer.clear_scenegraph_queue(self._ui_renderer)
+end
+
+TwitchRedeemUI.parent = function (self)
+	return self._parent
 end
 
 local customizer_data = {
@@ -200,6 +222,8 @@ TwitchRedeemUI._show_twitch_redemption = function(self)
   if self._active_redeem.user_color then
     self._widgets.vote_text_a.style.text.text_color = to_rgb_color(self._active_redeem.user_color)
   end
+
+  mod:dump(self._widgets.vote_text_a.style.text, "self._widgets.vote_text_a.style.text", 5)   -- TODO debug stuff
 
   self:_play_standard_vote_start()  -- TODO does this work?
 end

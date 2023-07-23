@@ -47,6 +47,22 @@ RedeemConfiguration.render_ui = function(self)
     -- end
 
     Imgui.text("General")
+
+    if Imgui.button("TEST") then
+      -- TODO
+      -- local PhysicsWorld = stingray.PhysicsWorld
+      -- local world = Managers.world:world("level_world")
+      -- local physics_world = World.get_data(world, "physics_world")
+      -- PhysicsWorld.set_gravity(physics_world, Vector3(0,0,5))
+      local mutator_handler = Managers.state.game_mode._mutator_handler
+      mod:echo("DEACTIVATING MUTATORS")
+      mod:dump(mutator_handler._mutators, "mutator_handler._mutators", 1)
+      mutator_handler:deactivate_mutators(false)
+      mutator_handler._mutators = {}
+      --self._mutators still active
+      --mod.spawn_horde = true
+    end
+
     Imgui.separator()
 
     if Imgui.button("     Twitch     ") then

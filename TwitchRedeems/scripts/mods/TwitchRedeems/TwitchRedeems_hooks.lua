@@ -25,6 +25,8 @@ mod:hook_safe(TwitchManager, "update", function(self, dt, t)
             end
             --mod:chat_broadcast(msg)
             mod:network_send("new-redemption", "all", redeem)
+            mod:info("Spawning Redeem '" .. redeem.title .. "'")
+            mod:dump(redeem, "redeem to spawn", 2) --TODO DEBUG
             fulfill_redeem(redeem)
           end
         end
@@ -168,7 +170,7 @@ mod:hook(HordeSpawner, "execute_vector_blob_horde", function(func, self, extra_d
 	local nav_world = conflict_director.nav_world
 
   local buff_system = Managers.state.entity:system("buff_system") -- Twitch Redeems
-  mod:echo("HEYO")
+
 	for i = 1, num_to_spawn do
 		local spawn_pos = nil
 
@@ -235,13 +237,9 @@ mod:hook(HordeSpawner, "execute_vector_blob_horde", function(func, self, extra_d
 end)
 
 -- UI hooks.
-mod:hook_safe(IngameHud, "init", function(self, ingame_ui_context)
-  mod:echo("IngameHud INIT")
-  mod:echo("CREATE _twitch_redeems_ui")
-  self._twitch_redeems_ui = TwitchRedeemUI:new(ingame_ui_context)
+mod:hook_safe(IngameHud, "init", function(self, parent, ingame_ui_context)
+  self._twitch_redeems_ui = TwitchRedeemUI:new(parent, ingame_ui_context)
 end)
-
-local TODO_cnt = 0
 
 mod:hook_safe(IngameHud, "update", function(self, dt , t)
   if self._twitch_redeems_ui then
@@ -250,13 +248,8 @@ mod:hook_safe(IngameHud, "update", function(self, dt , t)
       mod.twitch_redemption_ui_settings_dirty = false
     end
 
-    if TODO_cnt % 1000 == 0 then
-      --mod:echo("UPDATE _twitch_redeems_ui") -- TODO DEL
-    end
     self._twitch_redeems_ui:update(dt)
   end
-
-  TODO_cnt = TODO_cnt + 1
 end)
 
 mod:hook_safe(IngameHud, "destroy", function(self)
@@ -265,4 +258,3 @@ mod:hook_safe(IngameHud, "destroy", function(self)
   --   self._twitch_redeems_ui:destroy()
   --   self._twitch_redeems_ui = nil
   -- end
-end)

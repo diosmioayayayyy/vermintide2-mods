@@ -117,7 +117,7 @@ if not INCLUDE_GUARDS.REDEEM_HORDE then
   end
 
   RedeemHorde.spawn = function(self)
-    mod:echo("Spawning Twitch Redeem horde '" .. self.data.name .. "'")
+    mod:info("Spawning Twitch Redeem horde '" .. self.data.name .. "'")
     if self.redeem.spawn_type == SpawnType.HIDDEN then
       spawn_redeem_hidden(self.redeem)
     elseif self.redeem.spawn_type == SpawnType.HORDE then

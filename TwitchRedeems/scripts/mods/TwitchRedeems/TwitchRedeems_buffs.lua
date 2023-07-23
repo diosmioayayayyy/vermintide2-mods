@@ -1,5 +1,7 @@
 local mod = get_mod("TwitchRedeems")
 
+mod:info("Processing buff templates...")
+
 -- Enemies spawned with Twitch redeems will have purple glowing eyes.
 mod.add_buff_template("twitch_redeem_buff_eye_glow",
 {

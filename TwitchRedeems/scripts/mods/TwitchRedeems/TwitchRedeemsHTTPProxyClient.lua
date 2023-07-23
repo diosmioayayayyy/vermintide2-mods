@@ -105,6 +105,7 @@ TwitchRedeemsHTTPProxyClient.request_next_reedem = function(self)
         json_str = string.gsub(json_str, "\\", "")
         local success, redemption = pcall(cjson.decode, json_str)
         if success then
+          mod:dump(redemption, "TwitchRedeemsHTTPProxyClient.request_next_reedem", 2)-- TODO DEBUG
           mod.redeem_queue:push(redemption) -- Add redeem to queue.
         end
       end

@@ -66,10 +66,9 @@ if not INCLUDE_GUARDS.REDEEM_MUTATOR then
     local duration = self.data.duration:get()
 
     if not mutator_handler:has_activated_mutator(mutator_name) then
-      mutator_handler:initialize_mutators({
-        mutator_name
-      })
-      mutator_handler:activate_mutator(mutator_name, duration)
+      local oneshot_settings = {}
+      oneshot_settings.id = "xdd" -- TODO
+      mutator_handler:activate_mutator_one_shot(mutator_name, oneshot_settings, duration)
     else
       mod:info("Mutator already active '" .. mutator_name .. "'")
     end
