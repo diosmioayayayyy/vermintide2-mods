@@ -48,6 +48,17 @@ mod:hook(BreedFreezer, "try_unfreeze_breed", function(func, self, breed, data)
     end
     return func(self, breed, data)
 end)
+
+-- mod:hook_safe(Boot, "game_update", function(self, real_world_dt)
+--   --mod:echo("UPPPDAA")
+--   -- boot.lua 707
+-- end)www
+
+mod:hook(TimeManager, "scaled_delta_time", function(func, self, dt)
+  -- TODO make options wich dt's to change, like only simulation
+  return math.max(dt * self._global_time_scale, 1e-06)
+end)
+
 -- Twitch Redeems horde spawns.
 local function add_twitch_redeems_eye_glow_buff_to_horde(hordes)
   local buff_system = Managers.state.entity:system("buff_system")
@@ -251,10 +262,3 @@ mod:hook_safe(IngameHud, "update", function(self, dt , t)
     self._twitch_redeems_ui:update(dt)
   end
 end)
-
-mod:hook_safe(IngameHud, "destroy", function(self)
-  -- if self._twitch_redeems_ui then
-  --   mod:echo("DESTROY _twitch_redeems_ui")
-  --   self._twitch_redeems_ui:destroy()
-  --   self._twitch_redeems_ui = nil
-  -- end
