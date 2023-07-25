@@ -79,17 +79,30 @@ if not INCLUDE_GUARDS.REDEEM_MUTATOR then
     local mutator_name = MutatorName[self.data.mutator_index]
     local duration = self.data.duration:get()
 
-    if not mutator_handler:has_activated_mutator(mutator_name) then
-      local oneshot_settings = {}
-      oneshot_settings.id = "xdd" -- TODO
-      oneshot_settings.data = table.clone(self.mutator.settings)
-      mutator_handler:activate_mutator_one_shot(mutator_name, oneshot_settings, duration)
+    if self.mutator == nil then
+      -- Vanilla mutators.
+      if not mutator_handler:has_activated_mutator(mutator_name) then
+        mutator_handler:initialize_mutators({
+          mutator_name
+        })
+        mutator_handler:activate_mutator(mutator_name, duration)
+      else
+        mod:info("Mutator already active '" .. mutator_name .. "'")
+      end
     else
-      mod:info("Mutator already active '" .. mutator_name .. "'")
+      -- OneShot mutators.
+      if not mutator_handler:has_activated_mutator(mutator_name) then
+        local oneshot_settings = {}
+        oneshot_settings.uid = tostring(self)
+        oneshot_settings.data = table.clone(self.mutator.settings)
+        mutator_handler:activate_mutator_one_shot(mutator_name, oneshot_settings, duration)
+      else
+        mod:info("Mutator already active '" .. mutator_name .. "'")
+      end
     end
   end
-  
+
   -- TODO display active mutators
- 
+
   -- TODO add deactivate all mutators redeem
 end

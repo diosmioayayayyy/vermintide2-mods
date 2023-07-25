@@ -54,11 +54,6 @@ end)
 --   -- boot.lua 707
 -- end)www
 
-mod:hook(TimeManager, "scaled_delta_time", function(func, self, dt)
-  -- TODO make options wich dt's to change, like only simulation
-  return math.max(dt * self._global_time_scale, 1e-06)
-end)
-
 -- Twitch Redeems horde spawns.
 local function add_twitch_redeems_eye_glow_buff_to_horde(hordes)
   local buff_system = Managers.state.entity:system("buff_system")

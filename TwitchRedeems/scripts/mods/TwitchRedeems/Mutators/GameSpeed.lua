@@ -9,14 +9,24 @@ local mutator_template = {
   server_start_function = function(context, data)
   end,
   client_start_function = function (context, data)
+    local oneshot_settings = data.template.oneshot_settings
+    mod.global_time_scale = oneshot_settings.data.speed_multiplier
 	end,
   server_stop_function = function(context, data, is_destroy)
   end,
   client_stop_function = function(context, data, is_destroy)
+    mod.global_time_scale = 1.0
   end
 }
 
 mod.add_mutator_template("twitch_redeems_gamespeed_mutator", mutator_template, 1102)
+
+mod.global_time_scale = 1.0
+
+mod:hook(TimeManager, "scaled_delta_time", function(func, self, dt)
+  -- TODO make options wich dt's to change, like only simulation
+  return math.max(dt * self._global_time_scale  * mod.global_time_scale, 1e-06)
+end)
 
 MutatorGameSpeed = class(MutatorGameSpeed)
 
