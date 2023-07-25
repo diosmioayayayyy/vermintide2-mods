@@ -75,6 +75,7 @@ if not INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS then
     -- Check if the hexadecimal value is valid
     if #hex_str ~= 6 then
         mod:error("Invalid hexadecimal color format: " .. hex_str .. "/".. type(hex_str) .. "/" .. tostring(hex_str))
+        return {255, 255, 255, 255}
     end
 
     -- Convert the hexadecimal color to RGB values
