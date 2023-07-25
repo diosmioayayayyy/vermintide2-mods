@@ -22,3 +22,14 @@ mod:dofile("scripts/mods/TwitchRedeems/Mutators/Gravity")
 
 -- Process modded mutators.
 mod:dofile("scripts/managers/game_mode/mutator_templates")
+
+
+function create_twitch_redeems_mutator(mutator_type, other)
+  local mutator = nil
+  if mutator_type == MutatorType.GRAVITY then
+    mutator = MutatorGravity:new(other)
+  elseif mutator_type == MutatorType.GAMESPEED then
+    mutator = MutatorGameSpeed:new(other)
+  end
+  return mutator
+end

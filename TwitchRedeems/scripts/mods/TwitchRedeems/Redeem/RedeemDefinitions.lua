@@ -50,6 +50,7 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     SHARED_HEALTH_POOL = 43,
 
     GRAVITY = 100,
+    GAMESPEED = 101,
   }
 
   MutatorName = {
@@ -79,6 +80,37 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "shared_health_pool",
 
     "twitch_redeems_gravity_mutator",
+    "twitch_redeems_gamespeed_mutator",
+  }
+
+  MutatorTypeLookup = {
+    MutatorType.COMRADESHIP,
+    MutatorType.DARKNESS,
+    MutatorType.LIGHTNING,
+    MutatorType.TICKING_BOMB,
+    MutatorType.TWINS,
+    MutatorType.SLAYER_CURSE,
+    MutatorType.BLOODLUST,
+    MutatorType.ACT_ON_INSTINCT,
+    MutatorType.CHASING_SPIRITS,
+    MutatorType.WEAPONS_ABLAZE,
+
+  --   MutatorType.LIFE = 20,
+  --   MutatorType.METAL = 21,
+  --   MutatorType.HEAVENS = 22,
+  --   MutatorType.LIGHT = 23,
+  --   MutatorType.SHADOW = 24,
+  --   MutatorType.FIRE = 25,
+  --   MutatorType.DEATH = 26,
+  --   MutatorType.BEASTS = 27,
+
+    MutatorType.CORPSE_EXPLOSION,
+    MutatorType.POWERFUL_ELITES,
+    MutatorType.HIGH_INTENSITY,
+    MutatorType.SHARED_HEALTH_POOL,
+
+    MutatorType.GRAVITY,
+    MutatorType.GAMESPEED,
   }
 
   GuiDropdownMutators = {
@@ -108,6 +140,7 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "Shared Health Pool",
 
     "Gravity",
+    "Gamespeed",
   }
 
   EventType = {
