@@ -23,6 +23,30 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "Front", "Back", "Random"
   }
 
+  BuffType = {
+    SPEED = 1,
+    STRENGTH = 2,
+    COOLDOWN_REDUCTION = 2,
+  }
+
+  BuffName = {
+    "twitch_speed_boost",
+    "twitch_damage_boost",
+    "twitch_cooldown_reduction_boost",
+  }
+
+  BuffTypeLookup = {
+    BuffType.SPEED,
+    BuffType.STRENGTH,
+    BuffType.COOLDOWN_REDUCTION,
+  }
+
+  GuiDropdownBuffs = {
+    "Speed",
+    "Strength",
+    "Cooldown Reduction",
+  }
+
   MutatorType = {
     COMRADESHIP = 1,
     DARKNESS = 2,

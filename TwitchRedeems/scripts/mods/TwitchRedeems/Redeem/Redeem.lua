@@ -49,6 +49,11 @@ if not INCLUDE_GUARDS.REDEEM then
             local mutator = RedeemMutator:new(raw_mutator)
             self.data.mutators[key] = mutator
           end
+        elseif key == "buffs" then
+          for key, raw_buff in pairs(value) do
+            local buff = RedeemBuff:new(raw_buff)
+            self.data.buffs[key] = buff
+          end
         elseif key == "events" then
           for key, raw_event in pairs(value) do
             local event = RedeemEvent:new(raw_event)
@@ -88,7 +93,7 @@ if not INCLUDE_GUARDS.REDEEM then
     end
     data.buffs = {}
     for key, buff in pairs(self.data.buffs) do
-      --data.buffs[key] = buff:serialize()
+      data.buffs[key] = buff:serialize()
     end
     data.events = {}
     for key, event in pairs(self.data.events) do
@@ -119,6 +124,12 @@ if not INCLUDE_GUARDS.REDEEM then
     local mutator = RedeemMutator:new()
     table.insert(self.data.mutators, mutator)
     return mutator
+  end
+
+  Redeem.new_buff = function(self)
+    local buff = RedeemBuff:new()
+    table.insert(self.data.buffs, buff)
+    return buff
   end
 
   Redeem.new_event = function(self)
@@ -220,7 +231,23 @@ if not INCLUDE_GUARDS.REDEEM then
       -- ----------------------------------------------------
       Imgui.separator()
       Imgui.text("Buffs")
-      -- TODO
+      Imgui.same_line()
+      if Imgui.button("+##Buff" .. tostring(self)) then
+        self:new_buff()
+      end
+
+      local buff_to_delete = nil
+      for key, buff in pairs(self.data.buffs) do
+        if Imgui.button(buff.data.name .. "##" .. key) then
+          buff:toggle_gui_window()
+          mod.selected_buff = key
+        end
+
+        Imgui.same_line()
+        if Imgui.button("[x]##Buff" .. key) then
+          buff_to_delete = key
+        end
+      end
 
       -- ----------------------------------------------------
       Imgui.separator() 
@@ -255,6 +282,11 @@ if not INCLUDE_GUARDS.REDEEM then
         table.remove(self.data.mutators, mutator_to_delete)
       end
 
+      -- Delete buff.
+      if buff_to_delete then
+        table.remove(self.data.buffs, buff_to_delete)
+      end
+
       -- Delete event.
       if event_to_delete then
         table.remove(self.data.events, event_to_delete)
@@ -269,6 +301,10 @@ if not INCLUDE_GUARDS.REDEEM then
 
     for _, mutator in ipairs(self.data.mutators) do
       if mutator:render_ui() then window_open = true end
+    end
+
+    for _, buff in ipairs(self.data.buffs) do
+      if buff:render_ui() then window_open = true end
     end
 
     for _, event in ipairs(self.data.events) do
@@ -288,7 +324,7 @@ if not INCLUDE_GUARDS.REDEEM then
     end
 
     for _, buff in ipairs(self.data.buffs) do
-      --buff:prepare()
+      buff:prepare()
     end
 
     for _, event in ipairs(self.data.events) do
@@ -306,7 +342,7 @@ if not INCLUDE_GUARDS.REDEEM then
     end
 
     for _, buff in ipairs(self.data.buffs) do
-      --apply_mutator(buff.redeem)
+      buff:apply()
     end
 
     for _, event in ipairs(self.data.events) do
