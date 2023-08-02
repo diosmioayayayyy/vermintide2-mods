@@ -27,24 +27,58 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     SPEED = 1,
     STRENGTH = 2,
     COOLDOWN_REDUCTION = 2,
+    HEALTH_REGEN = 3,
+    GRIM_HEALTH_DEBUFF = 4,
+    POWER_BOOST_DISMEMBER = 5,
+    BLIGHTREAPER_CURSE = 6,
+    CHANGE_DODGE_SPEED = 7,
+    CHANGE_DODGE_DISTANCE = 8,
+    SURVIVAL_ALE = 9,
+    SUPER_JUMP = 10,
+    INVISIBILITY = 11,
+    CRITS = 12,
+    INFINITE_BOMBS = 13,
+    INVINCIBILITY = 14,
+    PULSATING_WAVES = 15,
   }
 
   BuffName = {
     "twitch_speed_boost",
     "twitch_damage_boost",
     "twitch_cooldown_reduction_boost",
-  }
-
-  BuffTypeLookup = {
-    BuffType.SPEED,
-    BuffType.STRENGTH,
-    BuffType.COOLDOWN_REDUCTION,
+    "twitch_health_regen",
+    "twitch_grimoire_health_debuff",
+    "twitch_power_boost_dismember",
+    "blightreaper_curse",
+    "change_dodge_speed",
+    "change_dodge_distance",
+    "bardin_survival_ale_buff",
+    "super_jump",
+    "twitch_vote_buff_invisibility",
+    "twitch_vote_buff_critical_strikes",
+    "twitch_vote_buff_infinite_bombs",
+    "twitch_vote_buff_invincibility",
+    "twitch_vote_buff_pulsating_waves",
   }
 
   GuiDropdownBuffs = {
     "Speed",
     "Strength",
     "Cooldown Reduction",
+
+    "Health Regen",
+    "Grimoire Health Debuff",
+    "Power Boost Dismember",
+    "Blightreaper Curse",
+    "Change Dodge Speed",
+    "Change Dodge Distance",
+    "Survival Ale Buff",
+    "Super Jump",
+    "Invisibility",
+    "Critical Strikes",
+    "Infinite Bombs",
+    "Invincibility",
+    "Pulsating Waves",
   }
 
   MutatorType = {

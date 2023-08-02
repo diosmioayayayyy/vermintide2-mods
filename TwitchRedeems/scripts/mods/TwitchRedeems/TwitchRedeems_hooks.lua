@@ -7,7 +7,7 @@ local function fulfill_redeem(redemption)
   local redeem_index = mod.redeem_lookup[string.lower(redemption.title)]
   if redeem_index ~= nil then
     local redeem = mod.redeems[redeem_index]
-    redeem:redeem()
+    redeem:redeem(redemption.user_input)
   end
 end
 

@@ -3,6 +3,7 @@ local mod = get_mod("TwitchRedeems")
 mod:dofile("scripts/mods/TwitchRedeems/RedeemFunctions")
 mod:dofile("scripts/mods/TwitchRedeems/Gui/ImguiWindow")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemDefinitions")
+mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemBuff")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemEvent")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemHorde")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemMutator")
@@ -332,7 +333,7 @@ if not INCLUDE_GUARDS.REDEEM then
     end
   end
 
-  Redeem.redeem = function(self)
+  Redeem.redeem = function(self, user_input)
     for _, horde in ipairs(self.data.hordes) do
       horde:spawn()
     end
@@ -342,7 +343,7 @@ if not INCLUDE_GUARDS.REDEEM then
     end
 
     for _, buff in ipairs(self.data.buffs) do
-      buff:apply()
+      buff:apply(user_input)
     end
 
     for _, event in ipairs(self.data.events) do
