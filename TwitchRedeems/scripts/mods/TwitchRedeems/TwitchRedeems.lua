@@ -23,6 +23,9 @@ local Managers = Managers
 
 -- Load purple eye material.
 Managers.package:load("resource_packages/levels/dlcs/morris/belakor_common", "global")
+Managers.package:load("resource_packages/levels/dlcs/wizards/dlc_wizards_tower", "global")
+
+mod.version = "1.0.6"
 
 mod.default_twitch_redeems_filename = "default_twitch_redeems"
 
