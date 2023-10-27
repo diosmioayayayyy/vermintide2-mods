@@ -2,6 +2,7 @@ local mod = get_mod("TwitchRedeems")
 
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemDefinitions")
 mod:dofile("scripts/mods/TwitchRedeems/Redeem/RedeemUnit")
+mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_utils")
 
 if not INCLUDE_GUARDS.REDEEM_MUTATOR then
   INCLUDE_GUARDS.REDEEM_MUTATOR = true
@@ -93,7 +94,8 @@ if not INCLUDE_GUARDS.REDEEM_MUTATOR then
       -- OneShot mutators.
       if not mutator_handler:has_activated_mutator(mutator_name) then
         local oneshot_settings = {}
-        oneshot_settings.uid = tostring(self)
+        oneshot_settings.mutator_name = mutator_name
+        oneshot_settings.uid = getTableAddressAsString(self)
         oneshot_settings.data = table.clone(self.mutator.settings)
         mutator_handler:activate_mutator_one_shot(mutator_name, oneshot_settings, duration)
       else

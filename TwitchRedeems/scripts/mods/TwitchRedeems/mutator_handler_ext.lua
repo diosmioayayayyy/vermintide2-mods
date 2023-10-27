@@ -15,11 +15,6 @@ mod:hook_safe(MutatorHandler, "init",
     Managers.state.event:register(self, "event_deactivate_oneshot_mutator_client", "rpc_deactivate_oneshot_mutator_client")
   end)
 
--- mod:hook_safe(MutatorHandler, "_deactivate_mutator",
---   function(self, name, active_mutators, mutator_context, is_destroy)
---     self:free_oneshot_mutator_id(name)
---   end)
-
 -- RPC for mutator_id greater 128
 mod:network_register("activate-oneshot-mutator-client",
   function(peer_id, mutator_id, activated_by_twitch)
@@ -160,9 +155,43 @@ mod:hook(MutatorHandler, "_deactivate_mutator", function(func, self, name, activ
 	end
 end)
 
+mod:hook(MutatorHandler, "hot_join_sync", function(func, self, peer_id)
+  -- Almost full copy to circumvent mutator_id bounds (max 128).
+	local network_transmit = self._network_transmit
+	local active_mutators = self._active_mutators
+	local mutator_context = self._mutator_context
+	local is_server = self._is_server
+
+	for mutator_name, mutator_settings in pairs(active_mutators) do
+		local mutator_id = NetworkLookup.mutator_templates[mutator_name]
+		local activated_by_twitch = not not mutator_settings.activated_by_twitch
+
+    -- This part differs from game logic.
+    if mutator_id < 256 then
+		  network_transmit:send_rpc("rpc_activate_mutator_client", peer_id, mutator_id, activated_by_twitch)
+    else
+      -- 'mutator_name' is the 'oneshot_mutator_name' here!
+      -- The original mutator name is stored in 'oneshot_settings.mutator_name'.
+      local oneshot_mutator_template = table.clone(MutatorTemplates[mutator_name])
+      mod:info("RPC: hot join sync: activate-oneshot-mutator-client")
+      mod:network_send("create-oneshot-mutator", peer_id, oneshot_mutator_template.oneshot_settings.mutator_name, mutator_name, mutator_id, oneshot_mutator_template.oneshot_settings)
+      mod:network_send("activate-oneshot-mutator-client", peer_id, mutator_id, activated_by_twitch)
+    end
+	end
+
+	for name, mutator_data in pairs(active_mutators) do
+		local template = mutator_data.template
+
+		if is_server then
+			template.server.hot_join_sync_function(mutator_context, mutator_data, peer_id)
+		else
+			template.client.hot_join_sync_function(mutator_context, mutator_data, peer_id)
+		end
+	end
+end)
+
 -- MutatorHandler extensions.
-MutatorHandler.create_oneshot_mutator = function(self, mutator_name, mutator_name_oneshot, mutator_id,
-                                                       oneshot_settings)
+MutatorHandler.create_oneshot_mutator = function(self, mutator_name, mutator_name_oneshot, mutator_id, oneshot_settings)
   mod:info("Creating oneshot mutator '" .. mutator_name .. "' with ID=" .. mutator_id)
 
   -- Create oneshot mutator template.
@@ -206,8 +235,7 @@ MutatorHandler.free_oneshot_mutator_id = function(self, mutator_name)
   mod:dump(self.mutator_id_free_list.queue, "ONESHOT MUTATOR ID: mutator_id_free_list", 1)
 end
 
-MutatorHandler.activate_mutator_one_shot = function(self, mutator_name, oneshot_settings, optional_duration,
-                                                    optional_flag)
+MutatorHandler.activate_mutator_one_shot = function(self, mutator_name, oneshot_settings, optional_duration, optional_flag)
   if self._is_server then
     local mutator_context = self._mutator_context
     local active_mutators = self._active_mutators
@@ -218,6 +246,11 @@ MutatorHandler.activate_mutator_one_shot = function(self, mutator_name, oneshot_
     if not self:has_activated_mutator(mutator_name_oneshot) then
       -- Prepare oneshot mutator name and send RPC event.
       local mutator_id = self:get_oneshot_mutator_id()
+
+      -- TODO DEBUG PRINTS
+      mod:info(string.format("network_send: create-oneshot-mutator => %s | %s | %i", mutator_name, mutator_name_oneshot, mutator_id))
+      mod:dump(oneshot_settings, "network_send: oneshot_settings", 5)
+
       mod:network_send("create-oneshot-mutator", "all", mutator_name, mutator_name_oneshot, mutator_id, oneshot_settings)
 
       self:initialize_mutators({ mutator_name_oneshot })

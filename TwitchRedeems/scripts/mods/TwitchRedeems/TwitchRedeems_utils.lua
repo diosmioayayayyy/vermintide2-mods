@@ -5,6 +5,10 @@ local mod = get_mod("TwitchRedeems")
 if not INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS then
   INCLUDE_GUARDS.TWITCH_REDEEMS_UTILS = true
 
+  function getTableAddressAsString(tbl)
+    return tostring(tbl):match('table: (.+)')
+  end
+
   local function merge(dst, src)
     for k, v in pairs(src) do
       dst[k] = v

@@ -44,7 +44,7 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
 
   function spawn_custom_redeem_horde(horde_redeem)
     mod:info("spawn_custom_redeem_horde") -- TODO DEBUG
-    mod:dump(horde_redeem, "horde_redeem", 5)
+    --mod:dump(horde_redeem, "horde_redeem", 5)
 
     local buff_system = Managers.state.entity:system("buff_system")
 
@@ -105,7 +105,7 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
 
   function spawn_redeem_hidden(horde_redeem)
     mod:info("spawn_redeem_hidden") -- TODO DEBUG
-    mod:dump(horde_redeem, "horde_redeem", 5)
+    --mod:dump(horde_redeem, "horde_redeem", 5)
 
     local buff_system = Managers.state.entity:system("buff_system")
     local conflict_director = Managers.state.conflict
@@ -122,7 +122,7 @@ if not INCLUDE_GUARDS.REDEEM_FUNCTIONS then
 
   function spawn_redeem_one(horde_redeem)
     mod:info("spawn_redeem_one") -- TODO DEBUG
-    mod:dump(horde_redeem, "horde_redeem", 5)
+    --mod:dump(horde_redeem, "horde_redeem", 5)
 
     local buff_system = Managers.state.entity:system("buff_system")
     local conflict_director = Managers.state.conflict

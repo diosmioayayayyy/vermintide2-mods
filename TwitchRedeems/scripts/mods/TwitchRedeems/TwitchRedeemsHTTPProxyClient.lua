@@ -110,7 +110,7 @@ TwitchRedeemsHTTPProxyClient.request_next_reedem = function(self)
         end
       end
     else
-      mod:error("HTTP Request 'request_next_reedem' failed")
+      --mod:error("HTTP Request 'request_next_reedem' failed")
     end
   end)
 end
