@@ -14,6 +14,7 @@ mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_utils")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeemsHTTPProxyClient")
 mod:dofile("scripts/mods/TwitchRedeems/Gui/twitch_redeem_ui")
 mod:dofile("scripts/mods/TwitchRedeems/buff_system_ext")
+mod:dofile("scripts/mods/TwitchRedeems/buff_function_template_fixes")
 mod:dofile("scripts/mods/TwitchRedeems/mutator_handler_ext")
 mod:dofile("scripts/mods/TwitchRedeems/TwitchRedeems_buffs")
 mod:dofile("scripts/mods/TwitchRedeems/MutatorTemplates")
@@ -180,7 +181,19 @@ mod.on_all_mods_loaded = function(status, state_name)
     mod.enable_redeems(not is_in_inn_level)
   end
 
+  mod:echo("Twitch Redeems " .. mod.version)
+
   Managers.ui:reload_ingame_ui(false) -- TODO DEL
+
+  -- Apply 'buff_function_template' fixes.
+  apply_buff_function_template_fixes()
+
+  -- Fix corpse explision mutator.
+  MutatorTemplates["corpse_explosion"].server.ai_killed_function = function (context, data, killed_unit, killer_unit, death_data)
+    local blackboard = BLACKBOARDS[killed_unit]
+    local explosion_template_name = "corpse_explosion_default"
+    AiUtils.generic_mutator_explosion(killed_unit, blackboard, explosion_template_name)
+  end
 end
 
 mod.apply_settings = function()
