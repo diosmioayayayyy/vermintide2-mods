@@ -65,7 +65,11 @@ class RedeemQueue {
     const redeem_settings = global.twitch_redeems_settings[redeem.reward.title];
 
     redeem.user_chat_color = this.user_colors[redeem.user_id];
-    redeem.twitch_redeems_uid = this.next_redeem_id++;
+
+    if (!redeem_settings.skip_queue_timer) {
+      redeem.twitch_redeems_uid = this.next_redeem_id++;
+    }
+
     console.log(`Added redeem '${redeem.reward.title}' to queue with uid ${redeem.twitch_redeems_uid}`);
 
     if (redeem_settings && redeem_settings.skip_queue_timer) {
@@ -79,7 +83,7 @@ class RedeemQueue {
       }
     }
   }
-  
+
   find_by_uid(uid) {
     for (const [index, redeem] of this.queue.items.entries()) {
       if (redeem.twitch_redeems_uid == uid) {
@@ -109,7 +113,7 @@ class RedeemQueue {
     if (redeem != null) {
       this.last_redeemed_id = redeem.twitch_redeems_uid;
       this.set_redeem_fulfilled(redeem);
-      
+
     }
     if (this.size() > 0) {
       this.start_queue_timer();
