@@ -107,6 +107,8 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     HIGH_INTENSITY = 42,
     SHARED_HEALTH_POOL = 43,
 
+    GEHEIMNISNACHT = 70,
+
     GRAVITY = 100,
     GAMESPEED = 101,
   }
@@ -136,6 +138,8 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "powerful_elites",
     "high_intensity",
     "shared_health_pool",
+
+    "geheimnisnacht_2021_hard_mode",
 
     "twitch_redeems_gravity_mutator",
     "twitch_redeems_gamespeed_mutator",
@@ -167,6 +171,8 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     MutatorType.HIGH_INTENSITY,
     MutatorType.SHARED_HEALTH_POOL,
 
+    MutatorType.GEHEIMNISNACHT,
+
     MutatorType.GRAVITY,
     MutatorType.GAMESPEED,
   }
@@ -196,6 +202,8 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
     "Powerful Elites",
     "High Intensity",
     "Shared Health Pool",
+
+    "Geheimnisnacht",
 
     "Gravity",
     "Gamespeed",
