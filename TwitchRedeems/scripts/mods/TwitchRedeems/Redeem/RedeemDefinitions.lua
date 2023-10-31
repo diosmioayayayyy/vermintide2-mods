@@ -111,6 +111,8 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
 
     GRAVITY = 100,
     GAMESPEED = 101,
+
+    PACING_FROZEN = 200,
   }
 
   MutatorName = {
@@ -143,6 +145,8 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
 
     "twitch_redeems_gravity_mutator",
     "twitch_redeems_gamespeed_mutator",
+
+    "pacing_frozen",
   }
 
   MutatorTypeLookup = {
@@ -175,6 +179,8 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
 
     MutatorType.GRAVITY,
     MutatorType.GAMESPEED,
+
+    MutatorType.PACING_FROZEN,
   }
 
   GuiDropdownMutators = {
@@ -207,6 +213,8 @@ if not INCLUDE_GUARDS.REDEEM_DEFINITIONS then
 
     "Gravity",
     "Gamespeed",
+
+    "Pacing Frozen",
   }
 
   EventType = {
