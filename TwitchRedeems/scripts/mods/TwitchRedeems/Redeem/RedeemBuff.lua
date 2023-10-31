@@ -70,10 +70,17 @@ if not INCLUDE_GUARDS.REDEEM_BUFF then
       if self.buff_template ~= nil then
         for _, buff in ipairs(self.buff_template.buffs) do
           Imgui.text(string.format("Buff: '%s'", buff.name))
+          local has_duration = false
           for key, setting in pairs(buff) do
+            if key == "duration" then
+              has_duration = true
+            end
             if type(setting) == "number" then
               buff[key] = Imgui.input_float(key .. "##" .. tostring(buff), setting)
             end
+          end
+          if not has_duration then
+            buff.duration = 30
           end
         end
       end
