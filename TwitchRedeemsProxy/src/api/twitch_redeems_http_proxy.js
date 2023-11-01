@@ -9,6 +9,10 @@ const { unpauseRedeems } = require('../renderer/controls.js');
 let server;
 global.twitch_redeems = {};
 global.twitch_redeems_settings = {};
+global.settings = {
+  redeem_idle_time: 30,
+  queue_redeem_after_idle_time: false,
+};
 
 const TWITCH_REDEEM_REWARD_TOKEN = "[Twitch Redeem]";
 
@@ -218,6 +222,13 @@ async function cancel_all_unfulfilled_redeems() {
   catch (error) { logRequestError(cancel_all_unfulfilled_redeems, error); }
 }
 
+function update_settings(body) {
+  const settings = JSON.parse(body);
+  for (const [key, value] of Object.entries(settings)) {
+    global.settings[key] = value;
+  }
+}
+
 function check_response_status_codes(responses, success_code) {
   for (const response of responses) {
     if (response.statusCode != success_code) {
@@ -336,6 +347,11 @@ async function handleRequestPost(request, response, body) {
       cancel_all_unfulfilled_redeems();
       console.log("Pausing redeems...");
       pause_redeems(true);
+      status_code = 200;
+    }
+    else if (request.url == '/redeem_settings') {
+      console.log("Received new redeem settings");
+      update_settings(body);
       status_code = 200;
     }
     else {

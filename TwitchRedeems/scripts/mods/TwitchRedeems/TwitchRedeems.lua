@@ -61,6 +61,8 @@ mod.SETTING_ID_REDEEM_GLOBAL_COOLDOWN = "GLOBAL_COOLDOWN"
 mod.SETTING_ID_REDEEM_GLOBAL_COOLDOWN_DURATION = "GLOBAL_COOLDOWN_DURATION"
 mod.SETTING_ID_REDEEM_USER_COOLDOWN = "USER_COOLDOWN"
 mod.SETTING_ID_REDEEM_USER_COOLDOWN_DURATION = "USER_COOLDOWN_DURATION"
+mod.SETTING_ID_REDEEM_IDLE_TIME = "REDEEM_IDLE_TIME"
+mod.SETTING_ID_REDEEM_AUTO_QUEUE_AFTER_IDLE_TIME = "REDEEM_AUTO_QUEUE_AFTER_IDLE_TIME"
 
 -- TODO DELETE
 -- local function cb_twitch_chat_message(key, message_type, user_name, message, parameter)
@@ -215,6 +217,7 @@ mod.on_game_state_changed = function(status, state_name)
       mod.http_proxy_client:request_map_end()
     elseif status == "enter" and not is_in_inn_level then
       mod.enable_redeems(true)
+      mod.settings_redeems:send_settings_to_proxy()
       mod.http_proxy_client:request_map_start()
     end
   end

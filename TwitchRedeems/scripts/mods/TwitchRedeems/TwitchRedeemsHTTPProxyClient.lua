@@ -7,6 +7,7 @@ local REQ_MAP_START = "/map_start"
 local REQ_MAP_END = "/map_end"
 local REQ_KEEP_ENTER = "/keep_enter"
 local REQ_REDEEMS = "/redeems"
+local REQ_REDEEM_SETTINGS = "/redeem_settings"
 local REQ_PAUSE_REDEEMS = "/pause_redeems"
 local REQ_UNPAUSE_REDEEMS = "/unpause_redeems"
 --local REQ_PLAYER_JOINED = "/game_client"
@@ -182,6 +183,16 @@ TwitchRedeemsHTTPProxyClient.request_update_redeems = function(self, body)
       mod:echo("Redeems were updated.")
     else
       mod:error("HTTP Request 'request_update_redeems' failed")
+    end
+  end)
+end
+
+TwitchRedeemsHTTPProxyClient.request_sends_settings = function(self, settings)
+  Requests.post(self.url .. REQ_REDEEM_SETTINGS, {}, cjson.encode(settings), function(response)
+    if response.success then
+      mod:echo("Redeem settings were sent.")
+    else
+      mod:error("HTTP Request 'request_sends_settings' failed")
     end
   end)
 end
