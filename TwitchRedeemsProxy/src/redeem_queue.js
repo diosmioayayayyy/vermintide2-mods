@@ -4,6 +4,38 @@ const TwitchRedeemsHTTPProxy = require('./api/twitch_redeems_http_proxy.js');
 const TwitchHelixAPI = require('./api/twitch_helix_api.js');
 const { ipcMain } = require('electron');
 
+
+function pick_random_redeem() {
+  var p = Math.random();
+  for (const [_, redeem] of Object.entries(global.twitch_redeems)) {
+    if (p > redeem["cdf"]) {
+      continue;
+    }
+    else{
+      return {
+        broadcaster_user_id: "",
+        broadcaster_user_login: "",
+        broadcaster_user_name: "",
+        id: "",
+        //user_id: "",
+        user_login: "",
+        user_name: "",
+        user_input: "",
+        status: "",
+        redeemed_at: "",
+        reward: {
+          //id: "",
+          title: redeem["title"],
+          prompt: "",
+          cost: redeem["cost"]
+        }
+      };
+    }
+  }
+  return null;
+}
+
+
 class RedeemQueue {
   constructor() {
     // Queue settings.
@@ -21,6 +53,8 @@ class RedeemQueue {
     this.queue_timer = 0;
     this.queue_timer_is_running = false;
     this.reset_browser_overlay = true;
+
+    this.idle_timer_id = null;
   }
 
   send_settings() {
@@ -57,7 +91,32 @@ class RedeemQueue {
     }
   }
 
-  async push(redeem) {
+  on_idle_timer_end(redeem_queue) {
+    // Replace the following line with the function you want to execute on timer end
+    var redeem = pick_random_redeem();
+    console.log("Timer ended. Execute your function here.");
+    redeem_queue.push(redeem, true);
+  }
+
+  start_idle_timer(duration) {
+    // Cancel idle timer.
+    if (this.idle_timer_id) {
+      clearInterval(this.idle_timer_id);
+      this.idle_timer_id = null;
+    }
+
+    // Start idle timer.
+    this.idle_timer_id = setInterval(this.on_idle_timer_end, duration, this);
+    console.log("Started idle timer")
+  }
+
+  reset_idle_timer() {
+    console.log("Reseting idle timer")
+    clearInterval(this.idle_timer_id);
+    this.idle_timer_id = null;
+  }
+
+  async push(redeem, idle_redeem=false) {
     // Query user color if we don't have it yet.
     if (!(redeem.user_id in this.user_colors)) {
       await this.get_user_chat_color(redeem.user_id);
@@ -66,13 +125,17 @@ class RedeemQueue {
 
     redeem.user_chat_color = this.user_colors[redeem.user_id];
 
-    if (!redeem_settings.skip_queue_timer) {
+    if (!idle_redeem) {
+      this.reset_idle_timer();
+    }
+
+    var redeem_skips_queue = idle_redeem || (redeem_settings && redeem_settings.skip_queue_timer);
+
+    if (!redeem_skips_queue) {
       redeem.twitch_redeems_uid = this.next_redeem_id++;
     }
 
-    console.log(`Added redeem '${redeem.reward.title}' to queue with uid ${redeem.twitch_redeems_uid}`);
-
-    if (redeem_settings && redeem_settings.skip_queue_timer) {
+    if (redeem_skips_queue) {
       // Redeems landing here will skip the redeem queue.
       this.skip_queue.push(redeem);
     }
@@ -82,6 +145,8 @@ class RedeemQueue {
         this.start_queue_timer();
       }
     }
+
+    console.log(`Added redeem '${redeem.reward.title}' to queue with uid ${redeem.twitch_redeems_uid}`);
   }
 
   find_by_uid(uid) {
@@ -102,6 +167,11 @@ class RedeemQueue {
       }
     }
 
+    //Start idle timer if not running.
+    if (global.settings.queue_redeem_after_idle_time && !this.idle_timer_id) {
+      this.start_idle_timer(global.settings.redeem_idle_time * 1000)
+    }
+
     if (!this.queue_timer_is_running) {
       return this.pop();
     }
@@ -113,7 +183,6 @@ class RedeemQueue {
     if (redeem != null) {
       this.last_redeemed_id = redeem.twitch_redeems_uid;
       this.set_redeem_fulfilled(redeem);
-
     }
     if (this.size() > 0) {
       this.start_queue_timer();
@@ -122,6 +191,10 @@ class RedeemQueue {
   }
 
   async set_redeem_fulfilled(redeem) {
+    if (!redeem.reward.id) {
+      return;
+    }
+
     try {
       const response = await TwitchHelixAPI.update_redemption_status_fulfilled(redeem);
       if (response.statusCode == 200) {
@@ -156,12 +229,14 @@ class RedeemQueue {
   }
 
   async get_user_chat_color(user_id) {
-    const raw_body = await TwitchHelixAPI.get_user_chat_color(user_id);
-    const body = JSON.parse(raw_body.data);
-
-    // Add colors to table.
-    for (const element of body.data) {
-      this.user_colors[element.user_id] = element.color;
+    if (user_id) {
+      const raw_body = await TwitchHelixAPI.get_user_chat_color(user_id);
+      const body = JSON.parse(raw_body.data);
+  
+      // Add colors to table.
+      for (const element of body.data) {
+        this.user_colors[element.user_id] = element.color;
+      }
     }
   }
 }

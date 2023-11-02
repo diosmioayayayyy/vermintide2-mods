@@ -56,6 +56,24 @@ async function get_twitch_redeems() {
     }
   }
   catch (error) { logRequestError(update_redeems, error); }
+
+  // TODO compute PDFs for bad or bad/good redeems.
+
+  // Compute probability to be picked during idle queuing.
+  var sum_costs = 0;
+  for (const [_, redeem] of Object.entries(redeems)) {
+    sum_costs += 1 / redeem["cost"];
+  }
+
+  // Compute CDF for picking random redeems proportional to their cost.
+  var cdf = 0;
+  for (const [_, redeem] of Object.entries(redeems)) {
+    var p = ( 1 / redeem["cost"]) / sum_costs;
+    redeem["probability"] = p;
+    cdf += p;
+    redeem["cdf"] = cdf;
+  }
+
   return redeems;
 }
 
@@ -227,6 +245,8 @@ function update_settings(body) {
   for (const [key, value] of Object.entries(settings)) {
     global.settings[key] = value;
   }
+
+  redeem_queue.reset_idle_timer();
 }
 
 function check_response_status_codes(responses, success_code) {

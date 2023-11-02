@@ -269,7 +269,7 @@ class TwitchHelixAPI {
 
   async update_redemption_status_fulfilled(redeem) {
     const body = { 'status' : 'FULFILLED'}
-    return await this.update_redemption_status(redeem.id,redeem.reward.id, body);
+    return await this.update_redemption_status(redeem.id, redeem.reward.id, body);
   }
 
   async get_unfulfilled_reward_redemptions(reward_id) {
