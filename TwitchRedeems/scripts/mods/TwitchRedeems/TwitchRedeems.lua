@@ -262,6 +262,8 @@ mod.setup_twitch_redeems = function()
         skip_queue_timer = redeem.data.skip_queue_timer,
         override_queue_timer = redeem.data.override_queue_timer,
         queue_timer_duration = redeem.data.queue_timer_duration,
+        good_redeem = redeem.data.good_redeem,
+        allow_auto_queue = redeem.data.allow_auto_queue,
       }
     }
     table.insert(twitch_redeems, twitch_redeem)

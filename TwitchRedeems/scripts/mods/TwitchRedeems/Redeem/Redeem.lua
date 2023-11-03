@@ -32,6 +32,8 @@ if not INCLUDE_GUARDS.REDEEM then
       skip_queue_timer     = false,
       override_queue_timer = false,
       queue_timer_duration = 5,
+      good_redeem          = false,
+      allow_auto_queue     = true,
       hordes               = {},
       mutators             = {},
       buffs                = {},
@@ -84,6 +86,8 @@ if not INCLUDE_GUARDS.REDEEM then
     data.skip_queue_timer = self.data.skip_queue_timer
     data.override_queue_timer = self.data.override_queue_timer
     data.queue_timer_duration = self.data.queue_timer_duration
+    data.good_redeem        = self.data.good_redeem
+    data.allow_auto_queue = self.data.allow_auto_queue
     data.hordes = {}
     for key, horde in pairs(self.data.hordes) do
       data.hordes[key] = horde:serialize()
@@ -165,6 +169,8 @@ if not INCLUDE_GUARDS.REDEEM then
       Imgui.text("Twitch Settings")
 
       self.data.user_input = Imgui.checkbox("User Input##" .. tostring(self), self.data.user_input)
+      Imgui.same_line()
+      self.data.good_redeem = Imgui.checkbox("Good Redeem##" .. tostring(self), self.data.good_redeem)
       self.data.cost = Imgui.input_int("Cost##" .. tostring(self), self.data.cost)
       self.data.background_color[1], self.data.background_color[2], self.data.background_color[3] = Imgui.color_edit_3(
         "Color##" .. tostring(self), self.data.background_color[1], self.data.background_color[2],
@@ -186,6 +192,8 @@ if not INCLUDE_GUARDS.REDEEM then
           self.data.queue_timer_duration = math.max(self.data.queue_timer_duration, 0)
         end
       end
+
+      self.data.allow_auto_queue = Imgui.checkbox("Auto Queue##" .. tostring(self), self.data.allow_auto_queue)
 
       -- ----------------------------------------------------
       Imgui.separator()

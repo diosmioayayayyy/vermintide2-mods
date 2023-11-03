@@ -8,7 +8,10 @@ const { ipcMain } = require('electron');
 function pick_random_redeem() {
   var p = Math.random();
   for (const [_, redeem] of Object.entries(global.twitch_redeems)) {
-    if (p > redeem["cdf"]) {
+    if (!redeem.auto_queue) {
+      continue;
+    }
+    if (p > redeem.cdf) {
       continue;
     }
     else{
@@ -19,7 +22,7 @@ function pick_random_redeem() {
         id: "",
         //user_id: "",
         user_login: "",
-        user_name: "",
+        user_name: "IdleQueue",
         user_input: "",
         status: "",
         redeemed_at: "",
@@ -95,7 +98,9 @@ class RedeemQueue {
     // Replace the following line with the function you want to execute on timer end
     var redeem = pick_random_redeem();
     console.log("Timer ended. Execute your function here.");
-    redeem_queue.push(redeem, true);
+    if (redeem) {
+      redeem_queue.push(redeem, true);
+    }
   }
 
   start_idle_timer(duration) {
@@ -110,8 +115,8 @@ class RedeemQueue {
     console.log("Started idle timer")
   }
 
-  reset_idle_timer() {
-    console.log("Reseting idle timer")
+  stop_idle_timer() {
+    console.log("Stopping idle timer")
     clearInterval(this.idle_timer_id);
     this.idle_timer_id = null;
   }
@@ -126,7 +131,7 @@ class RedeemQueue {
     redeem.user_chat_color = this.user_colors[redeem.user_id];
 
     if (!idle_redeem) {
-      this.reset_idle_timer();
+      this.stop_idle_timer();
     }
 
     var redeem_skips_queue = idle_redeem || (redeem_settings && redeem_settings.skip_queue_timer);

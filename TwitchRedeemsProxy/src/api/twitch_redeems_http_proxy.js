@@ -62,16 +62,32 @@ async function get_twitch_redeems() {
   // Compute probability to be picked during idle queuing.
   var sum_costs = 0;
   for (const [_, redeem] of Object.entries(redeems)) {
-    sum_costs += 1 / redeem["cost"];
+    var additional_setings = global.twitch_redeems_settings[redeem.title];
+    if (additional_setings && additional_setings.allow_auto_queue) {
+      sum_costs += 1 / redeem.cost
+    }
   }
 
   // Compute CDF for picking random redeems proportional to their cost.
   var cdf = 0;
-  for (const [_, redeem] of Object.entries(redeems)) {
-    var p = ( 1 / redeem["cost"]) / sum_costs;
-    redeem["probability"] = p;
-    cdf += p;
-    redeem["cdf"] = cdf;
+  for (const [redeem_key, redeem] of Object.entries(redeems)) {
+    redeem.auto_queue = false;
+
+    var additional_setings = global.twitch_redeems_settings[redeem.title];
+    if (additional_setings) {
+      redeem.auto_queue = additional_setings.allow_auto_queue;
+    }
+
+    if (redeem.auto_queue) {
+      var p = ( 1 / redeem.cost) / sum_costs;
+      redeem.probability = p;
+      cdf += p;
+      redeem.cdf = cdf;
+    }
+    else{
+      redeem.probability = 0;
+      redeem.cdf = 0;
+    }
   }
 
   return redeems;
@@ -246,7 +262,7 @@ function update_settings(body) {
     global.settings[key] = value;
   }
 
-  redeem_queue.reset_idle_timer();
+  redeem_queue.stop_idle_timer();
 }
 
 function check_response_status_codes(responses, success_code) {
@@ -363,6 +379,7 @@ async function handleRequestPost(request, response, body) {
     }
     else if (request.url == '/map_end') {
       console.log("Game is ending...");
+      redeem_queue.stop_idle_timer();
       redeem_queue.init();
       cancel_all_unfulfilled_redeems();
       console.log("Pausing redeems...");
